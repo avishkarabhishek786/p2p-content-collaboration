@@ -167,7 +167,7 @@
     //Required for blockchain API operators
     apiURL: {
       FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/', 'https://flosight.duckdns.org/', 'http://livenet-explorer.floexperiments.com/'],
-      FLO_TEST: ['https://testnet-flosight.duckdns.org', 'https://testnet.flocha.in/']
+      FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
     },
     adminID: "FMeiptdJNtYQEtzyYAVNP8fjsDJ1i4EPfE",
     //sendAmt: 0.001,
@@ -178,10 +178,12 @@
     supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
 
     //for cloud apps
-    subAdmins: [],
-    application: "Content Collaboration",
+    subAdmins: ['FTMMBXhn3K8UnVA3s6AiXhatwiaMUHffUo'],
+    application: "RIBC",
     vectorClock: {},
-    appObjects: {}
+    appObjects: {},
+    generalData: {},
+    generalVC: {}
   }
 </script>
 
@@ -4283,7 +4285,7 @@
                 cursor += 2 + sig[cursor + 1];
   
                 //if (cursor != sig.length)
-                //  throw new Error("Extra bytes in signature");
+                //	throw new Error("Extra bytes in signature");
   
                 var r = BigInteger.fromByteArrayUnsigned(rBa);
                 var s = BigInteger.fromByteArrayUnsigned(sBa);
@@ -7100,12 +7102,29 @@
             })
         },
 
+        sendGeneralData: function(message, type, options = {}){
+            this.sendApplicationData(message, type, options)
+                .then(result => reactor.dispatchEvent('logHandle',result))
+                .catch(error => reactor.dispatchEvent('errorHandle',error))
+        },
+
+        //request General Data
+        requestGeneralData: function(type, options = {}){
+            var filterStr = JSON.stringify({application: options.application || floGlobals.application, type: type, comment: options.comment})
+            options.type = type
+            options.lowerVectorClock = options.lowerVectorClock || floGlobals.generalVC[filterStr] + 1
+            this.requestApplicationData(options)
+                .then(dataSet => reactor.dispatchEvent("storeGeneralData", {filterStr: filterStr, dataSet:dataSet}))
+                .catch(error => reactor.dispatchEvent('errorHandle',error))
+        },
+
         //request an object data from supernode cloud
         requestObjectData: function(objectName, options = {}){
             var request = {
                 receiverID: options.receiverID || floGlobals.adminID,
                 senderIDs: (options.senderIDs === false) ? false: options.senderIDs || floGlobals.subAdmins,
                 application: options.application || floGlobals.application,
+                comment: options.comment,
                 type: `${objectName}@Reset`,
                 lowerVectorClock: floGlobals.vectorClock[objectName]+1,
                 mostRecent: true
@@ -7189,6 +7208,24 @@
         }
     });
 
+    reactor.registerEvent('storeGeneralData');
+    reactor.addEventListener('storeGeneralData', function(event){
+        try{
+            dataSet = JSON.parse(event.dataSet);
+            console.log(dataSet)
+            if(!Array.isArray(floGlobals.generalData[event.filterStr]))
+                floGlobals.generalData[event.filterStr] = [] 
+            for(vc in dataSet){
+                floGlobals.generalData[event.filterStr].push({sender: dataSet[vc].senderID, message: dataSet[vc].message})
+                compactIDB.writeData("generalData", floGlobals.generalData[event.filterStr], event.filterStr)
+                floGlobals.generalVC[event.filterStr] = vc
+                compactIDB.writeData("generalVC", vc, event.filterStr)
+            }
+        }catch(error){
+            console.log(error)
+        }
+    });
+
     reactor.registerEvent('errorHandle');
     reactor.addEventListener('errorHandle', function(event){
         console.log(event)
@@ -7212,8 +7249,8 @@
                         console.log(result)
                         floSupernode.kBucket.launch(Object.keys(floGlobals.supernodes),floGlobals.SNStorageID).then(result => {
                             console.log(result)
-                            loadObjectsFromIDB().then(result => {
-                                console.log(result)
+                            loadDataFromIDB().then(result => {
+                                console.log(result);
                                 cloudArticleApp.retrieveLatestContent();
                             }).catch(error => console.log(error))
                         }).catch(error => console.log(error))
@@ -7235,7 +7272,9 @@
                 credentials:{},
                 //any other objectstores if needed
                 appObjects:{},
-                vectorClocks:{}
+                vectorClocks:{},
+                generalData:{},
+                generalVC:{}
             }
             compactIDB.initDB(floGlobals.application, obj)
                 .then(result => resolve("Initiated supernode storage"))
@@ -7287,14 +7326,16 @@
         })
     }
 
-    function loadObjectsFromIDB(){
+    function loadDataFromIDB(){
         return new Promise((resolve,reject) => {
-            var promise1 = compactIDB.readAllData("appObjects")
-            var promise2 = compactIDB.readAllData("vectorClocks")
-            Promise.all([promise1,promise2]).then(results => {
-                floGlobals.appObjects = results[0]
-                floGlobals.vectorClock = results[1]
-                resolve("Loaded appObjects and vectorClocks from IDB")
+            var loadData = ["appObjects", "vectorClocks", "generalData", "generalVC"]
+            var promises = []
+            for(var i = 0; i < loadData.length; i++)
+                promises[i] = compactIDB.readAllData(loadData[i])
+            Promise.all(promises).then(results => {
+                for(var i = 0; i < loadData.length; i++)
+                    floGlobals[loadData[i]] = results[i]
+                resolve("Loaded Data from IDB")
             }).catch(error => reject(error))
         })
     }
@@ -7375,18 +7416,14 @@
         }) 
     }
 
-    function clearCredentials(type = 'Both'){
-        if(type === 'Both')
-            return clearCredentials('privKey') + clearCredentials('serverPass')
-        else if(type === 'privKey' || type === 'serverPass'){
-            var indexArr = localStorage.getItem(type)
-            if(!indexArr)
-                return `${type} credentials not found!\n`
-            indexArr = JSON.parse(indexArr)
-            indexArr.forEach(i => compactIDB.removeData('credentials', indexArr[i]))
-            localStorage.removeItem(type)
-            return `${type} credentials deleted!\n`
-        }
+    function clearCredentials(){
+        var indexArr = localStorage.getItem("privKey")
+        if(!indexArr)
+            return `privKey credentials not found!`
+        indexArr = JSON.parse(indexArr)
+        indexArr.forEach(i => compactIDB.removeData('credentials', i))
+        localStorage.removeItem("privKey")
+            return `privKey credentials deleted!`
     }
 </script>
 
@@ -7481,34 +7518,36 @@
 
         },
 
-        retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=false) {
+        retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
             floCloudAPI.requestObjectData(this.SUBJECT,{receiverID, senderIDs});
             await this.delay(5000);
             document.getElementById('current_data').innerHTML = '';
+
             this.showFullContentOfArticle(floGlobals.appObjects[this.SUBJECT]);
         },
 
         createNewArticle: function(article_name, div='', number_of_sections=cloudArticleApp.numberOfSections) {
             new_article = {};
             new_article[article_name] = {};
+            new_article[article_name].data = {};
             for (let j=0; j<number_of_sections; j++) {
                 i = j+1;
                 let content = '';
                 if(div=='reset_data_div') {
                     content = document.getElementById(`article_content${i}`).value;
-                    new_article[article_name][`section${i}`] = {};
-                    new_article[article_name][`section${i}`]["iteration0"] = {
+                    new_article[article_name].data[`section${i}`] = {};
+                    new_article[article_name].data[`section${i}`]["iteration0"] = {
                         content: content,
                         content_creator: myFloID,
                         score: 0
                     }
                 } else if(div=='update_data_div') {
                     content = document.getElementById(`article_content_up`).value;
-                    new_article[article_name][`section${i}`] = {};
+                    new_article[article_name].data[`section${i}`] = {};
                     if(i!==1) {
                         content = '';
                     }
-                    new_article[article_name][`section${i}`]["iteration0"] = {
+                    new_article[article_name].data[`section${i}`]["iteration0"] = {
                         content: content,
                         content_creator: myFloID,
                         score: 0
@@ -7518,6 +7557,7 @@
                 }
                     
             }
+
             return new_article;
         },
 
@@ -7565,8 +7605,12 @@
             console.log(floGlobals.appObjects[this.SUBJECT]);
             console.log(full_data);
 
-            floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT); 
-
+            if(floGlobals.subAdmins.includes(myFloID)) {
+                floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT); 
+            } else {
+                floCloudAPI.sendGeneralData(full_data,"typeContentCollab",{receiverID:floGlobals.adminID, senderIDs:[myFloID]})
+            }
+            
             this.retrieveLatestContent(); 
         },
 
@@ -7623,4 +7667,3 @@
 
 </body>
 </html>
-
