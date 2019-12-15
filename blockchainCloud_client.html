@@ -169,7 +169,8 @@
       FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/', 'https://flosight.duckdns.org/', 'http://livenet-explorer.floexperiments.com/'],
       FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
     },
-    adminID: "FMeiptdJNtYQEtzyYAVNP8fjsDJ1i4EPfE",
+    adminID: "F9Cs1wF7BS8fDj1gmCsuQ3kpBWRwQj7B2o",
+    //adminID: "FMeiptdJNtYQEtzyYAVNP8fjsDJ1i4EPfE",
     //sendAmt: 0.001,
     //fee: 0.0005,
 
@@ -179,7 +180,7 @@
 
     //for cloud apps
     subAdmins: ['FTMMBXhn3K8UnVA3s6AiXhatwiaMUHffUo'],
-    application: "RIBC",
+    application: "ContentCollaboration", // ContentCollaboration
     vectorClock: {},
     appObjects: {},
     generalData: {},
@@ -232,15 +233,9 @@
                         <h5>Reset</h5>
                         <label>Article Name: </label>
                         <input type="text" class="form-control" id="article_name"> <br>
-                        
-                        <label>Content1: </label>
-                        <input type="text" class="form-control" id="article_content1"> <br>
 
-                        <label>Content2: </label>
-                        <input type="text" class="form-control" id="article_content2"> <br>
-
-                        <label>Content3: </label>
-                        <input type="text" class="form-control" id="article_content3"> <br>
+                        <label>Number Of Sections: </label>
+                        <input type="text" class="form-control" id="section_nums"> <br>
                         
                         <input type="button" class="btn btn-secondary" id="reset_data_btn" value="Reset">
                     </div>
@@ -7216,7 +7211,7 @@
             if(!Array.isArray(floGlobals.generalData[event.filterStr]))
                 floGlobals.generalData[event.filterStr] = [] 
             for(vc in dataSet){
-                floGlobals.generalData[event.filterStr].push({sender: dataSet[vc].senderID, message: dataSet[vc].message})
+                floGlobals.generalData[event.filterStr].push({sender: dataSet[vc].senderID, vectorClock: vc, message: dataSet[vc].message})
                 compactIDB.writeData("generalData", floGlobals.generalData[event.filterStr], event.filterStr)
                 floGlobals.generalVC[event.filterStr] = vc
                 compactIDB.writeData("generalVC", vc, event.filterStr)
@@ -7425,6 +7420,20 @@
         localStorage.removeItem("privKey")
             return `privKey credentials deleted!`
     }
+
+    function getNextGeneralData(type, vectorClock, options = {}){
+        var filter = getFilterString(type, options)
+        var filteredResult = []
+        for(var i = 0; i<floGlobals.generalData[filter].length; i++)
+            if(floGlobals.generalData[filter][i].vectorClock > vectorClock)
+                filteredResult.push(floGlobals.generalData[filter][i])
+        return filteredResult
+    }
+
+    function getFilterString(type, options = {}){
+        var filterStr = JSON.stringify({application: options.application || floGlobals.application, type: type, comment: options.comment})
+        return filterStr
+    }
 </script>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -7435,9 +7444,11 @@
     
     const cloudArticleApp = {
 
-        SUBJECT: "testArticle",
+        SUBJECT: "testArticle2",
 
         numberOfSections: 5,
+
+        CONTENT_TYPE: "typeContentCollab",
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -7456,6 +7467,22 @@
             let full_data_div = document.getElementById('current_data');
             let full_article_div = document.getElementById('full_article_div');
             const articleSubject = floGlobals.appObjects[this.SUBJECT]; 
+
+            new_entries_array = [];
+            
+			for(new_data of Object.values(floGlobals.generalData)[0]) {
+			    new_obj = {
+			        content:new_data.message.content,
+			        content_creator: new_data.message.content_creator,
+			        score: 0
+			    }
+			    if(typeof new_data.message.section == "string") {
+			    	if(typeof new_entries_array[new_data.message.section] !== "object")
+				    		new_entries_array[new_data.message.section] = [];
+			    	new_entries_array[new_data.message.section].push(new_obj);
+				}  
+			}
+
             let t = ``;
 
             for(key in obj) {
@@ -7463,10 +7490,21 @@
                     t += `<h4 class="card text-center margin-15 padding-8">${key}</h4>`;
                 }
 
-                for(secKey in articleSubject[key]) {
-                    const secObject = articleSubject[key][secKey];
-                    // Sort by score
+                for(secKey in articleSubject[key].data) {
+                    const secObject = articleSubject[key].data[secKey];
+             
+                    // Add non scored new entries from users
+                    if(typeof new_entries_array[secKey]==="object") {
+                        let temp_iter_count = 0; 
+						for(new_conts of new_entries_array[secKey]) {
+						    secObject[`temp_iter_${temp_iter_count}`]= new_conts;
+						    temp_iter_count++;
+						}
+                    }
+
+			        // Sort by score
                     let secObj = Object.values(secObject).sort((a,b)=>b.score-a.score);
+                    console.log(secObj);
 
                     t += `<div id="paginated_gallery" class="gallery">
                         <div class="gallery_scroller">`;
@@ -7482,7 +7520,7 @@
                               </div>
                               <div class="card-body set-flex">
                               <div class="card-text content_div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" onfocusout="cloudArticleApp.edit_onfocuout()">
-                                ${article_data.content}
+                                ${this.paraTrimmer(article_data.content)}
                               </div>
                               <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
                             </div>
@@ -7502,6 +7540,7 @@
 
             const gallery = document.querySelector('#paginated_gallery');
             const gallery_scroller = gallery.querySelector('.gallery_scroller');
+            if(typeof gallery_scroller==null) return;
             const gallery_item_size = gallery_scroller.querySelector('div').clientWidth;
 
             gallery.querySelector('.btn.next').addEventListener('click', scrollToNextPage);
@@ -7520,9 +7559,9 @@
 
         retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
             floCloudAPI.requestObjectData(this.SUBJECT,{receiverID, senderIDs});
+            floCloudAPI.requestGeneralData(this.CONTENT_TYPE);
             await this.delay(5000);
             document.getElementById('current_data').innerHTML = '';
-
             this.showFullContentOfArticle(floGlobals.appObjects[this.SUBJECT]);
         },
 
@@ -7534,10 +7573,10 @@
                 i = j+1;
                 let content = '';
                 if(div=='reset_data_div') {
-                    content = document.getElementById(`article_content${i}`).value;
+                    //content = document.getElementById(`article_content${i}`).value;
                     new_article[article_name].data[`section${i}`] = {};
                     new_article[article_name].data[`section${i}`]["iteration0"] = {
-                        content: content,
+                        content: "",
                         content_creator: myFloID,
                         score: 0
                     }
@@ -7563,10 +7602,10 @@
 
         resetArticleContent: function() {
             const article_name = document.getElementById('article_name').value;
-            let number_of_sections = document.getElementById('num_sections').value;
+            let number_of_sections = document.getElementById('section_nums').value;
             number_of_sections = Number(number_of_sections);
             if(number_of_sections<1) throw new Error('Error: Number of sections must be more than 0.');
-            let new_article = this.createNewArticle(article_name, 'reset_data_div', num_sections);
+            let new_article = this.createNewArticle(article_name, 'reset_data_div', number_of_sections);
             floCloudAPI.resetObjectData(new_article, this.SUBJECT,
             {receiverID:floGlobals.adminID});
 
@@ -7588,27 +7627,34 @@
                 article = full_data[article_name];
             }
 
-            let iterNumber = Object.keys(article[section]).map(f=>{
+            let iterNumber = Object.keys(article.data[section]).map(f=>{
                 return f.match(/\d+/)[0];
             }).reduce(function(prev, current) {
                 return (prev.y > current.y) ? prev : current
             });
 
-            let oldArticle = article[section][`iteration${iterNumber}`];
+            let oldArticle = article.data[section][`iteration${iterNumber}`];
             let iterNum = Number(iterNumber)+1;
-            article[section][`iteration${iterNum}`] = {
+            article.data[section][`iteration${iterNum}`] = {
                 content: newcontent,
                 content_creator: myFloID,
-                score: Math.floor((Math.random() * 10) + 1)
+                score: 0
             };
 
             console.log(floGlobals.appObjects[this.SUBJECT]);
             console.log(full_data);
 
             if(floGlobals.subAdmins.includes(myFloID)) {
-                floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT); 
+                floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
             } else {
-                floCloudAPI.sendGeneralData(full_data,"typeContentCollab",{receiverID:floGlobals.adminID, senderIDs:[myFloID]})
+            	const general_data_obj = {
+            		article_name: article_name,
+            		content: newcontent,
+	                content_creator: myFloID,
+	                section: section,
+	                score: 0
+            	}
+            	floCloudAPI.sendGeneralData(general_data_obj,this.CONTENT_TYPE,{receiverID:floGlobals.adminID, senderIDs:[myFloID]});
             }
             
             this.retrieveLatestContent(); 
@@ -7621,7 +7667,7 @@
 
         edit_onfocuout: function(event) {
             let target = this.getEventTarget(event);
-            const updated_content = target.innerText;   
+            const updated_content = target.innerText.replace('..' , '');   
             const updated_content_hash = Crypto.SHA256(updated_content);
             let editable_div = document.getElementsByClassName('content_div');
             let _id = target.id;
@@ -7634,29 +7680,21 @@
             cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content);
         },
 
+        paraTrimmer: function(str='', maxLength=30) {
+        	if(str.length<1) return "";
+			//trim the string to the maximum length
+			var trimmedString = str.substr(0, maxLength);
+			//re-trim if we are in the middle of a word
+			trimmedString = trimmedString.substr(0, Math.min(trimmedString.length, trimmedString.lastIndexOf(" ")));
+			return (str.length>maxLength) ? trimmedString+'..' : trimmedString;
+		}
+
     }
 
-    function contentSettings(content_name="", content_sections=5) {
-      return {
-        getContentName: function() {
-          return content_name;
-        },
-        setContentName: function(name) {
-            content_name = name;
-        },
-        getNumberOfSections: function() {
-          return content_sections;
-        },
-        setNumberOfSections: function(num) {
-            content_sections = num;
-        },
-      };
-    }
  </script>
 
  <script>
     (function() {
-        //const SUBJECT = "testArticle";
         const reset_data_btn = document.getElementById('reset_data_btn');
         reset_data_btn.onclick = function() {
             cloudArticleApp.resetArticleContent();
