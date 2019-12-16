@@ -7464,13 +7464,15 @@
         },
 
         showFullContentOfArticle: function(obj) {
-            let full_data_div = document.getElementById('current_data');
-            let full_article_div = document.getElementById('full_article_div');
+            const full_data_div = document.getElementById('current_data');
+            const full_article_div = document.getElementById('full_article_div');
             const articleSubject = floGlobals.appObjects[this.SUBJECT]; 
 
-            new_entries_array = [];
+            const new_generalData = getNextGeneralData(this.CONTENT_TYPE, floGlobals.vectorClock[this.SUBJECT]);
+
+            let new_entries_array = [];
             
-			for(new_data of Object.values(floGlobals.generalData)[0]) {
+			for(new_data of new_generalData) {
 			    new_obj = {
 			        content:new_data.message.content,
 			        content_creator: new_data.message.content_creator,
@@ -7478,7 +7480,7 @@
 			    }
 			    if(typeof new_data.message.section == "string") {
 			    	if(typeof new_entries_array[new_data.message.section] !== "object")
-				    		new_entries_array[new_data.message.section] = [];
+			    		new_entries_array[new_data.message.section] = [];
 			    	new_entries_array[new_data.message.section].push(new_obj);
 				}  
 			}
