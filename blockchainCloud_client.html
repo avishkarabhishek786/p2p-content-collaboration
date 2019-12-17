@@ -63,9 +63,14 @@
           border-radius: 10px;
         }
 
+		.gallery_scroller div.card-body {
+		    height: 450em;
+		}
+
         .gallery_scroller div.colored_card {
           min-width: 40%;
           min-height: 100%;
+          max-height: 300px;	
           border-radius: 10px;
           background-color: #343a40;
           color: aliceblue;
@@ -123,6 +128,11 @@
 
         .content_div {
             flex: 1;
+            padding: 2px 2px;
+            overflow-x: hidden;
+            overflow-y: auto;
+    		max-height: 250px;
+    		font-size: 3vh;
         }
 
         .card-header {
@@ -135,14 +145,16 @@
           
         }
 
+
+
         /* Scrollbar */
         ::-webkit-scrollbar {
           width: 10px;
         }
 
-        /* Track */
+        /* Track   f1f1f1, 888, 555*/
         ::-webkit-scrollbar-track {
-          background: #f1f1f1; 
+          background: #343a40;  
         }
          
         /* Handle */
@@ -7424,9 +7436,11 @@
     function getNextGeneralData(type, vectorClock, options = {}){
         var filter = getFilterString(type, options)
         var filteredResult = []
-        for(var i = 0; i<floGlobals.generalData[filter].length; i++)
-            if(floGlobals.generalData[filter][i].vectorClock > vectorClock)
-                filteredResult.push(floGlobals.generalData[filter][i])
+        if(typeof floGlobals.generalData[filter]=="object") {
+        	for(var i = 0; i<floGlobals.generalData[filter].length; i++)
+	            if(floGlobals.generalData[filter][i].vectorClock > vectorClock)
+	                filteredResult.push(floGlobals.generalData[filter][i])
+        }
         return filteredResult
     }
 
@@ -7444,11 +7458,11 @@
     
     const cloudArticleApp = {
 
-        SUBJECT: "testArticle2",
+        SUBJECT: "testArticle3",
 
         numberOfSections: 5,
 
-        CONTENT_TYPE: "typeContentCollab",
+        CONTENT_TYPE: "typeContentCollab3",
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -7476,7 +7490,8 @@
 			    new_obj = {
 			        content:new_data.message.content,
 			        content_creator: new_data.message.content_creator,
-			        score: 0
+			        score: 0,
+			        vectorClock: new_data.vectorClock
 			    }
 			    if(typeof new_data.message.section == "string") {
 			    	if(typeof new_entries_array[new_data.message.section] !== "object")
@@ -7499,7 +7514,7 @@
                     if(typeof new_entries_array[secKey]==="object") {
                         let temp_iter_count = 0; 
 						for(new_conts of new_entries_array[secKey]) {
-						    secObject[`temp_iter_${temp_iter_count}`]= new_conts;
+							secObject[`temp_iter_${temp_iter_count}`]= new_conts;
 						    temp_iter_count++;
 						}
                     }
@@ -7514,7 +7529,8 @@
                     for(iterKey in secObj) {
                         const article_data = secObj[iterKey];
                         const gen_div_id = this.unique_id();
-                        const content_hash = Crypto.SHA256(article_data.content);
+                        const content_hash = Crypto.SHA256(article_data.content.trim());
+                        let vc = article_data.vectorClock || "";
                         t += 
                             `<div class="card colored_card">
                               <div class="card-header">
@@ -7522,13 +7538,13 @@
                               </div>
                               <div class="card-body set-flex">
                               <div class="card-text content_div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" onfocusout="cloudArticleApp.edit_onfocuout()">
-                                ${this.paraTrimmer(article_data.content)}
+                                ${article_data.content.trim()}
                               </div>
                               <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
                             </div>
                             <div class="card-footer">
                               <small class="text-muted">Section: ${secKey} </small>
-                              <small class="text-muted float-right">SCORE: ${article_data.score}</small>
+                              <small class="text-muted float-right" id="score_${vc}" onclick="cloudArticleApp.upgrade_article()">SCORE: ${article_data.score}</small>
                             </div>
                           </div>`;
                     }         
@@ -7541,8 +7557,9 @@
             full_data_div.innerHTML = t;
 
             const gallery = document.querySelector('#paginated_gallery');
+            if(gallery==null) return;
             const gallery_scroller = gallery.querySelector('.gallery_scroller');
-            if(typeof gallery_scroller==null) return;
+            if(gallery_scroller==null) return;
             const gallery_item_size = gallery_scroller.querySelector('div').clientWidth;
 
             gallery.querySelector('.btn.next').addEventListener('click', scrollToNextPage);
@@ -7616,12 +7633,10 @@
             return true;    
         }, 
 
-        addArticleContent: function(article_name="", section="", newcontent="") {
+        addArticleContent: function(article_name="", section="", newcontent="", content_creator="", score=0, vectorClock="") {
             this.retrieveLatestContent();  
             let full_data =  Object.assign({}, floGlobals.appObjects[this.SUBJECT]);
             let article = full_data[article_name];
-            //if(typeof article!=="object") throw new Error("Error: No such article found.");
-            //if(typeof article[section]!=="object") throw new Error("Error: No such section found.");
 
             if(typeof article!=="object") {
                 make_article=this.createNewArticle(article_name, 'update_data_div');
@@ -7637,14 +7652,13 @@
 
             let oldArticle = article.data[section][`iteration${iterNumber}`];
             let iterNum = Number(iterNumber)+1;
+            
             article.data[section][`iteration${iterNum}`] = {
                 content: newcontent,
-                content_creator: myFloID,
-                score: 0
+                content_creator: content_creator,
+                score: score,
+                vectorClock: vectorClock
             };
-
-            console.log(floGlobals.appObjects[this.SUBJECT]);
-            console.log(full_data);
 
             if(floGlobals.subAdmins.includes(myFloID)) {
                 floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
@@ -7669,7 +7683,7 @@
 
         edit_onfocuout: function(event) {
             let target = this.getEventTarget(event);
-            const updated_content = target.innerText.replace('..' , '');   
+            const updated_content = target.innerText.trim().replace('..' , '');   
             const updated_content_hash = Crypto.SHA256(updated_content);
             let editable_div = document.getElementsByClassName('content_div');
             let _id = target.id;
@@ -7682,13 +7696,33 @@
             cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content);
         },
 
+        upgrade_article: function(event) {
+    		let new_score = prompt("Enter Score: ", 0);
+    		new_score = Number(new_score);
+    		if(typeof new_score!=="number" || new_score<=0) return;
+    		let target = cloudArticleApp.getEventTarget(event);
+			let article_vc = target.id.substr(6);
+			let contents = floGlobals.appObjects[this.SUBJECT];
+			for(title of Object.keys(contents)) {
+				for(sections of Object.keys(contents[title].data)) {
+					for(iters of Object.values(contents[title].data[sections])) {
+						if(typeof iters.vectorClock==="string"
+							&& iters.vectorClock==article_vc) {
+							cloudArticleApp.addArticleContent(title, sections, iters.content,
+								iters.content_creator, new_score, article_vc);
+						}
+					}
+				}
+			}
+        },
+
         paraTrimmer: function(str='', maxLength=30) {
         	if(str.length<1) return "";
 			//trim the string to the maximum length
 			var trimmedString = str.substr(0, maxLength);
 			//re-trim if we are in the middle of a word
 			trimmedString = trimmedString.substr(0, Math.min(trimmedString.length, trimmedString.lastIndexOf(" ")));
-			return (str.length>maxLength) ? trimmedString+'..' : trimmedString;
+			return (str.length>maxLength) ? trimmedString.trim()+'..' : trimmedString.trim();
 		}
 
     }
