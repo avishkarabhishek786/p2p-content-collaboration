@@ -7458,11 +7458,13 @@
     
     const cloudArticleApp = {
 
-        SUBJECT: "testArticle3",
+        SUBJECT: "testArticle4",
 
         numberOfSections: 5,
 
-        CONTENT_TYPE: "typeContentCollab3",
+        CONTENT_TYPE: "typeContentCollab4",
+
+        subAdminsPublicKeys: ["03E458DB877FD1EA79470702A4F8858BA038935B64883EAC4C4748CA549A9F45CC"],
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -7521,8 +7523,8 @@
 
 			        // Sort by score
                     let secObj = Object.values(secObject).sort((a,b)=>b.score-a.score);
-                    console.log(secObj);
-
+                    const vc_array = [];
+            
                     t += `<div id="paginated_gallery" class="gallery">
                         <div class="gallery_scroller">`;
                     
@@ -7531,6 +7533,22 @@
                         const gen_div_id = this.unique_id();
                         const content_hash = Crypto.SHA256(article_data.content.trim());
                         let vc = article_data.vectorClock || "";
+
+			            if(Number(article_data.score)>0) {
+	                        const new_content_object = {
+				                content: article_data.content,
+				                content_creator: article_data.content_creator,
+				                score: article_data.score,
+				                vectorClock: article_data.vectorClock,
+				                signerPubKey: article_data.signerPubKey
+				            }
+				            if(!this.subAdminsPublicKeys.includes(article_data.signerPubKey)) continue;
+			            	if(floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey)!==true) continue;
+			            	if(vc.length>0) vc_array.push(vc);
+			            } else {
+			            	if(vc_array.includes(vc)) continue;
+			            }
+
                         t += 
                             `<div class="card colored_card">
                               <div class="card-header">
@@ -7549,8 +7567,9 @@
                           </div>`;
                     }         
                     t += `</div>
-                      <span class="btn prev"></span>
-                      <span class="btn next"></span></div>`;
+                        <span class="btn prev"></span>
+                        <span class="btn next"></span>
+                      </div>`;
                 }
                 
             }
@@ -7635,7 +7654,8 @@
 
         addArticleContent: function(article_name="", section="", newcontent="", content_creator="", score=0, vectorClock="") {
             this.retrieveLatestContent();  
-            let full_data =  Object.assign({}, floGlobals.appObjects[this.SUBJECT]);
+            //let full_data =  Object.assign({}, floGlobals.appObjects[this.SUBJECT]);
+            let full_data =  JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
             let article = full_data[article_name];
 
             if(typeof article!=="object") {
@@ -7652,13 +7672,18 @@
 
             let oldArticle = article.data[section][`iteration${iterNumber}`];
             let iterNum = Number(iterNumber)+1;
-            
-            article.data[section][`iteration${iterNum}`] = {
+
+            const new_content_object = {
                 content: newcontent,
                 content_creator: content_creator,
                 score: score,
-                vectorClock: vectorClock
-            };
+                vectorClock: vectorClock,
+                signerPubKey: myPubKey
+            }
+
+            new_content_object.sign = floCrypto.signData(JSON.stringify(new_content_object), myPrivKey);
+
+            article.data[section][`iteration${iterNum}`] = new_content_object;
 
             if(floGlobals.subAdmins.includes(myFloID)) {
                 floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
@@ -7668,8 +7693,11 @@
             		content: newcontent,
 	                content_creator: myFloID,
 	                section: section,
-	                score: 0
+	                score: 0,
+	                signerPubKey: myPubKey
             	}
+	            general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
+
             	floCloudAPI.sendGeneralData(general_data_obj,this.CONTENT_TYPE,{receiverID:floGlobals.adminID, senderIDs:[myFloID]});
             }
             
