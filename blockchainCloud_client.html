@@ -166,6 +166,83 @@
         ::-webkit-scrollbar-thumb:hover {
           background: #555; 
         }
+
+
+        /*logs*/
+        .sidenav {
+            position: fixed;
+            z-index: 1;
+            top: 84px;
+            left: 10px;
+            background: #eee;
+            overflow-x: hidden;
+        }
+
+        .w3-sidebar {
+            height: 100%;
+            width: auto;
+            transition: width 2s ease 0s;
+            -webkit-transition: width 2s;
+            position: fixed !important;
+            z-index: 1;
+        }
+
+        .w3-bar-block .w3-bar-item {
+            display: block;
+            padding: 8px 16px;
+            text-align: left;
+            border: none;
+            white-space: normal;
+            float: none;
+            outline: 0;
+            color: #fff;
+        }
+
+        .w3-large {
+            font-size: 18px !important;
+        }
+
+        .bg-black {
+            background-color: #101010;
+        }
+
+        .w3-bar-block .w3-bar-item {
+            display: block;
+            padding: 8px 16px;
+            text-align: left;
+            border: none;
+            white-space: normal;
+            float: none;
+            outline: 0;
+            color: #fff;
+        }
+
+        pre {
+            max-height: 20em;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 2px 5px;
+            color: #0f0;
+            background-color: #111;
+            border: 1px solid #030;
+            overflow: auto;
+            margin: 0;
+            white-space: pre-line;
+        }
+
+        .w3-xlarge {
+            font-size: 24px !important;
+        }
+
+        .w3-teal,
+        .w3-hover-teal:hover {
+            color: #fff !important;
+        }
+
+        user agent stylesheet div {
+            display: block;
+        }
+
     </style>
 </head>
 
@@ -201,6 +278,17 @@
 </script>
 
 <body onload="onLoadStartUp()">
+
+	<div class="sidenav">
+        <div class="w3-sidebar w3-bar-block" style="display: block; width: 98%;" id="mySidebar">
+            <div onclick="closeMessage()" class="w3-bar-item w3-button w3-large bg-black">Close</div>
+            <pre id="log">Event information log
+                =====================
+            </pre>
+        </div>
+        <div class="w3-button w3-teal w3-xlarge" onclick="displayMessages()">☰</div>
+    </div>
+
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <span class="navbar-brand mb-0 h1">Blockchain Content Collaboration</span>
@@ -7247,17 +7335,24 @@
     function onLoadStartUp() {
         initIndexedDB().then(result => {
             console.log(result)
+            showMessage(result)
             getCredentials().then(result => {
                 console.log(result)
-                alert(`FLO_ID: ${myFloID}`)
+                showMessage(result)
+                showMessage(`FLO_ID: ${myFloID}`)
                 readSubAdminListFromAPI().then(result => {
                     console.log(result)
+                    showMessage(result)
                     readSupernodeListFromAPI().then(result => {
                         console.log(result)
+                        showMessage(result)
                         floSupernode.kBucket.launch(Object.keys(floGlobals.supernodes),floGlobals.SNStorageID).then(result => {
                             console.log(result)
+                            showMessage(result)
                             loadDataFromIDB().then(result => {
                                 console.log(result);
+                                showMessage(result)
+                                showMessage('Loading latest data...')
                                 cloudArticleApp.retrieveLatestContent();
                             }).catch(error => console.log(error))
                         }).catch(error => console.log(error))
@@ -7430,7 +7525,9 @@
         indexArr = JSON.parse(indexArr)
         indexArr.forEach(i => compactIDB.removeData('credentials', i))
         localStorage.removeItem("privKey")
-            return `privKey credentials deleted!`
+        let info = `privKey credentials deleted!`;
+        showMessage(info)
+            return info;
     }
 
     function getNextGeneralData(type, vectorClock, options = {}){
@@ -7455,6 +7552,32 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 <script>
+    function displayMessages() {
+        document.getElementById("mySidebar").style.width = "98%";
+        document.getElementById("mySidebar").style.display = "block";
+    }
+
+    function closeMessage() {
+        document.getElementById("mySidebar").style.display = "none";
+    }
+
+    function LogEvent(msg) {
+        log.textContent += "> " + msg + "\n";
+        var ot = log.scrollHeight - log.clientHeight;
+        if (ot > 0) log.scrollTop = ot;
+    }
+
+    function showMessage(msg = '', t = 10000) {
+        if (msg.length > 0) LogEvent(msg);
+        displayMessages();
+        setTimeout(function () {
+            closeMessage();
+            clearTimeout();
+        }, t);
+    }
+</script>
+
+<script>
     
     const cloudArticleApp = {
 
@@ -7463,8 +7586,6 @@
         numberOfSections: 5,
 
         CONTENT_TYPE: "typeContentCollab4",
-
-        subAdminsPublicKeys: ["03E458DB877FD1EA79470702A4F8858BA038935B64883EAC4C4748CA549A9F45CC"],
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -7542,7 +7663,7 @@
 				                vectorClock: article_data.vectorClock,
 				                signerPubKey: article_data.signerPubKey
 				            }
-				            if(!this.subAdminsPublicKeys.includes(article_data.signerPubKey)) continue;
+				            if(!floGlobals.subAdmins.includes(bitjs.pubkey2address(myPubKey))) continue;
 			            	if(floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey)!==true) continue;
 			            	if(vc.length>0) vc_array.push(vc);
 			            } else {
@@ -7639,10 +7760,15 @@
         },
 
         resetArticleContent: function() {
+        	showMessage(`Creating new article...`);
             const article_name = document.getElementById('article_name').value;
             let number_of_sections = document.getElementById('section_nums').value;
             number_of_sections = Number(number_of_sections);
-            if(number_of_sections<1) throw new Error('Error: Number of sections must be more than 0.');
+            if(number_of_sections<1) {
+            	let err = 'Error: Number of sections must be more than 0.';
+            	showMessage(err)
+            	throw new Error(err)
+            }
             let new_article = this.createNewArticle(article_name, 'reset_data_div', number_of_sections);
             floCloudAPI.resetObjectData(new_article, this.SUBJECT,
             {receiverID:floGlobals.adminID});
@@ -7654,7 +7780,6 @@
 
         addArticleContent: function(article_name="", section="", newcontent="", content_creator="", score=0, vectorClock="") {
             this.retrieveLatestContent();  
-            //let full_data =  Object.assign({}, floGlobals.appObjects[this.SUBJECT]);
             let full_data =  JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
             let article = full_data[article_name];
 
@@ -7684,6 +7809,8 @@
             new_content_object.sign = floCrypto.signData(JSON.stringify(new_content_object), myPrivKey);
 
             article.data[section][`iteration${iterNum}`] = new_content_object;
+
+            showMessage(`Adding new iteration to article ${article_name}`);
 
             if(floGlobals.subAdmins.includes(myFloID)) {
                 floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
@@ -7743,15 +7870,6 @@
 				}
 			}
         },
-
-        paraTrimmer: function(str='', maxLength=30) {
-        	if(str.length<1) return "";
-			//trim the string to the maximum length
-			var trimmedString = str.substr(0, maxLength);
-			//re-trim if we are in the middle of a word
-			trimmedString = trimmedString.substr(0, Math.min(trimmedString.length, trimmedString.lastIndexOf(" ")));
-			return (str.length>maxLength) ? trimmedString.trim()+'..' : trimmedString.trim();
-		}
 
     }
 
