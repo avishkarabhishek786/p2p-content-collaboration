@@ -1,248 +1,326 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Content Collaboration</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-
+    <title>Content Collaboration</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="blockchain,ContentCollaboration,RanchiMall">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="This web app can be used to collaborate between various teams using blockchain technology.">
+    <!--<link rel="stylesheet" href="css/main.css">-->
     <style>
-        html, body {
-          padding: 0;
-          position: absolute;
-          left: 0;
-          right: 0;
-          font-size: 20px;
+        @font-face {
+        font-family: 'Roboto';
+        font-style: normal;
+        src: url("../fonts/roboto-v20-latin-regular.eot");
+        src: local("Roboto"), local("Roboto-Regular"), url("../fonts/roboto-v20-latin-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto-v20-latin-regular.woff2") format("woff2"), url("../fonts/roboto-v20-latin-regular.woff") format("woff"), url("../fonts/roboto-v20-latin-regular.ttf") format("truetype"), url("../fonts/roboto-v20-latin-regular.svg#Roboto") format("svg");
         }
 
         body {
-            background-color: #000000;
+        margin: 0;
+        font-size: 16px;
+        background: #111;
         }
 
-        .margin-15 {
-            margin: 15px 15px;
+        * {
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        font-family: 'Roboto', sans-serif;
         }
 
-        .padding-8 {
-            padding: 8px 8px;   
-        }
-
-        .gallery {
-          position: relative;
-          /*max-width: 800px;*/
-          padding: 0 10;
-          margin-bottom: 50px;
-        }
-
-        .gallery_scroller {
-           /* snap mandatory on horizontal axis  */
-          scroll-snap-type: x mandatory;
-
-          overflow-x: scroll;
-          overflow-y: hidden;
-
-          display: flex;
-          align-items: center;
-
-          height: 500px;
-          
-          /* Enable Safari touch scrolling physics which is needed for scroll snap */
-          -webkit-overflow-scrolling: touch;
-        }
-
-
-        .gallery_scroller div {
-           /* snap align center  */
-          scroll-snap-align: center;
-          margin: 10px;
-          position: relative;
-        }
-
-        .gallery_scroller img {
-          border-radius: 10px;
-        }
-
-		.gallery_scroller div.card-body {
-		    height: 450em;
-		}
-
-        .gallery_scroller div.colored_card {
-          min-width: 40%;
-          min-height: 100%;
-          max-height: 300px;	
-          border-radius: 10px;
-          background-color: #343a40;
-          color: aliceblue;
-         }
-
-        .gallery div.note {
-          position: absolute;
-
-          /* vertically align center */
-          top:  50%;
-          transform: translateY(-50%);
-          left: 0;
-          right: 0;
-
-          background: rgba(0,0,0, 0.6);
-          padding: 20px;
-          position: absolute;
-
-          font-size: 4em;
-          color: white;
-        }
-
-
-        .gallery .btn {
-          position: absolute;
-
-          top: 50%;
-          transform: translateY(-50%);
-
-          height: 30px;
-          width: 30px;
-
-          border-radius: 2px;
-          background-color: rgba(0,0,0,0.5);
-          background-position: 50% 50%;
-          background-repeat: no-repeat;
-
-          z-index: 1;
-        }
-
-        .gallery .btn.next {
-          background-image: url('data:image/svg+xml;charset=utf-8,<svg width="18" height="18" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><title>Shape</title><path d="M25.557 14.7L13.818 2.961 16.8 0l16.8 16.8-16.8 16.8-2.961-2.961L25.557 18.9H0v-4.2z" fill="%23FFF" fill-rule="evenodd"/></svg>');
-          right: 10px;
-        }
-
-        .gallery .btn.prev {
-          background-image: url('data:image/svg+xml;charset=utf-8,<svg width="18" height="18" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><title>Shape</title><path d="M33.6 14.7H8.043L19.782 2.961 16.8 0 0 16.8l16.8 16.8 2.961-2.961L8.043 18.9H33.6z" fill="%23FFF" fill-rule="evenodd"/></svg>');
-          left: 10px;
-        }
-
-        .set-flex {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .content_div {
-            flex: 1;
-            padding: 2px 2px;
-            overflow-x: hidden;
-            overflow-y: auto;
-    		max-height: 250px;
-    		font-size: 3vh;
-        }
-
-        .card-header {
-            font-size: medium;
-        }
-        .float-right {
-            float: right;
-        }
-        .gallery {
-          
-        }
-
-
-
-        /* Scrollbar */
         ::-webkit-scrollbar {
-          width: 10px;
+        width: 0.5em;
+        height: 0.5em;
         }
 
-        /* Track   f1f1f1, 888, 555*/
         ::-webkit-scrollbar-track {
-          background: #343a40;  
+        background: rgba(255, 255, 255, 0.1);
         }
-         
-        /* Handle */
+
         ::-webkit-scrollbar-thumb {
-          background: #888; 
+        background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Handle on hover */
         ::-webkit-scrollbar-thumb:hover {
-          background: #555; 
+        background: #555;
         }
 
-
-        /*logs*/
-        .sidenav {
-            position: fixed;
-            z-index: 1;
-            top: 84px;
-            left: 10px;
-            background: #eee;
-            overflow-x: hidden;
+        button {
+        -ms-flex-item-align: start;
+            align-self: flex-start;
+        display: flexbox;
+        background: transparent;
+        color: white;
+        padding: 1em 2em;
+        border: none;
+        -webkit-transition: background 0.2s ease;
+        transition: background 0.2s ease;
         }
 
-        .w3-sidebar {
-            height: 100%;
-            width: auto;
-            transition: width 2s ease 0s;
-            -webkit-transition: width 2s;
-            position: fixed !important;
-            z-index: 1;
+        button:hover {
+        background: linear-gradient(45deg, teal, mediumSpringGreen);
+        cursor: pointer;
         }
 
-        .w3-bar-block .w3-bar-item {
-            display: block;
-            padding: 8px 16px;
-            text-align: left;
-            border: none;
-            white-space: normal;
-            float: none;
-            outline: 0;
-            color: #fff;
+        button:first-of-type {
+        margin-left: auto;
         }
 
-        .w3-large {
-            font-size: 18px !important;
+        input {
+        -ms-flex-item-align: start;
+            align-self: flex-start;
+        display: flexbox;
+        width: 100%;
+        padding: 1em;
+        margin: 1em 0;
+        color: white;
         }
 
-        .bg-black {
-            background-color: #101010;
+        #modal_container {
+        position: fixed;
+        display: -ms-grid;
+        display: grid;
+        width: 100vw;
+        height: 100vh;
+        place-items: center;
+        z-index: 12;
+        background: rgba(0, 0, 0, 0.6);
+        -webkit-transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease;
         }
 
-        .w3-bar-block .w3-bar-item {
-            display: block;
-            padding: 8px 16px;
-            text-align: left;
-            border: none;
-            white-space: normal;
-            float: none;
-            outline: 0;
-            color: #fff;
+        #article_creation_modal {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+        width: 24em;
+        background: #222;
+        padding: 1em 2em;
+        color: white;
         }
 
-        pre {
-            max-height: 20em;
-            font-family: monospace;
-            font-size: 12px;
-            padding: 2px 5px;
-            color: #0f0;
-            background-color: #111;
-            border: 1px solid #030;
-            overflow: auto;
-            margin: 0;
-            white-space: pre-line;
+        #article_creation_modal h3 {
+        font-weight: normal;
         }
 
-        .w3-xlarge {
-            font-size: 24px !important;
+        #article_creation_modal input {
+        -ms-flex-item-align: start;
+            align-self: flex-start;
+        display: flexbox;
+        width: 100%;
+        padding: 1em;
+        border: solid 1px rgba(0, 0, 0, 0.2);
+        margin: 1em 0;
+        background: #111;
+        color: white;
         }
 
-        .w3-teal,
-        .w3-hover-teal:hover {
-            color: #fff !important;
+        #article_creation_modal button {
+        margin: 1em 0;
         }
 
-        user agent stylesheet div {
-            display: block;
+        #article_creation_modal button:first-of-type {
+        margin-left: auto;
         }
 
+        .section-title {
+        color: white;
+        }
+
+        .gallery-container {
+        position: relative;
+        }
+
+        .gallery-container:hover .navigation-arrows {
+        opacity: 1;
+        }
+
+        .gallery-container .navigation-arrows {
+        -webkit-transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease;
+        opacity: 0;
+        background: rgba(0, 0, 0, 0.8);
+        cursor: pointer;
+        padding: 0.5em;
+        height: 4em;
+        width: 2em;
+        z-index: 2;
+        position: absolute;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+                transform: translateY(-50%);
+        fill: white;
+        }
+
+        .gallery-container svg:nth-of-type(2) {
+        right: 0;
+        }
+
+        .gallery {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+                flex-direction: row;
+        overflow-x: auto;
+        -ms-scroll-snap-type: x mandatory;
+            scroll-snap-type: x mandatory;
+        }
+
+        .article-body {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
+        scroll-snap-align: center;
+        min-width: 30%;
+        background-color: #222;
+        color: white;
+        margin: 1em 1em 1em 0;
+        -webkit-box-shadow: 0.25px 0.5em 0.5em rgba(0, 0, 0, 0.3);
+                box-shadow: 0.25px 0.5em 0.5em rgba(0, 0, 0, 0.3);
+        }
+
+        .article-body .article-header {
+        padding: 1em;
+        word-break: break-all;
+        }
+
+        .article-body .article-header h5 {
+        font-weight: normal;
+        }
+
+        .article-body .card-body {
+        padding: 1em;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+        }
+
+        .article-body .card-footer {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        padding: 1em;
+        }
+
+        .article-body .card-footer h5 {
+        font-weight: normal;
+        display: inline-flexbox;
+        -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+                user-select: none;
+        }
+
+        .article-body .card-footer h5:first-of-type {
+        text-transform: capitalize;
+        }
+
+        .article-body .card-footer h5:nth-of-type(2) {
+        margin-left: auto;
+        color: mediumspringgreen;
+        cursor: pointer;
+        }
+
+        .show {
+        opacity: 1 !important;
+        pointer-events: all !important;
+        }
+
+        .hide {
+        opacity: 0;
+        pointer-events: none;
+        }
+
+        #article_container {
+        padding: 2em;
+        }
+
+        .no-transformations {
+        -webkit-transform: none;
+                transform: none;
+        }
+
+        #navbar {
+        width: 100%;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+                flex-direction: row;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        color: white;
+        background: #222;
+        }
+
+        #navbar #icon {
+        width: 2em;
+        margin: 0 0.5em;
+        }
+
+        #navbar button {
+        padding: 1.2em 2em;
+        background: linear-gradient(45deg, teal, mediumSpringGreen);
+        text-transform: uppercase;
+        font-weight: bold;
+        }
+
+        #spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+        height: 2em;
+        fill: teal;
+        }
+
+        .spin {
+        -webkit-animation: spin 1s infinite ease;
+                animation: spin 1s infinite ease;
+        }
+
+        @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+        }
+        }
+
+        @keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+        }
+        }
+
+        @media only screen and (max-width: 720px) {
+        .article-body {
+            min-width: calc(100% - 5em);
+        }
+        }
+        /*# sourceMappingURL=main.css.map */
     </style>
 </head>
 
@@ -278,77 +356,72 @@
 </script>
 
 <body onload="onLoadStartUp()">
-
-	<div class="sidenav">
-        <div class="w3-sidebar w3-bar-block" style="display: block; width: 98%;" id="mySidebar">
-            <div onclick="closeMessage()" class="w3-bar-item w3-button w3-large bg-black">Close</div>
-            <pre id="log">Event information log
-                =====================
-            </pre>
+    <section id="modal_container" class="hide">
+        <div id="article_creation_modal">
+            <h3>Create a new article</h3>
+            <input type="text" id="article_name" placeholder="Article name">
+    
+            <input type="number" id="section_nums" placeholder="Section number">
+            
+            <button id="hide_article_creation_modal" onclick="hide_article_creation_modal(this.parentNode)">Cancel</button>
+            <button id="create_article">Create</button>
         </div>
-        <div class="w3-button w3-teal w3-xlarge" onclick="displayMessages()">☰</div>
-    </div>
+    </section>
 
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <span class="navbar-brand mb-0 h1">Blockchain Content Collaboration</span>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarText">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#" data-toggle="modal" data-target=".bd-example-modal-lg">Actions <span class="sr-only">(current)</span></a>
-          </li>
-        </ul>
-        <span class="navbar-text" id="retrieveLatestContentBtn" onclick="cloudArticleApp.retrieveLatestContent()">
-          Refresh
-        </span>
-      </div>
+    <nav id="navbar">
+        <svg id="icon" viewBox="0 0 99.555 117.877" style="enable-background:new 0 0 99.555 117.877;"
+            xml:space="preserve">
+            <style type="text/css">
+                .st0{fill:url(#SVGID_1_);}
+                .st1{fill:url(#SVGID_2_);}
+            </style>
+            <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="97.2301" y1="78.3705" x2="9.026" y2="12.0223">
+                <stop  offset="0" style="stop-color:mediumspringgreen"/>
+                <stop  offset="1" style="stop-color:teal"/>
+            </linearGradient>
+            <path class="st0" d="M98.46,77.89c-4.54-16.94-21.95-27-38.9-22.46c-4.21,1.13-7.99,3.05-11.23,5.57l-4.93-4.93
+            c6.24-8.59,6.09-20.35-0.46-28.78l4.97-4.97c4.6,2.71,10.62,2.11,14.57-1.84c4.69-4.69,4.69-12.28,0-16.97s-12.28-4.69-16.97,0
+            c-3.95,3.95-4.56,9.97-1.84,14.57l-4.97,4.97c-9.42-7.32-23.02-6.68-31.67,1.97c-9.37,9.37-9.37,24.57,0,33.94
+            c8.35,8.35,21.31,9.24,30.67,2.71l4.98,4.98c-5.86,7.58-8.24,17.7-5.57,27.67c4.54,16.94,21.95,27,38.9,22.46
+            C92.95,112.25,103,94.83,98.46,77.89z"/>
+        </svg>
+      <span>Blockchain Content Collaboration</span>
+      <button id="show_article_creation_modal" onclick="show_article_creation_modal()">Create article</button>
     </nav>
-  
-    <div class="container">
+    
+    <svg class="hide" id="spinner" viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+            <path class='p2' d="M6.5,13.8c-2.2-0.5-3.9-2.3-4.4-4.5c-0.7-3.6,1.7-6.8,5-7.2C7.6,2,8,1.6,8,1.1v0c0-0.6-0.5-1.1-1.1-1
+                C2.5,0.7-0.8,4.9,0.2,9.6c0.6,3.1,2.9,5.5,6,6.2c4.8,1.1,9.1-2.2,9.8-6.7C16,8.5,15.5,8,14.9,8h0c-0.5,0-0.9,0.4-1,0.9
+                C13.5,12.2,10.2,14.7,6.5,13.8z"/>
+    </svg>
 
+    <section id="article_container">
         <div id="current_data"></div>
-        <div class="cards">
-            <div id="full_article_div" class="card-body"></div>  
-        </div>
+    </section>
+</div>
 
-    </div>
-
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Actions</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">    
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="reset_data_div">
-                        <h5>Reset</h5>
-                        <label>Article Name: </label>
-                        <input type="text" class="form-control" id="article_name"> <br>
-
-                        <label>Number Of Sections: </label>
-                        <input type="text" class="form-control" id="section_nums"> <br>
-                        
-                        <input type="button" class="btn btn-secondary" id="reset_data_btn" value="Reset">
-                    </div>
-                </div>
-
-          </div>
-            </div>
-            <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-        </div>
-      </div>
-    </div>   
+<script>
+    function show_article_creation_modal(element){ 
+        document.getElementById('modal_container').classList.add('show');
+    }
+    function hide_article_creation_modal(element){ 
+        element.parentNode.classList.remove('show');
+    }
+    function prevArticle(container){
+        container.children[0].scrollBy({
+            top: 0,
+            left: -100,
+            behavior: 'smooth'
+        });
+    }
+    function nextArticle(container){
+        container.children[0].scrollBy({
+            top: 0,
+            left: 100,
+            behavior: 'smooth'
+        });
+    }
+</script>
 
 <script>
     //All util libraries required for Standard operations (DO NOT EDIT ANY)
@@ -7333,26 +7406,20 @@
 
 <script>
     function onLoadStartUp() {
+        document.getElementById('spinner').classList.add('show', 'spin');
         initIndexedDB().then(result => {
             console.log(result)
-            showMessage(result)
             getCredentials().then(result => {
                 console.log(result)
-                showMessage(result)
-                showMessage(`FLO_ID: ${myFloID}`)
+                ////showMessage(`FLO_ID: ${myFloID}`)
                 readSubAdminListFromAPI().then(result => {
                     console.log(result)
-                    showMessage(result)
                     readSupernodeListFromAPI().then(result => {
                         console.log(result)
-                        showMessage(result)
                         floSupernode.kBucket.launch(Object.keys(floGlobals.supernodes),floGlobals.SNStorageID).then(result => {
                             console.log(result)
-                            showMessage(result)
                             loadDataFromIDB().then(result => {
                                 console.log(result);
-                                showMessage(result)
-                                showMessage('Loading latest data...')
                                 cloudArticleApp.retrieveLatestContent();
                             }).catch(error => console.log(error))
                         }).catch(error => console.log(error))
@@ -7526,7 +7593,7 @@
         indexArr.forEach(i => compactIDB.removeData('credentials', i))
         localStorage.removeItem("privKey")
         let info = `privKey credentials deleted!`;
-        showMessage(info)
+        //showMessage(info)
             return info;
     }
 
@@ -7546,44 +7613,13 @@
         return filterStr
     }
 </script>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
-<script>
-    function displayMessages() {
-        document.getElementById("mySidebar").style.width = "98%";
-        document.getElementById("mySidebar").style.display = "block";
-    }
-
-    function closeMessage() {
-        document.getElementById("mySidebar").style.display = "none";
-    }
-
-    function LogEvent(msg) {
-        log.textContent += "> " + msg + "\n";
-        var ot = log.scrollHeight - log.clientHeight;
-        if (ot > 0) log.scrollTop = ot;
-    }
-
-    function showMessage(msg = '', t = 10000) {
-        if (msg.length > 0) LogEvent(msg);
-        displayMessages();
-        setTimeout(function () {
-            closeMessage();
-            clearTimeout();
-        }, t);
-    }
-</script>
-
 <script>
     
     const cloudArticleApp = {
 
         SUBJECT: "testArticle4",
 
-        numberOfSections: 5,
+        numberOfSections: 7,
 
         CONTENT_TYPE: "typeContentCollab4",
 
@@ -7601,9 +7637,9 @@
         },
 
         showFullContentOfArticle: function(obj) {
-            const full_data_div = document.getElementById('current_data');
-            const full_article_div = document.getElementById('full_article_div');
-            const articleSubject = floGlobals.appObjects[this.SUBJECT]; 
+            document.getElementById('spinner').classList.remove('show', 'spin');
+            const full_data_div = document.getElementById('current_data'),
+                  articleSubject = floGlobals.appObjects[this.SUBJECT]; 
 
             const new_generalData = getNextGeneralData(this.CONTENT_TYPE, floGlobals.vectorClock[this.SUBJECT]);
 
@@ -7623,14 +7659,15 @@
 				}  
 			}
 
-            let t = ``;
+            let article_structure = ``;
 
             for(key in obj) {
                 if (Object.keys(articleSubject).includes(key)) {
-                    t += `<h4 class="card text-center margin-15 padding-8">${key}</h4>`;
+                    article_structure += `<h2 class="section-title">${key}</h2>`;
                 }
 
                 for(secKey in articleSubject[key].data) {
+                    let tempCounter = 0;
                     const secObject = articleSubject[key].data[secKey];
              
                     // Add non scored new entries from users
@@ -7646,13 +7683,13 @@
                     let secObj = Object.values(secObject).sort((a,b)=>b.score-a.score);
                     const vc_array = [];
             
-                    t += `<div id="paginated_gallery" class="gallery">
-                        <div class="gallery_scroller">`;
+                    article_structure += `<div class="gallery-container">
+                                            <div class="gallery">`;
                     
                     for(iterKey in secObj) {
-                        const article_data = secObj[iterKey];
-                        const gen_div_id = this.unique_id();
-                        const content_hash = Crypto.SHA256(article_data.content.trim());
+                        const article_data = secObj[iterKey],
+                              gen_div_id = this.unique_id(),
+                              content_hash = Crypto.SHA256(article_data.content.trim());
                         let vc = article_data.vectorClock || "";
 
 			            if(Number(article_data.score)>0) {
@@ -7670,50 +7707,53 @@
 			            	if(vc_array.includes(vc)) continue;
 			            }
 
-                        t += 
-                            `<div class="card colored_card">
-                              <div class="card-header">
-                                Author Id: ${article_data.content_creator}
-                              </div>
-                              <div class="card-body set-flex">
-                              <div class="card-text content_div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" onfocusout="cloudArticleApp.edit_onfocuout()">
-                                ${article_data.content.trim()}
-                              </div>
-                              <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
-                            </div>
-                            <div class="card-footer">
-                              <small class="text-muted">Section: ${secKey} </small>
-                              <small class="text-muted float-right" id="score_${vc}" onclick="cloudArticleApp.upgrade_article()">SCORE: ${article_data.score}</small>
-                            </div>
+                        article_structure += 
+                            `<div class="article-body">
+                                <div class="article-header">
+                                    <h5>Author Id: ${article_data.content_creator}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="content_div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" onfocusout="cloudArticleApp.edit_onfocuout()">
+                                        ${article_data.content.trim()}
+                                    </div>
+                                    <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
+                                </div>
+                                <div class="card-footer">
+                                    <h5>${secKey}</h5>
+                                    <h5 title="Give score to this article" id="score_${vc}" onclick="cloudArticleApp.upgrade_article()">SCORE ${article_data.score}</h5>
+                                </div>
                           </div>`;
+                        tempCounter++;
                     }         
-                    t += `</div>
-                        <span class="btn prev"></span>
-                        <span class="btn next"></span>
-                      </div>`;
+                    if(tempCounter > 1 && window.innerWidth < 720)
+                        article_structure += `
+                        </div>
+                            <svg class="navigation-arrows" onclick="prevArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
+                            <polygon points="71.94,29.94 15.31,29.94 39.6,5.66 33.94,0 5.66,28.28 5.66,28.28 0,33.94 5.66,39.6 5.66,39.6 33.94,67.88 
+                                39.6,62.23 15.31,37.94 71.94,37.94 "/>
+                            </svg>
+
+                            <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
+                            <polygon points="0,37.94 56.63,37.94 32.34,62.23 38,67.88 66.28,39.6 66.28,39.6 71.94,33.94 66.28,28.28 66.28,28.28 38,0 
+                                32.34,5.66 56.63,29.94 0,29.94 "/>
+                            </svg>`;
+                    if(tempCounter > 3 && window.innerWidth > 720)
+                        article_structure += `
+                        </div>
+                            <svg class="navigation-arrows" onclick="prevArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
+                            <polygon points="71.94,29.94 15.31,29.94 39.6,5.66 33.94,0 5.66,28.28 5.66,28.28 0,33.94 5.66,39.6 5.66,39.6 33.94,67.88 
+                                39.6,62.23 15.31,37.94 71.94,37.94 "/>
+                            </svg>
+
+                            <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
+                            <polygon points="0,37.94 56.63,37.94 32.34,62.23 38,67.88 66.28,39.6 66.28,39.6 71.94,33.94 66.28,28.28 66.28,28.28 38,0 
+                                32.34,5.66 56.63,29.94 0,29.94 "/>
+                            </svg>`;
+                        article_structure+=`</div>`;
                 }
                 
             }
-            full_data_div.innerHTML = t;
-
-            const gallery = document.querySelector('#paginated_gallery');
-            if(gallery==null) return;
-            const gallery_scroller = gallery.querySelector('.gallery_scroller');
-            if(gallery_scroller==null) return;
-            const gallery_item_size = gallery_scroller.querySelector('div').clientWidth;
-
-            gallery.querySelector('.btn.next').addEventListener('click', scrollToNextPage);
-            gallery.querySelector('.btn.prev').addEventListener('click', scrollToPrevPage);
-
-            // For paginated scrolling, simply scroll the gallery one item in the given
-            // direction and let css scroll snaping handle the specific alignment.
-            function scrollToNextPage() {
-              gallery_scroller.scrollBy(gallery_item_size, 0);
-            }
-            function scrollToPrevPage() {
-              gallery_scroller.scrollBy(-gallery_item_size, 0);
-            }
-
+            full_data_div.innerHTML = article_structure;
         },
 
         retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
@@ -7731,7 +7771,7 @@
             for (let j=0; j<number_of_sections; j++) {
                 i = j+1;
                 let content = '';
-                if(div=='reset_data_div') {
+                if(div=='article_creation_modal') {
                     //content = document.getElementById(`article_content${i}`).value;
                     new_article[article_name].data[`section${i}`] = {};
                     new_article[article_name].data[`section${i}`]["iteration0"] = {
@@ -7760,16 +7800,14 @@
         },
 
         resetArticleContent: function() {
-        	showMessage(`Creating new article...`);
             const article_name = document.getElementById('article_name').value;
             let number_of_sections = document.getElementById('section_nums').value;
             number_of_sections = Number(number_of_sections);
             if(number_of_sections<1) {
             	let err = 'Error: Number of sections must be more than 0.';
-            	showMessage(err)
             	throw new Error(err)
             }
-            let new_article = this.createNewArticle(article_name, 'reset_data_div', number_of_sections);
+            let new_article = this.createNewArticle(article_name, 'article_creation_modal', number_of_sections);
             floCloudAPI.resetObjectData(new_article, this.SUBJECT,
             {receiverID:floGlobals.adminID});
 
@@ -7810,7 +7848,7 @@
 
             article.data[section][`iteration${iterNum}`] = new_content_object;
 
-            showMessage(`Adding new iteration to article ${article_name}`);
+            //showMessage(`Adding new iteration to article ${article_name}`);
 
             if(floGlobals.subAdmins.includes(myFloID)) {
                 floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
@@ -7861,10 +7899,8 @@
 			for(title of Object.keys(contents)) {
 				for(sections of Object.keys(contents[title].data)) {
 					for(iters of Object.values(contents[title].data[sections])) {
-						if(typeof iters.vectorClock==="string"
-							&& iters.vectorClock==article_vc) {
-							cloudArticleApp.addArticleContent(title, sections, iters.content,
-								iters.content_creator, new_score, article_vc);
+						if(typeof iters.vectorClock==="string" && iters.vectorClock==article_vc) {
+							cloudArticleApp.addArticleContent(title, sections, iters.content,iters.content_creator, new_score, article_vc);
 						}
 					}
 				}
@@ -7877,9 +7913,9 @@
 
  <script>
     (function() {
-        const reset_data_btn = document.getElementById('reset_data_btn');
-        reset_data_btn.onclick = function() {
+        document.getElementById('create_article').onclick = function() {
             cloudArticleApp.resetArticleContent();
+            document.getElementById('modal_container').classList.remove('show');
         }
     })();
  </script>
