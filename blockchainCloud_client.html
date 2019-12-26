@@ -63,14 +63,14 @@
           border-radius: 10px;
         }
 
-		.gallery_scroller div.card-body {
-		    height: 450em;
-		}
+    .gallery_scroller div.card-body {
+        height: 450em;
+    }
 
         .gallery_scroller div.colored_card {
           min-width: 40%;
           min-height: 100%;
-          max-height: 300px;	
+          max-height: 300px;  
           border-radius: 10px;
           background-color: #343a40;
           color: aliceblue;
@@ -131,8 +131,8 @@
             padding: 2px 2px;
             overflow-x: hidden;
             overflow-y: auto;
-    		max-height: 250px;
-    		font-size: 3vh;
+        max-height: 250px;
+        font-size: 3vh;
         }
 
         .card-header {
@@ -279,7 +279,7 @@
 
 <body onload="onLoadStartUp()">
 
-	<div class="sidenav">
+  <div class="sidenav">
         <div class="w3-sidebar w3-bar-block" style="display: block; width: 98%;" id="mySidebar">
             <div onclick="closeMessage()" class="w3-bar-item w3-button w3-large bg-black">Close</div>
             <pre id="log">Event information log
@@ -4380,7 +4380,7 @@
                 cursor += 2 + sig[cursor + 1];
   
                 //if (cursor != sig.length)
-                //	throw new Error("Extra bytes in signature");
+                //  throw new Error("Extra bytes in signature");
   
                 var r = BigInteger.fromByteArrayUnsigned(rBa);
                 var s = BigInteger.fromByteArrayUnsigned(sBa);
@@ -7534,9 +7534,9 @@
         var filter = getFilterString(type, options)
         var filteredResult = []
         if(typeof floGlobals.generalData[filter]=="object") {
-        	for(var i = 0; i<floGlobals.generalData[filter].length; i++)
-	            if(floGlobals.generalData[filter][i].vectorClock > vectorClock)
-	                filteredResult.push(floGlobals.generalData[filter][i])
+          for(var i = 0; i<floGlobals.generalData[filter].length; i++)
+              if(floGlobals.generalData[filter][i].vectorClock > vectorClock)
+                  filteredResult.push(floGlobals.generalData[filter][i])
         }
         return filteredResult
     }
@@ -7581,11 +7581,11 @@
     
     const cloudArticleApp = {
 
-        SUBJECT: "testArticle4",
+        SUBJECT: "testArticle6",
 
         numberOfSections: 5,
 
-        CONTENT_TYPE: "typeContentCollab4",
+        CONTENT_TYPE: "typeContentCollab6",
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -7609,19 +7609,19 @@
 
             let new_entries_array = [];
             
-			for(new_data of new_generalData) {
-			    new_obj = {
-			        content:new_data.message.content,
-			        content_creator: new_data.message.content_creator,
-			        score: 0,
-			        vectorClock: new_data.vectorClock
-			    }
-			    if(typeof new_data.message.section == "string") {
-			    	if(typeof new_entries_array[new_data.message.section] !== "object")
-			    		new_entries_array[new_data.message.section] = [];
-			    	new_entries_array[new_data.message.section].push(new_obj);
-				}  
-			}
+            for(new_data of new_generalData) {
+                new_obj = {
+                    content:new_data.message.content,
+                    content_creator: new_data.message.content_creator,
+                    score: 0,
+                    vectorClock: new_data.vectorClock
+                }
+                if(typeof new_data.message.section == "string") {
+                  if(typeof new_entries_array[new_data.message.section] !== "object")
+                    new_entries_array[new_data.message.section] = [];
+                  new_entries_array[new_data.message.section].push(new_obj);
+                }  
+            }
 
             let t = ``;
 
@@ -7632,18 +7632,23 @@
 
                 for(secKey in articleSubject[key].data) {
                     const secObject = articleSubject[key].data[secKey];
+
+                    if(typeof secObject.section_details==="object"
+                      && secObject.section_details.section_name.length) {
+                      t += `<h5 class="text-center margin-15 padding-8">${secObject.section_details.section_name}</h5>`;
+                    }
              
                     // Add non scored new entries from users
                     if(typeof new_entries_array[secKey]==="object") {
                         let temp_iter_count = 0; 
-						for(new_conts of new_entries_array[secKey]) {
-							secObject[`temp_iter_${temp_iter_count}`]= new_conts;
-						    temp_iter_count++;
-						}
+                        for(new_conts of new_entries_array[secKey]) {
+                          secObject.section_iters[`temp_iter_${temp_iter_count}`]= new_conts;
+                            temp_iter_count++;
+                        }
                     }
 
-			        // Sort by score
-                    let secObj = Object.values(secObject).sort((a,b)=>b.score-a.score);
+              // Sort by score
+                    let secObj = Object.values(secObject.section_iters).sort((a,b)=>b.score-a.score);
                     const vc_array = [];
             
                     t += `<div id="paginated_gallery" class="gallery">
@@ -7655,20 +7660,20 @@
                         const content_hash = Crypto.SHA256(article_data.content.trim());
                         let vc = article_data.vectorClock || "";
 
-			            if(Number(article_data.score)>0) {
-	                        const new_content_object = {
-				                content: article_data.content,
-				                content_creator: article_data.content_creator,
-				                score: article_data.score,
-				                vectorClock: article_data.vectorClock,
-				                signerPubKey: article_data.signerPubKey
-				            }
-				            if(!floGlobals.subAdmins.includes(bitjs.pubkey2address(myPubKey))) continue;
-			            	if(floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey)!==true) continue;
-			            	if(vc.length>0) vc_array.push(vc);
-			            } else {
-			            	if(vc_array.includes(vc)) continue;
-			            }
+                  if(Number(article_data.score)>0) {
+                          const new_content_object = {
+                        content: article_data.content,
+                        content_creator: article_data.content_creator,
+                        score: article_data.score,
+                        vectorClock: article_data.vectorClock,
+                        signerPubKey: article_data.signerPubKey
+                    }
+                    if(!floGlobals.subAdmins.includes(bitjs.pubkey2address(myPubKey))) continue;
+                    if(floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey)!==true) continue;
+                    if(vc.length>0) vc_array.push(vc);
+                  } else {
+                    if(vc_array.includes(vc)) continue;
+                  }
 
                         t += 
                             `<div class="card colored_card">
@@ -7733,19 +7738,29 @@
                 let content = '';
                 if(div=='reset_data_div') {
                     //content = document.getElementById(`article_content${i}`).value;
-                    new_article[article_name].data[`section${i}`] = {};
-                    new_article[article_name].data[`section${i}`]["iteration0"] = {
+                    new_article[article_name].data[`section${i}`] = {
+                      section_details: {},
+                      section_iters: {},
+                    };
+                    new_article[article_name].data[`section${i}`]["section_details"]={
+                      section_name: ""
+                    };
+                    new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
                         content: "",
                         content_creator: myFloID,
                         score: 0
                     }
                 } else if(div=='update_data_div') {
                     content = document.getElementById(`article_content_up`).value;
-                    new_article[article_name].data[`section${i}`] = {};
-                    if(i!==1) {
-                        content = '';
-                    }
-                    new_article[article_name].data[`section${i}`]["iteration0"] = {
+                    new_article[article_name].data[`section${i}`] = {  
+                      section_details: {},
+                      section_iters: {},
+                    };
+                    new_article[article_name].data[`section${i}`]["section_details"]={
+                      section_name: ""
+                    };
+                    if(i!==1) content = '';
+                    new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
                         content: content,
                         content_creator: myFloID,
                         score: 0
@@ -7760,14 +7775,14 @@
         },
 
         resetArticleContent: function() {
-        	showMessage(`Creating new article...`);
+          showMessage(`Creating new article...`);
             const article_name = document.getElementById('article_name').value;
             let number_of_sections = document.getElementById('section_nums').value;
             number_of_sections = Number(number_of_sections);
             if(number_of_sections<1) {
-            	let err = 'Error: Number of sections must be more than 0.';
-            	showMessage(err)
-            	throw new Error(err)
+              let err = 'Error: Number of sections must be more than 0.';
+              showMessage(err)
+              throw new Error(err)
             }
             let new_article = this.createNewArticle(article_name, 'reset_data_div', number_of_sections);
             floCloudAPI.resetObjectData(new_article, this.SUBJECT,
@@ -7783,19 +7798,21 @@
             let full_data =  JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
             let article = full_data[article_name];
 
-            if(typeof article!=="object") {
-                make_article=this.createNewArticle(article_name, 'update_data_div');
-                full_data[article_name] = make_article[article_name];
-                article = full_data[article_name];
-            }
+            if(typeof article!=="object") throw new Error(article_name+ " does not exists");
 
-            let iterNumber = Object.keys(article.data[section]).map(f=>{
+            // if(typeof article!=="object") {
+            //     make_article=this.createNewArticle(article_name, 'update_data_div');
+            //     full_data[article_name] = make_article[article_name];
+            //     article = full_data[article_name];
+            // }
+
+            let iterNumber = Object.keys(article.data[section]["section_iters"]).map(f=>{
                 return f.match(/\d+/)[0];
             }).reduce(function(prev, current) {
                 return (prev.y > current.y) ? prev : current
             });
 
-            let oldArticle = article.data[section][`iteration${iterNumber}`];
+            let oldArticle = article.data[section]["section_iters"][`iteration${iterNumber}`];
             let iterNum = Number(iterNumber)+1;
 
             const new_content_object = {
@@ -7808,24 +7825,24 @@
 
             new_content_object.sign = floCrypto.signData(JSON.stringify(new_content_object), myPrivKey);
 
-            article.data[section][`iteration${iterNum}`] = new_content_object;
+            article.data[section]["section_iters"][`iteration${iterNum}`] = new_content_object;
 
             showMessage(`Adding new iteration to article ${article_name}`);
 
             if(floGlobals.subAdmins.includes(myFloID)) {
                 floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
             } else {
-            	const general_data_obj = {
-            		article_name: article_name,
-            		content: newcontent,
-	                content_creator: myFloID,
-	                section: section,
-	                score: 0,
-	                signerPubKey: myPubKey
-            	}
-	            general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
+              const general_data_obj = {
+                article_name: article_name,
+                content: newcontent,
+                content_creator: myFloID,
+                section: section,
+                score: 0,
+                signerPubKey: myPubKey
+              }
+              general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
 
-            	floCloudAPI.sendGeneralData(general_data_obj,this.CONTENT_TYPE,{receiverID:floGlobals.adminID, senderIDs:[myFloID]});
+              floCloudAPI.sendGeneralData(general_data_obj,this.CONTENT_TYPE,{receiverID:floGlobals.adminID, senderIDs:[myFloID]});
             }
             
             this.retrieveLatestContent(); 
@@ -7837,6 +7854,7 @@
         },
 
         edit_onfocuout: function(event) {
+            if(floGlobals.subAdmins.includes(myFloID)) return;
             let target = this.getEventTarget(event);
             const updated_content = target.innerText.trim().replace('..' , '');   
             const updated_content_hash = Crypto.SHA256(updated_content);
@@ -7848,27 +7866,27 @@
             let separate_data = detail_block.trim().split('__');
             if(separate_data.length!==2) return;
 
-            cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content);
+            cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content, myFloID);
         },
 
         upgrade_article: function(event) {
-    		let new_score = prompt("Enter Score: ", 0);
-    		new_score = Number(new_score);
-    		if(typeof new_score!=="number" || new_score<=0) return;
-    		let target = cloudArticleApp.getEventTarget(event);
-			let article_vc = target.id.substr(6);
-			let contents = floGlobals.appObjects[this.SUBJECT];
-			for(title of Object.keys(contents)) {
-				for(sections of Object.keys(contents[title].data)) {
-					for(iters of Object.values(contents[title].data[sections])) {
-						if(typeof iters.vectorClock==="string"
-							&& iters.vectorClock==article_vc) {
-							cloudArticleApp.addArticleContent(title, sections, iters.content,
-								iters.content_creator, new_score, article_vc);
-						}
-					}
-				}
-			}
+          let new_score = prompt("Enter Score: ", 0);
+          new_score = Number(new_score);
+          if(typeof new_score!=="number" || new_score<=0) return;
+          let target = cloudArticleApp.getEventTarget(event);
+          let article_vc = target.id.substr(6);
+          let contents = floGlobals.appObjects[this.SUBJECT];
+          for(title of Object.keys(contents)) {
+            for(sections of Object.keys(contents[title].data)) {
+              for(iters of Object.values(contents[title].data[sections].section_iters)) {
+                if(typeof iters.vectorClock==="string"
+                  && iters.vectorClock==article_vc) {
+                  cloudArticleApp.addArticleContent(title, sections, iters.content,
+                    iters.content_creator, new_score, article_vc);
+                }
+              }
+            }
+          }
         },
 
     }
