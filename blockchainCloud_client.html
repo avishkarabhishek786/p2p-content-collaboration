@@ -63,9 +63,9 @@
           border-radius: 10px;
         }
 
-    .gallery_scroller div.card-body {
-        height: 450em;
-    }
+        .gallery_scroller div.card-body {
+            height: 450em;
+        }
 
         .gallery_scroller div.colored_card {
           min-width: 40%;
@@ -289,7 +289,6 @@
         <div class="w3-button w3-teal w3-xlarge" onclick="displayMessages()">☰</div>
     </div>
 
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <span class="navbar-brand mb-0 h1">Blockchain Content Collaboration</span>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -340,10 +339,16 @@
                         <input type="button" class="btn btn-secondary" id="reset_data_btn" value="Reset">
                     </div>
                 </div>
-
           </div>
+
+          <div class="row">    
+            <div class="col-md-12">
+              <div id="section_settings"></div>
             </div>
-            <div class="modal-footer">
+          </div>
+
+      </div>
+      <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
         </div>
@@ -7298,6 +7303,8 @@
                 floGlobals.vectorClock[message.object] = vc
                 compactIDB.writeData("vectorClocks", vc, message.object)
             }
+            document.getElementById('current_data').innerHTML = '';
+            cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
         }catch(error){
             console.log(error)
         }
@@ -7316,6 +7323,8 @@
                 floGlobals.generalVC[event.filterStr] = vc
                 compactIDB.writeData("generalVC", vc, event.filterStr)
             }
+            document.getElementById('current_data').innerHTML = '';
+            cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
         }catch(error){
             console.log(error)
         }
@@ -7635,7 +7644,7 @@
 
                     if(typeof secObject.section_details==="object"
                       && secObject.section_details.section_name.length) {
-                      t += `<h5 class="text-center margin-15 padding-8">${secObject.section_details.section_name}</h5>`;
+                      t += `<h5 class="text-center margin-15 padding-8 badge badge-light">${secKey.toUpperCase()}: ${secObject.section_details.section_name}</h5>`;
                     }
              
                     // Add non scored new entries from users
@@ -7647,7 +7656,7 @@
                         }
                     }
 
-              // Sort by score
+                    // Sort by score
                     let secObj = Object.values(secObject.section_iters).sort((a,b)=>b.score-a.score);
                     const vc_array = [];
             
@@ -7660,20 +7669,20 @@
                         const content_hash = Crypto.SHA256(article_data.content.trim());
                         let vc = article_data.vectorClock || "";
 
-                  if(Number(article_data.score)>0) {
+                        if(Number(article_data.score)>0) {
                           const new_content_object = {
-                        content: article_data.content,
-                        content_creator: article_data.content_creator,
-                        score: article_data.score,
-                        vectorClock: article_data.vectorClock,
-                        signerPubKey: article_data.signerPubKey
-                    }
-                    if(!floGlobals.subAdmins.includes(bitjs.pubkey2address(myPubKey))) continue;
-                    if(floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey)!==true) continue;
-                    if(vc.length>0) vc_array.push(vc);
-                  } else {
-                    if(vc_array.includes(vc)) continue;
-                  }
+                            content: article_data.content,
+                            content_creator: article_data.content_creator,
+                            score: article_data.score,
+                            vectorClock: article_data.vectorClock,
+                            signerPubKey: article_data.signerPubKey
+                          }
+                          if(!floGlobals.subAdmins.includes(bitjs.pubkey2address(myPubKey))) continue;
+                          if(floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey)!==true) continue;
+                          if(vc.length>0) vc_array.push(vc);
+                        } else {
+                          if(vc_array.includes(vc)) continue;
+                        }
 
                         t += 
                             `<div class="card colored_card">
@@ -7687,7 +7696,6 @@
                               <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
                             </div>
                             <div class="card-footer">
-                              <small class="text-muted">Section: ${secKey} </small>
                               <small class="text-muted float-right" id="score_${vc}" onclick="cloudArticleApp.upgrade_article()">SCORE: ${article_data.score}</small>
                             </div>
                           </div>`;
@@ -7719,14 +7727,49 @@
               gallery_scroller.scrollBy(-gallery_item_size, 0);
             }
 
+            //section_settings
+            if(!floGlobals.subAdmins.includes(myFloID)) return false;
+            let section_settings_html = '';
+            // Object.keys(floGlobals.appObjects[this.SUBJECT]).forEach(k=>{
+            //   section_settings_html += `<select class="form-control" id="topic_name_section">`;
+            //   section_settings_html += `</option>${k}</option>`;
+            //   section_settings_html += `</select>`;
+            // });
+
+            const section_settings = document.getElementById('section_settings');
+            let sec_counter = 1;
+            const Topic = Object.keys(floGlobals.appObjects[this.SUBJECT])[0];
+            //const Topic = document.getElementById("topic_name_section").value;
+            section_settings_html += `<h5>Section Settings</h5>`;
+            for(vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
+              section_settings_html += `<label for="section${sec_counter}">Section ${sec_counter}: </label>`;
+              section_settings_html += `<input type="text" id="section${sec_counter}" class="form-control" name="section_names_ip">`;
+              sec_counter++;
+            }
+            section_settings_html += `<button class="btn btn-secondary" id="change-section-names-btn" onclick="cloudArticleApp.update_section_names()">Update Section Names</button>`;
+            section_settings.innerHTML = section_settings_html;
+
+        },
+
+        update_section_names: async function() {
+          if(!floGlobals.subAdmins.includes(myFloID)) return;
+          var sec_items = document.getElementsByName("section_names_ip");
+          let full_data =  JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
+          const Topic = Object.keys(full_data)[0];
+          sec_items.forEach((y,i)=>{
+            i++;
+            full_data[Topic].data[`section${i}`].section_details.section_name=y.value;
+          });
+      
+          floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
         },
 
         retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
             floCloudAPI.requestObjectData(this.SUBJECT,{receiverID, senderIDs});
             floCloudAPI.requestGeneralData(this.CONTENT_TYPE);
-            await this.delay(5000);
-            document.getElementById('current_data').innerHTML = '';
-            this.showFullContentOfArticle(floGlobals.appObjects[this.SUBJECT]);
+            // await this.delay(5000);
+            // document.getElementById('current_data').innerHTML = '';
+            // this.showFullContentOfArticle(floGlobals.appObjects[this.SUBJECT]);
         },
 
         createNewArticle: function(article_name, div='', number_of_sections=cloudArticleApp.numberOfSections) {
@@ -7775,7 +7818,7 @@
         },
 
         resetArticleContent: function() {
-          showMessage(`Creating new article...`);
+            showMessage(`Creating new article...`);
             const article_name = document.getElementById('article_name').value;
             let number_of_sections = document.getElementById('section_nums').value;
             number_of_sections = Number(number_of_sections);
