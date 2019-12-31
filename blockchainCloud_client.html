@@ -343,6 +343,7 @@
 
           <div class="row">    
             <div class="col-md-12">
+              <div id="section_names_select_settings"></div>
               <div id="section_settings"></div>
             </div>
           </div>
@@ -7729,26 +7730,37 @@
 
             //section_settings
             if(!floGlobals.subAdmins.includes(myFloID)) return false;
+            const section_names_settings = document.getElementById('section_names_select_settings');
             let section_settings_html = '';
-            // Object.keys(floGlobals.appObjects[this.SUBJECT]).forEach(k=>{
-            //   section_settings_html += `<select class="form-control" id="topic_name_section">`;
-            //   section_settings_html += `</option>${k}</option>`;
-            //   section_settings_html += `</select>`;
-            // });
-
-            const section_settings = document.getElementById('section_settings');
-            let sec_counter = 1;
-            const Topic = Object.keys(floGlobals.appObjects[this.SUBJECT])[0];
-            //const Topic = document.getElementById("topic_name_section").value;
             section_settings_html += `<h5>Section Settings</h5>`;
+            section_settings_html += `<select class="form-control" id="topic_name_section" onchange="cloudArticleApp.pop_up_section_names_ui()">`;
+            section_settings_html += `<option>Choose Topic...</option>`;
+            Object.keys(floGlobals.appObjects[this.SUBJECT]).forEach(k=>{
+              section_settings_html += `<option>${k}</option>`;
+            });
+            section_settings_html += `</select>`;
+
+            section_names_settings.innerHTML = section_settings_html;
+
+        },
+
+        pop_up_section_names_ui: function() {
+            let sec_counter = 1;
+            let section_settings_html = ``;
+            const Topic = document.getElementById("topic_name_section").value;
+            const section_settings = document.getElementById("section_settings");
+            
+            if(!Object.keys(floGlobals.appObjects[this.SUBJECT]).includes(Topic)) return;
+            section_settings.innerHTML=""; 
+            section_settings_html += `<h5>Section Names: </h5>`;
             for(vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
               section_settings_html += `<label for="section${sec_counter}">Section ${sec_counter}: </label>`;
-              section_settings_html += `<input type="text" id="section${sec_counter}" class="form-control" name="section_names_ip">`;
+              section_settings_html += `<input type="text" id="section${sec_counter}" class="form-control" name="section_names_ip" value="${vals.section_details.section_name}">`;
               sec_counter++;
             }
             section_settings_html += `<button class="btn btn-secondary" id="change-section-names-btn" onclick="cloudArticleApp.update_section_names()">Update Section Names</button>`;
-            section_settings.innerHTML = section_settings_html;
 
+            section_settings.innerHTML = section_settings_html;          
         },
 
         update_section_names: async function() {
@@ -7762,14 +7774,12 @@
           });
       
           floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
+          this.retrieveLatestContent();
         },
 
         retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
             floCloudAPI.requestObjectData(this.SUBJECT,{receiverID, senderIDs});
             floCloudAPI.requestGeneralData(this.CONTENT_TYPE);
-            // await this.delay(5000);
-            // document.getElementById('current_data').innerHTML = '';
-            // this.showFullContentOfArticle(floGlobals.appObjects[this.SUBJECT]);
         },
 
         createNewArticle: function(article_name, div='', number_of_sections=cloudArticleApp.numberOfSections) {
