@@ -29,7 +29,7 @@
 
         ::-webkit-scrollbar {
         width: 0.5em;
-        height: 0.5em;
+        height: 0.25em;
         }
 
         ::-webkit-scrollbar-track {
@@ -54,6 +54,7 @@
         border: none;
         -webkit-transition: background 0.2s ease;
         transition: background 0.2s ease;
+        font-size: 1em;
         }
 
         button:hover {
@@ -73,6 +74,8 @@
         padding: 1em;
         margin: 1em 0;
         color: white;
+        border: none;
+        font-size: 1em;
         }
 
         #modal_container {
@@ -101,8 +104,9 @@
         color: white;
         }
 
-        #article_creation_modal h3 {
+        #article_creation_modal h3, #article_creation_modal h4 {
         font-weight: normal;
+        width: 100%;
         }
 
         #article_creation_modal input {
@@ -111,17 +115,30 @@
         display: flexbox;
         width: 100%;
         padding: 1em;
-        border: solid 1px rgba(0, 0, 0, 0.2);
+        border: none;
         margin: 1em 0;
         background: #111;
         color: white;
+        }
+
+        #article_creation_modal select {
+        width: 100%;
+        padding: 1em;
+        background: #111;
+        color: white;
+        border: none;
+        font-size: 1em;
+        }
+
+        #article_creation_modal #section_settings, #article_creation_modal #section_names_select_settings {
+        width: 100%;
         }
 
         #article_creation_modal button {
         margin: 1em 0;
         }
 
-        #article_creation_modal button:first-of-type {
+        #article_creation_modal #hide_article_creation_modal {
         margin-left: auto;
         }
 
@@ -141,11 +158,10 @@
         -webkit-transition: opacity 0.2s ease;
         transition: opacity 0.2s ease;
         opacity: 0;
-        background: rgba(0, 0, 0, 0.8);
         cursor: pointer;
-        padding: 0.5em;
-        height: 4em;
-        width: 2em;
+        padding: 1.5em;
+        height: 100%;
+        width: 4em;
         z-index: 2;
         position: absolute;
         top: 50%;
@@ -154,8 +170,15 @@
         fill: white;
         }
 
+        .gallery-container svg:nth-of-type(1) {
+        background: -webkit-gradient(linear, right top, left top, from(transparent), to(rgba(0, 0, 0, 0.6)));
+        background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.6));
+        }
+
         .gallery-container svg:nth-of-type(2) {
         right: 0;
+        background: -webkit-gradient(linear, left top, right top, from(transparent), to(rgba(0, 0, 0, 0.6)));
+        background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.6));
         }
 
         .gallery {
@@ -170,6 +193,12 @@
         overflow-x: auto;
         -ms-scroll-snap-type: x mandatory;
             scroll-snap-type: x mandatory;
+        }
+
+        .gallery-name {
+        font-weight: normal;
+        color: white;
+        background: #00fa9a;
         }
 
         .article-body {
@@ -286,42 +315,65 @@
                 transform: translate(-50%, -50%);
         height: 2em;
         fill: teal;
+        overflow: visible;
         }
 
-        .spin {
-        -webkit-animation: spin 1s infinite ease;
-                animation: spin 1s infinite ease;
+        .pulse .first-orb {
+        -webkit-animation: pulse 1s infinite ease;
+                animation: pulse 1s infinite ease;
         }
 
-        @-webkit-keyframes spin {
+        .pulse .second-orb {
+        -webkit-animation: pulse 1s 0.1s infinite ease;
+                animation: pulse 1s 0.1s infinite ease;
+        }
+
+        .pulse .third-orb {
+        -webkit-animation: pulse 1s 0.2s infinite ease;
+                animation: pulse 1s 0.2s infinite ease;
+        }
+
+        @-webkit-keyframes pulse {
         0% {
-            -webkit-transform: rotate(0deg);
-                    transform: rotate(0deg);
+            -webkit-transform: scale(1);
+                    transform: scale(1);
+        }
+        60% {
+            -webkit-transform: scale(1.5);
+                    transform: scale(1.5);
         }
         100% {
-            -webkit-transform: rotate(359deg);
-                    transform: rotate(359deg);
+            -webkit-transform: scale(1);
+                    transform: scale(1);
         }
         }
 
-        @keyframes spin {
+        @keyframes pulse {
         0% {
-            -webkit-transform: rotate(0deg);
-                    transform: rotate(0deg);
+            -webkit-transform: scale(1);
+                    transform: scale(1);
+        }
+        60% {
+            -webkit-transform: scale(1.5);
+                    transform: scale(1.5);
         }
         100% {
-            -webkit-transform: rotate(359deg);
-                    transform: rotate(359deg);
+            -webkit-transform: scale(1);
+                    transform: scale(1);
         }
         }
 
         @media only screen and (max-width: 720px) {
         .article-body {
-            min-width: calc(100% - 5em);
+            min-width: 100%;
+        }
+        #article_container {
+            padding: 1em;
         }
         }
         /*# sourceMappingURL=main.css.map */
     </style>
+    
 </head>
 
 <script>
@@ -362,7 +414,10 @@
             <input type="text" id="article_name" placeholder="Article name">
     
             <input type="number" id="section_nums" placeholder="Section number">
-            
+
+            <div id="section_names_select_settings"></div>
+            <div id="section_settings"></div>
+
             <button id="hide_article_creation_modal" onclick="hide_article_creation_modal(this.parentNode)">Cancel</button>
             <button id="create_article">Create</button>
         </div>
@@ -389,10 +444,17 @@
       <button id="show_article_creation_modal" onclick="show_article_creation_modal()">Create article</button>
     </nav>
     
-    <svg class="hide" id="spinner" viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
-            <path class='p2' d="M6.5,13.8c-2.2-0.5-3.9-2.3-4.4-4.5c-0.7-3.6,1.7-6.8,5-7.2C7.6,2,8,1.6,8,1.1v0c0-0.6-0.5-1.1-1.1-1
-                C2.5,0.7-0.8,4.9,0.2,9.6c0.6,3.1,2.9,5.5,6,6.2c4.8,1.1,9.1-2.2,9.8-6.7C16,8.5,15.5,8,14.9,8h0c-0.5,0-0.9,0.4-1,0.9
-                C13.5,12.2,10.2,14.7,6.5,13.8z"/>
+    <svg class="hide" id="spinner"viewBox="0 0 100 118" xml:space="preserve">
+        <style type="text/css">
+            .first-orb{fill:#00FA9A;}
+            .second-orb{fill:#00EDBF;}
+            .third-orb{fill:#1AA7BA;}
+        </style>
+        <g>
+            <circle class="first-orb" cx="54" cy="12" r="12"/>
+            <circle class="second-orb" cx="24" cy="42" r="24"/>
+            <circle class="third-orb" cx="68" cy="86" r="32"/>
+        </g>
     </svg>
 
     <section id="article_container">
@@ -410,14 +472,14 @@
     function prevArticle(container){
         container.children[0].scrollBy({
             top: 0,
-            left: -100,
+            left: -400,
             behavior: 'smooth'
         });
     }
     function nextArticle(container){
         container.children[0].scrollBy({
             top: 0,
-            left: 100,
+            left: 400,
             behavior: 'smooth'
         });
     }
@@ -7371,6 +7433,8 @@
                 floGlobals.vectorClock[message.object] = vc
                 compactIDB.writeData("vectorClocks", vc, message.object)
             }
+            document.getElementById('current_data').innerHTML = '';
+            cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
         }catch(error){
             console.log(error)
         }
@@ -7389,6 +7453,8 @@
                 floGlobals.generalVC[event.filterStr] = vc
                 compactIDB.writeData("generalVC", vc, event.filterStr)
             }
+            document.getElementById('current_data').innerHTML = '';
+            cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
         }catch(error){
             console.log(error)
         }
@@ -7406,12 +7472,12 @@
 
 <script>
     function onLoadStartUp() {
-        document.getElementById('spinner').classList.add('show', 'spin');
+        document.getElementById('spinner').classList.add('show', 'pulse');
         initIndexedDB().then(result => {
             console.log(result)
             getCredentials().then(result => {
                 console.log(result)
-                ////showMessage(`FLO_ID: ${myFloID}`)
+                //showMessage(`FLO_ID: ${myFloID}`)
                 readSubAdminListFromAPI().then(result => {
                     console.log(result)
                     readSupernodeListFromAPI().then(result => {
@@ -7619,7 +7685,7 @@
 
         SUBJECT: "testArticle4",
 
-        numberOfSections: 7,
+        numberOfSections: 5,
 
         CONTENT_TYPE: "typeContentCollab4",
 
@@ -7637,7 +7703,7 @@
         },
 
         showFullContentOfArticle: function(obj) {
-            document.getElementById('spinner').classList.remove('show', 'spin');
+            document.getElementById('spinner').classList.remove('show', 'pulse');
             const full_data_div = document.getElementById('current_data'),
                   articleSubject = floGlobals.appObjects[this.SUBJECT]; 
 
@@ -7669,6 +7735,11 @@
                 for(secKey in articleSubject[key].data) {
                     let tempCounter = 0;
                     const secObject = articleSubject[key].data[secKey];
+                    
+                    if(typeof secObject.section_details==="object"
+                      && secObject.section_details.section_name.length) {
+                      article_structure += `<h3 class="gallery-name">${secKey.toUpperCase()} ${secObject.section_details.section_name}</h3>`;
+                    }
              
                     // Add non scored new entries from users
                     if(typeof new_entries_array[secKey]==="object") {
@@ -7725,35 +7796,66 @@
                           </div>`;
                         tempCounter++;
                     }         
-                    if(tempCounter > 1 && window.innerWidth < 720)
+                    if((tempCounter > 1 && window.innerWidth < 720) || (tempCounter > 3 && window.innerWidth > 720))
                         article_structure += `
                         </div>
-                            <svg class="navigation-arrows" onclick="prevArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
-                            <polygon points="71.94,29.94 15.31,29.94 39.6,5.66 33.94,0 5.66,28.28 5.66,28.28 0,33.94 5.66,39.6 5.66,39.6 33.94,67.88 
-                                39.6,62.23 15.31,37.94 71.94,37.94 "/>
+                            <svg class="navigation-arrows" onclick="prevArticle(this.parentNode)"  viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
+                                <polygon points="5.66,50.91 45.25,90.51 50.91,84.85 11.31,45.25 50.91,5.66 45.25,0 5.66,39.6 0,45.25 	"/>
                             </svg>
 
-                            <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
-                            <polygon points="0,37.94 56.63,37.94 32.34,62.23 38,67.88 66.28,39.6 66.28,39.6 71.94,33.94 66.28,28.28 66.28,28.28 38,0 
-                                32.34,5.66 56.63,29.94 0,29.94 "/>
-                            </svg>`;
-                    if(tempCounter > 3 && window.innerWidth > 720)
-                        article_structure += `
-                        </div>
-                            <svg class="navigation-arrows" onclick="prevArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
-                            <polygon points="71.94,29.94 15.31,29.94 39.6,5.66 33.94,0 5.66,28.28 5.66,28.28 0,33.94 5.66,39.6 5.66,39.6 33.94,67.88 
-                                39.6,62.23 15.31,37.94 71.94,37.94 "/>
-                            </svg>
-
-                            <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 71.94 67.88" style="enable-background:new 0 0 71.94 67.88;" xml:space="preserve">
-                            <polygon points="0,37.94 56.63,37.94 32.34,62.23 38,67.88 66.28,39.6 66.28,39.6 71.94,33.94 66.28,28.28 66.28,28.28 38,0 
-                                32.34,5.66 56.63,29.94 0,29.94 "/>
+                            <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
+                                <polygon points="45.25,39.6 5.66,0 0,5.66 39.6,45.25 0,84.85 5.66,90.51 45.25,50.91 50.91,45.25 "/>
                             </svg>`;
                         article_structure+=`</div>`;
                 }
                 
             }
             full_data_div.innerHTML = article_structure;
+
+            //section_settings
+            if(!floGlobals.subAdmins.includes(myFloID)) return false;
+            const section_names_settings = document.getElementById('section_names_select_settings');
+            let section_settings_html = `<h4>Section Settings</h4>
+                                        <select class="form-control" id="topic_name_section" onchange="cloudArticleApp.pop_up_section_names_ui()">
+                                        <option>Choose Topic...</option>`;
+            Object.keys(floGlobals.appObjects[this.SUBJECT]).forEach(k=>{
+              section_settings_html += `<option>${k}</option>`;
+            });
+            section_settings_html += `</select>`;
+            section_names_settings.innerHTML = section_settings_html;
+        },
+
+        pop_up_section_names_ui: function() {
+            let sec_counter = 1;
+            let section_settings_html = ``;
+            const Topic = document.getElementById("topic_name_section").value;
+            const section_settings = document.getElementById("section_settings");
+            
+            if(!Object.keys(floGlobals.appObjects[this.SUBJECT]).includes(Topic)) return;
+            section_settings.innerHTML=""; 
+            section_settings_html += `<h5>Section Names: </h5>`;
+            for(vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
+              section_settings_html += `<label for="section${sec_counter}">Section ${sec_counter}: </label>`;
+              section_settings_html += `<input type="text" id="section${sec_counter}" class="form-control" name="section_names_ip" value="${vals.section_details.section_name}">`;
+              sec_counter++;
+            }
+            section_settings_html += `<button class="btn btn-secondary" id="change-section-names-btn" onclick="cloudArticleApp.update_section_names()">Update Section Names</button>`;
+
+            section_settings.innerHTML = section_settings_html;          
+        },
+
+        update_section_names: async function() {
+          if(!floGlobals.subAdmins.includes(myFloID)) return;
+          var sec_items = document.getElementsByName("section_names_ip");
+          let full_data =  JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
+          const Topic = Object.keys(full_data)[0];
+          sec_items.forEach((y,i)=>{
+            i++;
+            full_data[Topic].data[`section${i}`].section_details.section_name=y.value;
+          });
+      
+          floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, {receiverID: floGlobals.adminID}); 
+          this.retrieveLatestContent();
         },
 
         retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
@@ -7773,25 +7875,35 @@
                 let content = '';
                 if(div=='article_creation_modal') {
                     //content = document.getElementById(`article_content${i}`).value;
-                    new_article[article_name].data[`section${i}`] = {};
-                    new_article[article_name].data[`section${i}`]["iteration0"] = {
+                    new_article[article_name].data[`section${i}`] = {
+                      section_details: {},
+                      section_iters: {},
+                    };
+                    new_article[article_name].data[`section${i}`]["section_details"]={
+                      section_name: ""
+                    };
+                    new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
                         content: "",
                         content_creator: myFloID,
                         score: 0
                     }
                 } else if(div=='update_data_div') {
                     content = document.getElementById(`article_content_up`).value;
-                    new_article[article_name].data[`section${i}`] = {};
-                    if(i!==1) {
-                        content = '';
-                    }
-                    new_article[article_name].data[`section${i}`]["iteration0"] = {
+                    new_article[article_name].data[`section${i}`] = {  
+                      section_details: {},
+                      section_iters: {},
+                    };
+                    new_article[article_name].data[`section${i}`]["section_details"]={
+                      section_name: ""
+                    };
+                    if(i!==1) content = '';
+                    new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
                         content: content,
                         content_creator: myFloID,
                         score: 0
                     }
                 } else {
-                    console.error('errror');
+                    console.error('error');
                 }
                     
             }
