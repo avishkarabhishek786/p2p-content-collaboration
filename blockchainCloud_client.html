@@ -596,7 +596,14 @@
 </script>
 
 <body onload="onLoadStartUp()">
-    <section class="popup-container hide">
+    <div>
+        <button onclick="cloudArticleApp.retrieveLatestContent()">Refresh</button>
+        <button onclick="cloudArticleApp.logout()">Logout</button>
+        <button onclick="cloudArticleApp.reset_export_list()">Reset Export Selection</button>
+        <button onclick="cloudArticleApp."></button>
+        <button onclick="cloudArticleApp.export_as_file()">Export Selections as file</button>
+    </div>
+    <section class="popup-container hide" id="article_creation_div">
         <div id="article_creation_modal" class="popup">
             <h3>Create a new article</h3>
             <input type="text" id="article_name" placeholder="Article name">
@@ -8333,7 +8340,6 @@ Bitcoin.Util = {
     sendDataToSN(data, snfloID){
         return new Promise((resolve, reject) => {
             console.log(snfloID)
-            console.info("five");
             var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
             websocket.onmessage = (evt => {
                 if(evt.data == '$+'){
@@ -8361,7 +8367,6 @@ Bitcoin.Util = {
     sendData: function (data, floID) {
       return new Promise((resolve, reject) => {
         this.kBucket.determineClosestSupernode(floID).then(closestNode => {
-            console.info("four");
             console.log(closestNode)
             this.sendDataToSN(data, closestNode[0])
                 .then(result => resolve(result))
@@ -9039,7 +9044,6 @@ Bitcoin.Util = {
                     type: type,
                     comment: options.comment || ""
                 }
-                console.info("three");
                 console.table(data);
                 floSupernode.sendData(JSON.stringify(data), data.receiverID)
                     .then(result => resolve(result))
@@ -9070,7 +9074,6 @@ Bitcoin.Util = {
         //send General Data
         sendGeneralData: function(message, type, options = {}){
             return new Promise((resolve,reject) => {
-                console.info("two");
                 this.sendApplicationData(message, type, options)
                     .then(result => resolve(result))
                     .catch(error => reject(error))
@@ -9429,13 +9432,15 @@ Bitcoin.Util = {
     
     const cloudArticleApp = {
 
-        SUBJECT: "BusinessDesign1", // BusinessDesign1 | testArticle9
+        SUBJECT: "testArticle9", // BusinessDesign1 | testArticle9
 
         numberOfSections: 5,
 
-        CONTENT_TYPE: "BUSINESS_DESIGN", // BUSINESS_DESIGN | typeContentCollab9
+        CONTENT_TYPE: "typeContentCollab9", // BUSINESS_DESIGN | typeContentCollab9
 
         todaysContenthashList: [],
+
+        export_file_object: {},
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -9453,8 +9458,6 @@ Bitcoin.Util = {
         showFullContentOfArticle: function(obj) {
             const full_data_div = document.getElementById('current_data'),
                   articleSubject = floGlobals.appObjects[this.SUBJECT]; 
-
-            //const new_generalData = floDapps.getNextGeneralData(this.CONTENT_TYPE, floGlobals.vectorClock[this.SUBJECT]);
 
             const new_generalData = floGlobals.generalData[JSON.stringify({application:floGlobals.application, type:cloudArticleApp.CONTENT_TYPE})]
 
@@ -9487,7 +9490,8 @@ Bitcoin.Util = {
 
                     if(typeof secObject.section_details==="object"
                       && secObject.section_details.section_name.length) {
-                      article_structure += `<h3 class="gallery-name">${secObject.section_details.section_name}</h3>`;
+                      article_structure_id = Crypto.SHA256(secObject.section_details.section_name);  
+                      article_structure += `<h3 class="gallery-name" id="${article_structure_id}">${secObject.section_details.section_name}</h3>`;
                     }
              
                     // Add non scored new entries from users
@@ -9513,13 +9517,7 @@ Bitcoin.Util = {
                         let vc = article_data.vectorClock || "";
 
                         if(Number(article_data.score)>0) {
-                          // const new_content_object = {
-                          //   content: article_data.content,
-                          //   content_creator: article_data.content_creator,
-                          //   score: article_data.score,
-                          //   vectorClock: article_data.vectorClock,
-                          //   signerPubKey: article_data.signerPubKey
-                          // }
+
                           const new_content_object = {
                             article_name: article_data.article_name,
                             content: article_data.content,
@@ -9553,6 +9551,7 @@ Bitcoin.Util = {
                                     <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
                                 </div>
                                 <div class="card-footer">
+                                    <h5 id="exp_${gen_div_id}"  onclick="cloudArticleApp.register_content_to_export(event)">Export</h5>
                                     <h5 title="Give score to this article">
                                         <svg viewBox="0 0 16.55 16" style="enable-background:new 0 0 16.55 16;" xml:space="preserve" fill="${fill}">
                                             <polygon
@@ -9722,7 +9721,7 @@ Bitcoin.Util = {
             let iterNum = Number(iterNumber)+1;
 
             // Convert line breaks into br
-            newcontent = newcontent.replace(/\n/g, '<br>').trim();
+            newcontent = newcontent.replace(/\n/g, '<br>').trim(); //.replace(/\r\n|\r|\n/g,"</br>")
 
             const contentSHA256Hash = Crypto.SHA256(newcontent);
 
@@ -9764,8 +9763,6 @@ Bitcoin.Util = {
                 signerPubKey: myPubKey
               }
               general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
-
-              console.info("one");
 
               floCloudAPI.sendGeneralData(general_data_obj,this.CONTENT_TYPE,{receiverID:floGlobals.adminID, senderIDs:[myFloID]});
             }
@@ -9814,6 +9811,82 @@ Bitcoin.Util = {
             }
           }
         },
+
+        register_content_to_export: function(event) {
+          let target = cloudArticleApp.getEventTarget(event);
+          let article_id = target.id.substring(4);
+          let parent_heading_id = target.parentElement.parentElement.parentElement.parentElement.previousElementSibling.id;
+          
+          if(typeof cloudArticleApp.export_file_object[parent_heading_id]!=="object") {
+            this.register_heading_to_export(parent_heading_id);
+          }
+          if(JSON.stringify(cloudArticleApp.export_file_object[parent_heading_id].contents).search(article_id)>=0) return;
+          const rank = Number(Object.keys(cloudArticleApp.export_file_object[parent_heading_id].contents))+1;
+          cloudArticleApp.export_file_object[parent_heading_id].contents[rank] = {
+            article_id: article_id,
+            rank: rank
+          }
+          target.classList.add("snippet_selected");
+          target.innerText= 'Selected';
+        },
+
+        register_heading_to_export: function(heading_id="") {
+            if(heading_id.length<1 || typeof cloudArticleApp.export_file_object[heading_id]==="object") return;
+            
+            cloudArticleApp.export_file_object[heading_id] = {
+                title: document.getElementById(heading_id).innerText,
+                rank: Object.keys(cloudArticleApp.export_file_object).length+1,
+                contents: {}
+            };
+        },
+
+        export_as_file: function(e) {
+            const headings = Object.values(cloudArticleApp.export_file_object).sort((a,b)=>a.rank<b.rank);
+
+            let t = ``;
+
+            for(textContent of headings) {
+                let snippets = Object.values(textContent.contents).sort((c,d)=>c.rank<d.rank);
+                t += `<h4>${textContent.title}</h4>`;
+                for(snips of snippets) {
+                    if(typeof snips!=="object") continue;
+                    t += '<p>' +document.getElementById(snips.article_id).innerText+'</p>';
+                }
+            }
+
+            let file_name = "content_collaboration"+new Date().getTime();
+
+            this.downloadInnerHtml(file_name, t, 'text/html');
+
+        },
+
+        // https://stackoverflow.com/a/22085875/5348972
+        downloadInnerHtml: function(filename, elHtml, mimeType) {
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(new Blob([elHtml], { type: mimeType + ';charset=utf-8;' }), filename);
+            } else {
+                var link = document.createElement('a');
+                mimeType = mimeType || 'text/plain';
+
+                link.setAttribute('download', filename);
+                link.setAttribute('href', 'data:' + mimeType  +  ';charset=utf-8,' + encodeURIComponent(elHtml));
+                link.click(); 
+            }
+            cloudArticleApp.export_file_object = {};
+        },
+
+        reset_export_list: function() {
+            cloudArticleApp.export_file_object = {};
+            let cl_list = document.getElementsByClassName('snippet_selected');
+            for(cl of cl_list) {
+                cl.innerText= 'Export';
+                cl.classList.remove("snippet_selected");
+            }
+        }, 
+        logout: function() {
+            floDapps.clearCredentials();
+            alert('You have logged out successfully.')
+        }
 
     }
 
