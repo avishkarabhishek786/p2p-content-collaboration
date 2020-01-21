@@ -603,32 +603,8 @@
         <button onclick="cloudArticleApp."></button>
         <button onclick="cloudArticleApp.export_as_file()">Export Selections as file</button>
     </div>
-    <section class="popup-container hide" id="article_creation_div">
-        <div id="article_creation_modal" class="popup">
-            <h3>Create a new article</h3>
-            <input type="text" id="article_name" placeholder="Article name">
+    <div id="admindiv"></div>
     
-            <input type="number" id="section_nums" placeholder="Number of sections">
-
-            <button onclick="hidePopup('article_creation_modal')">Cancel</button>
-            <button id="reset_data_btn">Create</button>
-            
-        </div>
-    </section>
-    <div class="popup-container hide">
-        <div id="edit_article" class="popup">
-            <header>
-                <h3>Edit section names</h3>
-                <button onclick="cloudArticleApp.update_section_names()">
-                    <svg viewBox="0 0 45.91 32.62">
-                        <polyline points="0.71,17.21 14.71,31.21 45.21,0.71 "/>
-                    </svg>
-                    Done</button>
-            </header>
-            <div id="edit_section_container"></div>
-        </div>
-    </div>
-
     <nav id="navbar">
         <svg id="icon" viewBox="0 0 99.555 117.877">
             <style type="text/css">
@@ -666,80 +642,122 @@
         <div id="current_data"></div>
     </section>
 
-    <script>
-        // function required for popups or modals to appear
-        function showPopup(popup) { 
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.remove('hide');    
-            thisPopup.classList.add('no-transformations');    
-            window.onclick = function(event) {
-                if (event.target == thisPopup.parentNode)
-                    hidePopup(popup);
-            }
+ <script>
+
+    // function required for popups or modals to appear
+    function showPopup(popup) { 
+        let thisPopup = document.getElementById(popup);
+        thisPopup.parentNode.classList.remove('hide');    
+        thisPopup.classList.add('no-transformations');    
+        window.onclick = function(event) {
+            if (event.target == thisPopup.parentNode)
+                hidePopup(popup);
         }
-    
-        // hides the popup or modal 
-        function hidePopup(popup) { 
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.add('hide');    
-            thisPopup.classList.remove('no-transformations');    
+    }
+
+    // hides the popup or modal 
+    function hidePopup(popup) { 
+        let thisPopup = document.getElementById(popup);
+        thisPopup.parentNode.classList.add('hide');    
+        thisPopup.classList.remove('no-transformations');    
+    }
+    function prevArticle(container){
+        let observer = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting)
+                container.children[1].classList.add('hide')
+            else
+                container.children[1].classList.remove('hide')
+        },{
+            root: container,
+            threshold: 1
+        })
+        observer.observe(container.children[0].firstElementChild)
+        container.children[0].scrollBy({
+            top: 0,
+            left: -400,
+            behavior: 'smooth'
+        });
+    }
+    function nextArticle(container){
+        container.children[1].classList.remove('hide')
+        let observer = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting)
+                container.children[2].classList.add('hide')
+            else
+                container.children[2].classList.remove('hide')
+        }, {
+            root: container,
+            threshold: 1
+        })
+        observer.observe(container.children[0].lastElementChild)
+
+        container.children[0].scrollBy({
+            top: 0,
+            left: 400,
+            behavior: 'smooth'
+        });  
+    }
+    function showMessage(msg) {
+        document.getElementById('show_log_events').textContent = msg;
+        if(document.getElementById('loader_container').classList.contains('hide')){
+            showLoader()
+            setTimeout(() => {
+                hideLoader()
+            }, 1000);
         }
-        function prevArticle(container){
-            let observer = new IntersectionObserver((entries) => {
-                if(entries[0].isIntersecting)
-                    container.children[1].classList.add('hide')
-                else
-                    container.children[1].classList.remove('hide')
-            },{
-                root: container,
-                threshold: 1
-            })
-            observer.observe(container.children[0].firstElementChild)
-            container.children[0].scrollBy({
-                top: 0,
-                left: -400,
-                behavior: 'smooth'
-            });
+    }
+    function showLoader(){
+        let spinner = document.getElementById('loader_container');
+            spinner.firstElementChild.classList.add('pulse');
+            spinner.classList.remove('hide');
+    }
+    function hideLoader(){
+        let spinner = document.getElementById('loader_container');
+            spinner.firstElementChild.classList.remove('pulse');
+            spinner.classList.add('hide');
+    }
+
+    function buidAdminUI() {
+        
+        if(floGlobals.subAdmins.includes(myFloID)) {
+            let admindivui = `<section class="popup-container hide" id="article_creation_div">
+                <div id="article_creation_modal" class="popup">
+                    <h3>Create a new article</h3>
+                    <input type="text" id="article_name" placeholder="Article name">
+            
+                    <input type="number" id="section_nums" placeholder="Number of sections">
+
+                    <button onclick="hidePopup('article_creation_modal')">Cancel</button>
+                    <button id="reset_data_btn">Create</button>
+                    
+                </div>
+            </section>
+            <div class="popup-container hide">
+                <div id="edit_article" class="popup">
+                    <header>
+                        <h3>Edit section names</h3>
+                        <button onclick="cloudArticleApp.update_section_names()">
+                            <svg viewBox="0 0 45.91 32.62">
+                                <polyline points="0.71,17.21 14.71,31.21 45.21,0.71 "/>
+                            </svg>
+                            Done</button>
+                    </header>
+                    <div id="edit_section_container"></div>
+                </div>
+            </div>`;
+
+            document.getElementById('admindiv').innerHTML = admindivui;
+
+            const reset_data_btn = document.getElementById('reset_data_btn');
+            reset_data_btn.onclick = function() {
+                cloudArticleApp.resetArticleContent();
+                hidePopup('edit_article')
+            }    
         }
-        function nextArticle(container){
-            container.children[1].classList.remove('hide')
-            let observer = new IntersectionObserver((entries) => {
-                if(entries[0].isIntersecting)
-                    container.children[2].classList.add('hide')
-                else
-                    container.children[2].classList.remove('hide')
-            }, {
-                root: container,
-                threshold: 1
-            })
-            observer.observe(container.children[0].lastElementChild)
-    
-            container.children[0].scrollBy({
-                top: 0,
-                left: 400,
-                behavior: 'smooth'
-            });  
-        }
-        function showMessage(msg) {
-            document.getElementById('show_log_events').textContent = msg;
-            if(document.getElementById('loader_container').classList.contains('hide')){
-                showLoader()
-                setTimeout(() => {
-                    hideLoader()
-                }, 1000);
-            }
-        }
-        function showLoader(){
-            let spinner = document.getElementById('loader_container');
-                spinner.firstElementChild.classList.add('pulse');
-                spinner.classList.remove('hide');
-        }
-        function hideLoader(){
-            let spinner = document.getElementById('loader_container');
-                spinner.firstElementChild.classList.remove('pulse');
-                spinner.classList.add('hide');
-        }
-    </script>    
+
+        
+    };
+ </script>
 
 <script id="init_lib">
     //All util libraries required for Standard operations (DO NOT EDIT ANY)
@@ -9423,6 +9441,7 @@ Bitcoin.Util = {
             console.log(result)
             showMessage(result)
             showMessage(`Welcome FLO_ID: ${myFloID}`)
+            buidAdminUI();
             cloudArticleApp.retrieveLatestContent();
         }).catch(error => console.error(error))
     }
@@ -9891,17 +9910,6 @@ Bitcoin.Util = {
     }
 
  </script>
-
- <script>
-    (function() {
-        const reset_data_btn = document.getElementById('reset_data_btn');
-        reset_data_btn.onclick = function() {
-            cloudArticleApp.resetArticleContent();
-            hidePopup('edit_article')
-        }
-    })();
- </script>
-
 
 </body>
 </html>
