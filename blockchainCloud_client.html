@@ -9450,11 +9450,11 @@ Bitcoin.Util = {
     
     const cloudArticleApp = {
 
-        SUBJECT: "testArticle9", // BusinessDesign1 | testArticle9
+        SUBJECT: "BusinessDesign1", // BusinessDesign1 | testArticle9
 
         numberOfSections: 5,
 
-        CONTENT_TYPE: "typeContentCollab9", // BUSINESS_DESIGN | typeContentCollab9
+        CONTENT_TYPE: "BUSINESS_DESIGN", // BUSINESS_DESIGN | typeContentCollab9
 
         todaysContenthashList: [],
 
@@ -9833,7 +9833,7 @@ Bitcoin.Util = {
         register_content_to_export: function(event) {
           let target = cloudArticleApp.getEventTarget(event);
           let article_id = target.id.substring(4);
-          let parent_heading_id = target.parentElement.parentElement.parentElement.parentElement.previousElementSibling.id;
+          let parent_heading_id = target.closest('.gallery-container').previousElementSibling.id;
           
           if(typeof cloudArticleApp.export_file_object[parent_heading_id]!=="object") {
             this.register_heading_to_export(parent_heading_id);
