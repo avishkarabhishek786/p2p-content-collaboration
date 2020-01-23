@@ -6,562 +6,741 @@
     <meta name="keywords" content="blockchain,ContentCollaboration,RanchiMall">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="This web app can be used to collaborate between various teams using blockchain technology.">
-    <link href="https://fonts.googleapis.com/css?family=Quicksand|Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700|Roboto:300,400,500,700&display=swap" rel="stylesheet">
     <!--<link rel="stylesheet" href="css/main.css">-->
     <style>html {
-        font-size: 16px;
-      }
-      
-      @media only screen and (min-width: 1920px) {
-        html {
-          font-size: 18px;
-        }
-      }
-      
-      @media only screen and (min-width: 2560px) {
-        html {
-          font-size: 20px;
-        }
-      }
-      
-      @media only screen and (min-width: 3840px) {
-        html {
-          font-size: 22px;
-        }
-      }
-      
-      body {
-        margin: 0;
-        font-size: 16px;
-        background: #111;
-      }
-      
-      :root {
-        --primary-color: #00fa9a;
-        --light-shade: rgba(255, 255, 255, 0.1);
-      }
-      
-      * {
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        font-family: 'Roboto', sans-serif;
-      }
-      
-      h1, h2, h3, h4, h5 {
-        font-family: 'Quicksand', sans-serif;
-      }
-      
-      ::-webkit-scrollbar {
-        width: 0.6rem;
-        height: 0.25rem;
-      }
-      
-      ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-      }
-      
-      ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-      }
-      
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-      
-      button {
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
-        display: inline-flex;
-        -webkit-box-align: center;
-            -ms-flex-align: center;
-                align-items: center;
-        background: transparent;
-        color: var(--primary-color);
-        padding: 1.2rem;
-        border: none;
-        -webkit-transition: background 0.2s ease;
-        transition: background 0.2s ease;
-        font-weight: bold;
-      }
-      
-      button svg {
-        height: 1rem;
-      }
-      
-      button:hover {
-        background: var(--light-shade);
-        cursor: pointer;
-      }
-      
-      button:first-of-type {
-        margin-left: auto;
-      }
-      
-      button:focus {
-        outline: none;
-      }
-      
-      input {
-        -ms-flex-item-align: start;
-            align-self: flex-start;
-        display: flexbox;
-        width: 100%;
-        padding: 1rem;
-        border: none;
-        margin: 1rem 0;
-        background: #181818;
-        color: white;
-        font-size: 1rem !important;
-      }
-      
-      .popup-container {
-        display: -ms-grid;
-        display: grid;
-        position: fixed;
-        width: 100vw;
-        height: 100vh;
-        top: 0;
-        left: 0;
-        place-items: center;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 4;
-        -webkit-transition: opacity 0.2s ease;
-        transition: opacity 0.2s ease;
-      }
-      
-      .popup-container .popup {
-        overflow-y: auto;
-        padding: 1rem 0;
-        position: relative;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-wrap: wrap;
-            flex-wrap: wrap;
-        background: #222;
-        -webkit-transform: translateY(1em);
-                transform: translateY(1em);
-        -webkit-transition: -webkit-transform 0.2s ease;
-        transition: -webkit-transform 0.2s ease;
-        transition: transform 0.2s ease;
-        transition: transform 0.2s ease, -webkit-transform 0.2s ease;
-        -webkit-box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.24);
-                box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.24);
-        color: white;
-      }
-      
-      #article_creation_modal {
-        max-height: 24rem;
-        width: 24rem;
-        padding: 1rem 2rem;
-      }
-      
-      #article_creation_modal h3, #article_creation_modal h4 {
-        font-weight: normal;
-        width: 100%;
-      }
-      
-      #article_creation_modal button {
-        margin: 1rem 0;
-      }
-      
-      #article_creation_modal button:first-of-type {
-        margin-left: auto;
-        margin-right: 1rem;
-      }
-      
-      .section-title {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        width: 100%;
-        -webkit-box-align: center;
-            -ms-flex-align: center;
-                align-items: center;
-        -webkit-box-orient: horizontal;
-        -webkit-box-direction: normal;
-            -ms-flex-direction: row;
-                flex-direction: row;
-      }
-      
-      .section-title h2 {
-        color: #111;
-        background: var(--primary-color);
-        padding: 0.5rem;
-        margin: 0;
-      }
-      
-      .gallery-name {
-        padding: 0.2rem 0;
-        margin: 1rem 0;
-        color: white;
-      }
-      
-      .edit-article {
-        margin-left: auto;
-      }
-      
-      .edit-article svg {
-        fill: var(--primary-color);
-        margin-right: 0.5rem;
-      }
-      
-      #edit_article {
-        width: 24rem;
-        padding: 0;
-      }
-      
-      #edit_article label {
-        font-size: 0.9rem;
-      }
-      
-      #edit_article input {
-        margin-bottom: 2rem;
-        margin-top: 0.5rem;
-        width: 100%;
-      }
-      
-      #edit_article header {
-        width: 100%;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-orient: horizontal;
-        -webkit-box-direction: normal;
-            -ms-flex-direction: row;
-                flex-direction: row;
-        -webkit-box-align: center;
-            -ms-flex-align: center;
-                align-items: center;
-        padding: 0.5rem 2rem;
-      }
-      
-      #edit_article header button {
-        margin-left: auto;
-        margin-right: 0;
-        -ms-flex-item-align: center;
-            -ms-grid-row-align: center;
-            align-self: center;
-      }
-      
-      #edit_article header button svg {
-        stroke: var(--primary-color);
-        stroke-width: 0.2rem;
-        fill: none;
-        margin-right: 0.5rem;
-      }
-      
-      #edit_article #edit_section_container {
-        max-height: 50vh;
-        overflow-y: auto;
-        padding: 1rem 2rem;
-      }
-      
-      .gallery-container {
-        position: relative;
-      }
-      
-      .gallery-container .navigation-arrows {
-        -webkit-transition: opacity 0.2s ease;
-        transition: opacity 0.2s ease;
-        cursor: pointer;
-        padding: 1.5rem;
-        height: 100%;
-        width: 4rem;
-        z-index: 2;
-        position: absolute;
-        top: 50%;
-        -webkit-transform: translateY(-50%);
-                transform: translateY(-50%);
-        fill: white;
-      }
-      
-      .gallery-container .navigation-arrows:nth-of-type(1) {
-        background: -webkit-gradient(linear, right top, left top, from(transparent), to(rgba(0, 0, 0, 0.6)));
-        background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.6));
-      }
-      
-      .gallery-container .navigation-arrows:nth-of-type(2) {
-        right: 0;
-        background: -webkit-gradient(linear, left top, right top, from(transparent), to(rgba(0, 0, 0, 0.6)));
-        background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.6));
-      }
-      
-      .gallery {
-        position: relative;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-orient: horizontal;
-        -webkit-box-direction: normal;
-            -ms-flex-direction: row;
-                flex-direction: row;
-        overflow-x: auto;
-        -ms-scroll-snap-type: x mandatory;
-            scroll-snap-type: x mandatory;
-      }
-      
-      .article-body {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-            -ms-flex-direction: column;
-                flex-direction: column;
-        scroll-snap-align: start;
-        min-width: 30%;
-        background-color: #222;
-        color: white;
-        margin: 0 1rem 1rem 0;
-      }
-      
-      .article-body .article-header {
-        padding: 0.5rem 1rem;
-        word-break: break-all;
-      }
-      
-      .article-body .article-header h5 {
-        font-weight: normal;
-        color: #82DDF0;
-        font-family: 'roboto', sans-serif;
-      }
-      
-      .article-body .card-body {
-        -webkit-box-flex: 1;
-            -ms-flex: 1;
-                flex: 1;
-      }
-      
-      .article-body .card-body .content-div {
-        padding: 0 1rem;
-        min-height: 12rem;
-        line-height: 1.4rem;
-        max-height: 60vh;
-        overflow-y: auto;
-        font-family: 'Quicksand', serif;
-        font-weight: normal !important;
-        font-size: 1.1rem;
-      }
-      
-      .article-body .card-footer {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        padding: 0.5rem 1rem;
-      }
-      
-      .article-body .card-footer h5 {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        font-weight: normal;
-        -webkit-user-select: none;
-           -moz-user-select: none;
-            -ms-user-select: none;
-                user-select: none;
-        -webkit-box-align: center;
-            -ms-flex-align: center;
-                align-items: center;
-      }
-      
-      .article-body .card-footer h5:first-of-type {
-        margin-left: auto;
-        color: var(--primary-color);
-        cursor: pointer;
-      }
-      
-      .article-body .card-footer h5 svg {
-        stroke: var(--primary-color);
-        width: 1.2rem;
-        margin-right: 0.5rem;
-      }
-      
-      .article-body .card-footer h5 svg:hover {
-        fill: var(--primary-color);
-      }
-      
-      .show {
-        opacity: 1;
-        pointer-events: all;
-      }
-      
-      .hide {
-        opacity: 0;
-        pointer-events: none;
-      }
-      
-      #article_container {
-        padding: 2rem;
-        position: absolute;
-        width: 100%;
-        height: calc(100% - 4.4rem);
-        bottom: 0;
-        overflow-y: auto;
-      }
-      
-      .no-transformations {
-        -webkit-transform: none !important;
-                transform: none !important;
-      }
-      
-      #navbar {
-        position: fixed;
-        width: 100%;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-orient: horizontal;
-        -webkit-box-direction: normal;
-            -ms-flex-direction: row;
-                flex-direction: row;
-        -webkit-box-align: center;
-            -ms-flex-align: center;
-                align-items: center;
-        color: white;
-        background: #222;
-        padding: 0.5rem;
-        z-index: 2;
-      }
-      
-      #navbar h5 {
-        font-weight: normal;
-        margin: 0 0 0.25rem 0;
-      }
-      
-      #navbar span {
-        font-size: 0.9rem;
-        -ms-grid-column-align: center;
-            justify-self: center;
-      }
-      
-      #navbar #icon {
-        width: 2rem;
-        margin: 0 0.5rem;
-      }
-      
-      #navbar button {
-        text-transform: uppercase;
-      }
-      
-      #navbar button svg {
-        stroke: var(--primary-color);
-        stroke-width: 0.2rem;
-        margin-right: 0.5rem;
-      }
-      
-      #loader_container {
-        position: fixed;
-        height: 100vh;
-        width: 100vw;
-        top: 0;
-        background: rgba(0, 0, 0, 0.3);
-        display: -ms-grid;
-        display: grid;
-        place-content: center;
-        z-index: 4;
-        text-align: center;
-      }
-      
-      #loader_container #spinner {
-        position: relative;
-        height: 2rem;
-        fill: teal;
-        overflow: visible;
-        -ms-grid-column-align: center;
-            justify-self: center;
-      }
-      
-      #loader_container h4 {
-        font-weight: normal;
-        color: white;
-      }
-      
-      .pulse .first-orb {
-        -webkit-animation: pulse 1s infinite ease;
-                animation: pulse 1s infinite ease;
-      }
-      
-      .pulse .second-orb {
-        -webkit-animation: pulse 1s 0.1s infinite ease;
-                animation: pulse 1s 0.1s infinite ease;
-      }
-      
-      .pulse .third-orb {
-        -webkit-animation: pulse 1s 0.2s infinite ease;
-                animation: pulse 1s 0.2s infinite ease;
-      }
-      
-      @-webkit-keyframes pulse {
-        0% {
-          -webkit-transform: scale(1);
-                  transform: scale(1);
-        }
-        60% {
-          -webkit-transform: scale(1.5);
-                  transform: scale(1.5);
-        }
-        100% {
-          -webkit-transform: scale(1);
-                  transform: scale(1);
-        }
-      }
-      
-      @keyframes pulse {
-        0% {
-          -webkit-transform: scale(1);
-                  transform: scale(1);
-        }
-        60% {
-          -webkit-transform: scale(1.5);
-                  transform: scale(1.5);
-        }
-        100% {
-          -webkit-transform: scale(1);
-                  transform: scale(1);
-        }
-      }
-      
-      @media only screen and (max-width: 640px) {
-        ::-webkit-scrollbar {
-          width: 0.2rem;
-          height: 0.2rem;
-        }
-        ::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.3);
-        }
-        .article-body {
-          min-width: calc(100% - 2em) !important;
-        }
-        #article_container {
-          padding: 1rem;
-        }
-        .navigation-arrows {
-          opacity: 0;
-          pointer-events: none;
-        }
-        .popup {
-          width: 100% !important;
-        }
-        .popup-container {
-          -webkit-box-align: end;
-              -ms-flex-align: end;
-                  align-items: flex-end;
-        }
-        #edit_section_container {
-          max-height: 70vh !important;
-        }
-      }
-      
-      @media only screen and (max-width: 1280px) {
-        .article-body {
-          min-width: 50%;
-        }
-      }
-      /*# sourceMappingURL=main.css.map */</style>
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+@media only screen and (min-width: 1920px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media only screen and (min-width: 2560px) {
+  html {
+    font-size: 20px;
+  }
+}
+
+@media only screen and (min-width: 3840px) {
+  html {
+    font-size: 22px;
+  }
+}
+
+body {
+  margin: 0;
+  font-size: 16px;
+  background: #111;
+}
+
+:root {
+  --primary-color: #00fa9a;
+  --light-shade: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+h1, h2, h3, h4, h5, span, p {
+  font-family: 'Quicksand', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 0.6rem;
+  height: 0.25rem;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.hide-completely {
+  display: none !important;
+}
+
+._2rem-stroke svg {
+  stroke-width: 0.2rem !important;
+}
+
+._5rem-stroke svg {
+  stroke-width: 0.5rem !important;
+}
+
+.no-fill svg, .no-fill path, .no-fill polyline {
+  fill: none !important;
+}
+
+button {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: transparent;
+  color: var(--primary-color);
+  padding: 1.2rem;
+  border: none;
+  -webkit-transition: background 0.2s ease;
+  transition: background 0.2s ease;
+  font-weight: 500;
+}
+
+button svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+button:hover {
+  background: var(--light-shade);
+  cursor: pointer;
+}
+
+button:first-of-type {
+  margin-left: auto;
+}
+
+button:focus {
+  outline: none;
+}
+
+input {
+  -ms-flex-item-align: start;
+      align-self: flex-start;
+  display: flexbox;
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  margin: 1rem 0;
+  background: #181818;
+  color: white;
+  font-size: 1rem !important;
+}
+
+#clear_export svg {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #222;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  text-align: right;
+  -webkit-box-shadow: 0.2rem 0.4rem 0.6rem rgba(0, 0, 0, 0.24);
+          box-shadow: 0.2rem 0.4rem 0.6rem rgba(0, 0, 0, 0.24);
+  z-index: 2;
+  right: 0;
+}
+
+.dropdown-content button {
+  width: 100%;
+}
+
+.dropdown-content button svg {
+  fill: none;
+  overflow: visible;
+}
+
+.dropdown:hover .dropdown-content {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.spacer {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.popup-container {
+  display: -ms-grid;
+  display: grid;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(0.5rem);
+          backdrop-filter: blur(0.5rem);
+  z-index: 4;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+
+.popup-container .popup {
+  overflow-y: auto;
+  padding: 1rem 0;
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  background: #222;
+  -webkit-transform: translateY(1em);
+          transform: translateY(1em);
+  -webkit-transition: -webkit-transform 0.2s ease;
+  transition: -webkit-transform 0.2s ease;
+  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, -webkit-transform 0.2s ease;
+  -webkit-box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.24);
+          box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.24);
+  color: white;
+}
+
+#context_menu {
+  display: none;
+}
+
+#article_creation_modal {
+  max-height: 24rem;
+  width: 24rem;
+  padding: 1rem 2rem;
+}
+
+#article_creation_modal h3, #article_creation_modal h4 {
+  font-weight: normal;
+  width: 100%;
+}
+
+#article_creation_modal button {
+  margin: 1rem 0;
+}
+
+#article_creation_modal button:first-of-type {
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.section-title {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+
+.section-title h2 {
+  color: #111;
+  background: var(--primary-color);
+  padding: 0.5rem;
+  margin: 0;
+}
+
+.gallery-name {
+  padding: 0.2rem 0;
+  margin: 1rem 0;
+  color: white;
+}
+
+.edit-article {
+  margin-left: auto;
+}
+
+.edit-article svg {
+  fill: var(--primary-color);
+  margin-right: 0.5rem;
+}
+
+#edit_article {
+  width: 24rem;
+  padding: 0;
+}
+
+#edit_article label {
+  font-size: 0.9rem;
+}
+
+#edit_article input {
+  margin-bottom: 2rem;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+#edit_article header {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0.5rem 2rem;
+}
+
+#edit_article header button {
+  margin-left: auto;
+  margin-right: 0;
+  -ms-flex-item-align: center;
+      -ms-grid-row-align: center;
+      align-self: center;
+}
+
+#edit_article header button svg {
+  stroke: var(--primary-color);
+  stroke-width: 0.3rem;
+  fill: none;
+  margin-right: 0.5rem;
+}
+
+#edit_article #edit_section_container {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: 1rem 2rem;
+}
+
+.gallery-container {
+  position: relative;
+}
+
+.gallery-container .navigation-arrows {
+  -webkit-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  padding: 1.5rem;
+  height: 100%;
+  width: 4rem;
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  fill: white;
+}
+
+.gallery-container .navigation-arrows:nth-of-type(1) {
+  background: -webkit-gradient(linear, right top, left top, from(transparent), to(rgba(0, 0, 0, 0.6)));
+  background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.6));
+}
+
+.gallery-container .navigation-arrows:nth-of-type(2) {
+  right: 0;
+  background: -webkit-gradient(linear, left top, right top, from(transparent), to(rgba(0, 0, 0, 0.6)));
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.6));
+}
+
+.gallery {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  overflow-x: auto;
+  -ms-scroll-snap-type: x mandatory;
+      scroll-snap-type: x mandatory;
+}
+
+.article-body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  scroll-snap-align: start;
+  min-width: 30%;
+  background-color: #222;
+  color: white;
+  margin: 0 1rem 1rem 0;
+}
+
+.article-body .article-header {
+  padding: 0.5rem 1rem;
+  word-break: break-all;
+}
+
+.article-body .article-header h5 {
+  font-weight: normal;
+  color: #82DDF0;
+}
+
+.article-body .card-body {
+  position: relative;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.article-body .card-body .content-div {
+  padding: 0 1rem 4rem 1rem;
+  min-height: 12rem;
+  line-height: 1.2rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  font-weight: 400;
+}
+
+.article-body .card-body .content-div * {
+  font-family: 'Roboto', sans-serif;
+}
+
+.article-body .card-body button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-right: 1rem;
+}
+
+.article-body .card-footer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 0.5rem 1rem;
+}
+
+.article-body .card-footer h5 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  font-weight: normal;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.article-body .card-footer h5:nth-of-type(2) {
+  margin-left: auto;
+}
+
+.article-body .card-footer h5:nth-of-type(2):hover svg {
+  fill: var(--primary-color);
+}
+
+.article-body .card-footer h5 svg {
+  stroke: var(--primary-color);
+  width: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#article_container {
+  padding: 2rem;
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 4.4rem);
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.snippet-selected {
+  outline: 1px solid var(--primary-color);
+}
+
+.no-transformations {
+  -webkit-transform: none !important;
+          transform: none !important;
+}
+
+#navbar {
+  position: fixed;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: white;
+  background: #222;
+  padding: 0.5rem 1rem;
+  z-index: 2;
+}
+
+#navbar h5 {
+  font-weight: normal;
+  margin: 0 0 0.25rem 0;
+}
+
+#navbar span {
+  font-size: 0.9rem;
+  -ms-grid-column-align: center;
+      justify-self: center;
+}
+
+#navbar #icon {
+  width: 2rem;
+  margin: 0 0.5rem;
+}
+
+#navbar button {
+  text-transform: uppercase;
+}
+
+#navbar button svg {
+  stroke: var(--primary-color);
+  stroke-width: 0.2rem;
+  margin-right: 0.5rem;
+  fill: none;
+  overflow: visible;
+}
+
+.floating-btn {
+  display: none;
+}
+
+#loader_container {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(0.5rem);
+          backdrop-filter: blur(0.5rem);
+  -webkit-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
+  display: -ms-grid;
+  display: grid;
+  place-content: center;
+  z-index: 4;
+  text-align: center;
+}
+
+#loader_container #spinner {
+  position: relative;
+  height: 2rem;
+  fill: teal;
+  overflow: visible;
+  -ms-grid-column-align: center;
+      justify-self: center;
+}
+
+#loader_container h4 {
+  font-weight: normal;
+  color: white;
+}
+
+#loader_container button {
+  margin: auto;
+}
+
+.pulse .first-orb {
+  -webkit-animation: pulse 1s infinite ease;
+          animation: pulse 1s infinite ease;
+}
+
+.pulse .second-orb {
+  -webkit-animation: pulse 1s 0.1s infinite ease;
+          animation: pulse 1s 0.1s infinite ease;
+}
+
+.pulse .third-orb {
+  -webkit-animation: pulse 1s 0.2s infinite ease;
+          animation: pulse 1s 0.2s infinite ease;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+  60% {
+    -webkit-transform: scale(1.5);
+            transform: scale(1.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+  60% {
+    -webkit-transform: scale(1.5);
+            transform: scale(1.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+
+.spin svg {
+  -webkit-animation: spin 0.6s ease infinite;
+          animation: spin 0.6s ease infinite;
+  -webkit-transform-origin: center;
+          transform-origin: center;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
+@media only screen and (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 0.2rem;
+    height: 0.2rem;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .hide-on-mobile {
+    display: none;
+  }
+  .article-body {
+    min-width: calc(100% - 2em) !important;
+  }
+  #context_menu, .floating-btn {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin: 2rem;
+    background: #222;
+    position: fixed;
+    -webkit-box-shadow: 0.2rem 0.4rem 0.6rem rgba(0, 0, 0, 0.24), -0.1rem -0.2rem 0.4rem rgba(0, 0, 0, 0.16);
+            box-shadow: 0.2rem 0.4rem 0.6rem rgba(0, 0, 0, 0.24), -0.1rem -0.2rem 0.4rem rgba(0, 0, 0, 0.16);
+    z-index: 3;
+  }
+  #context_menu button, .floating-btn button {
+    width: 100%;
+  }
+  #context_menu button svg, .floating-btn button svg {
+    fill: none;
+    stroke: var(--primary-color);
+  }
+  .floating-btn {
+    background: #282828;
+    bottom: 0;
+    right: 0;
+    border-radius: 5rem;
+    overflow: hidden;
+  }
+  .floating-btn button svg {
+    stroke-width: 0.2rem;
+  }
+  #context_menu {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  #context_menu button svg {
+    stroke-width: 0.2rem;
+    margin-right: 0.5rem;
+  }
+  #context_menu button:nth-of-type(1) svg {
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+  }
+  #article_container {
+    padding: 0.5rem 0.5rem 6rem 0.5rem;
+  }
+  #navbar {
+    padding: 0.5rem;
+  }
+  .navigation-arrows {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .popup {
+    width: 100% !important;
+  }
+  .popup-container {
+    -webkit-box-align: end;
+        -ms-flex-align: end;
+            align-items: flex-end;
+  }
+  #edit_section_container {
+    max-height: 70vh !important;
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .article-body {
+    min-width: 50%;
+  }
+  .hide-on-medium {
+    display: none;
+  }
+}
+/*# sourceMappingURL=main.css.map */</style>
 </head>
 
 <script>
@@ -596,34 +775,41 @@
 </script>
 
 <body onload="onLoadStartUp()">
-    <section class="popup-container hide">
-        <div id="article_creation_modal" class="popup">
-            <h3>Create a new article</h3>
-            <input type="text" id="article_name" placeholder="Article name">
-    
-            <input type="number" id="section_nums" placeholder="Number of sections">
-
-            <button onclick="hidePopup('article_creation_modal')">Cancel</button>
-            <button id="reset_data_btn">Create</button>
-            
-        </div>
-    </section>
-    <div class="popup-container hide">
-        <div id="edit_article" class="popup">
-            <header>
-                <h3>Edit section names</h3>
-                <button onclick="cloudArticleApp.update_section_names()">
-                    <svg viewBox="0 0 45.91 32.62">
-                        <polyline points="0.71,17.21 14.71,31.21 45.21,0.71 "/>
-                    </svg>
-                    Done</button>
-            </header>
-            <div id="edit_section_container"></div>
-        </div>
+    <div id="admindiv"></div>
+    <div id="context_menu" class="hide">
+        <button onclick="cloudArticleApp.reset_export_list()">
+            <svg viewBox="0 0 24 24">
+                <line x1="12" y1="0" x2="12" y2="24"/>
+                <line x1="0" y1="12" x2="24" y2="12"/>
+            </svg>
+            Clear Selection</button>
+        <button onclick="cloudArticleApp.export_as_file()">
+            <svg viewBox="0 0 28.44 24.47">
+            <g>
+                <path d="M27.19,6.72C14.18,6.6,4.87,12.2,0.47,24.3"/>
+                <polyline points="21.37,0.35 27.73,6.72 21.37,13.08"/>
+            </g>
+            </svg>
+            Export as file</button>
     </div>
-
+    <div class="floating-btn">
+        <button onclick="cloudArticleApp.retrieveLatestContent()">
+            <svg viewBox="0 0 38 40.05">
+                <title>Refresh content</title>
+                <path d="M37,21.05c0,9.94-8.06,18-18,18s-18-8.06-18-18s8.06-18,18-18c5.89,0,11.11,2.82,14.4,7.19"/>
+                <polygon points="22.63,10.96 22.81,8.96 32.63,9.86 32.81,0 34.81,0.04 34.59,12.05 "/>
+            </svg>
+        </button>
+        <button class="admin-options hide-completely" onclick="showPopup('article_creation_modal')">
+                <svg viewBox="0 0 24 24">
+                    <title>Create new article</title>
+                    <line x1="12" y1="0" x2="12" y2="24"/>
+                    <line x1="0" y1="12" x2="24" y2="12"/>
+                </svg>
+        </button>
+    </div>
     <nav id="navbar">
-        <svg id="icon" viewBox="0 0 99.555 117.877">
+        <svg id="icon" viewBox="0 0 99.555 117.877" title="Content collaboration logo">
             <style type="text/css">
                 .first-orb{fill:#00FA9A;}
                 .second-orb{fill:#00EDBF;}
@@ -635,13 +821,58 @@
                 <circle class="third-orb" cx="68" cy="86" r="32"/>
             </g>
         </svg>
-      <span><h5>RanchiMall</h5>CONTENT COLLABORATION</span>
-      <button onclick="showPopup('article_creation_modal')">
-        <svg viewBox="0 0 24 24">
-            <line x1="12" y1="0" x2="12" y2="24"/>
-            <line x1="0" y1="12" x2="24" y2="12"/>
+      <span><h5>RanchiMall</h5>CONTENT COLLABORATION</span><div class="spacer"></div>
+      <button id="refresh_btn" title="Refresh the content" class="hide-on-mobile" onclick="cloudArticleApp.retrieveLatestContent()">
+        <svg viewBox="0 0 38 40.05">
+            <path d="M37,21.05c0,9.94-8.06,18-18,18s-18-8.06-18-18s8.06-18,18-18c5.89,0,11.11,2.82,14.4,7.19"/>
+            <polygon points="22.63,10.96 22.81,8.96 32.63,9.86 32.81,0 34.81,0.04 34.59,12.05 "/>
         </svg>
-         Article</button>
+        Refresh</button>
+        <button id="clear_export" title="Clear article selection" class="export-options hide-completely no-fill hide-on-mobile" onclick="cloudArticleApp.reset_export_list()">
+            <svg viewBox="0 0 24 24">
+                <line x1="12" y1="0" x2="12" y2="24"/>
+                <line x1="0" y1="12" x2="24" y2="12"/>
+            </svg>
+            Clear Selection</button>
+        <button class="export-options no-fill hide-completely hide-on-mobile" title="Export selected articles as html file" onclick="cloudArticleApp.export_as_file()">
+            <svg viewBox="0 0 28.44 24.47">
+            <g>
+                <path d="M27.19,6.72C14.18,6.6,4.87,12.2,0.47,24.3"/>
+                <polyline points="21.37,0.35 27.73,6.72 21.37,13.08"/>
+            </g>
+            </svg>
+            Export as file
+        </button>
+      <div class="dropdown hide-on-mobile admin-options hide-completely" title="dropdown menu option for sub-admins">
+        <button class="dropbtn _5rem-stroke">
+            <svg viewBox="0 0 72 55">
+            <line x1="0" y1="0.5" x2="63" y2="0.5"/>
+            <line x1="0" y1="27.5" x2="45" y2="27.5"/>
+            <line x1="0" y1="54.5" x2="72" y2="54.5"/>
+            </svg>
+            Options</button>
+        <div class="dropdown-content">
+            <button onclick="showPopup('article_creation_modal')" title="Create new article">
+                <svg viewBox="0 0 24 24">
+                    <line x1="12" y1="0" x2="12" y2="24"/>
+                    <line x1="0" y1="12" x2="24" y2="12"/>
+                </svg>
+                New Article
+            </button>
+        </div>
+      </div>
+        <button id="logout_btn" title="Logout button" class="_5rem-stroke" onclick="cloudArticleApp.logout()">
+            <svg viewBox="0 0 73.21 73">
+            <g>
+                <path d="M27.71,18.5"/>
+                <polyline points="27.71,18.5 27.71,0.5 72.71,0.5 72.71,72.5 27.71,72.5 27.71,54.5"/>
+                <g>
+                    <line x1="41.85" y1="36.6" x2="0.71" y2="36.6"/>
+                    <polyline points="16.14,21.17 0.71,36.6 16.14,52.03"/>
+                </g>
+            </g>
+            </svg>            
+            Logout</button>
     </nav>
     
     <div id="loader_container" class="hide">
@@ -653,86 +884,141 @@
             </g>
         </svg>
         <h4 id="show_log_events"></h4>
+        <button onclick="cloudArticleApp.logout()">Clear All Data</button>
     </div>
 
     <section id="article_container">
         <div id="current_data"></div>
     </section>
 
-    <script>
-        // function required for popups or modals to appear
-        function showPopup(popup) { 
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.remove('hide');    
-            thisPopup.classList.add('no-transformations');    
-            window.onclick = function(event) {
-                if (event.target == thisPopup.parentNode)
-                    hidePopup(popup);
-            }
+ <script>
+
+    // function required for popups or modals to appear
+    function showPopup(popup) { 
+        let thisPopup = document.getElementById(popup);
+        thisPopup.parentNode.classList.remove('hide');    
+        thisPopup.classList.add('no-transformations');    
+        window.onclick = function(event) {
+            if (event.target == thisPopup.parentNode)
+                hidePopup(popup);
         }
-    
-        // hides the popup or modal 
-        function hidePopup(popup) { 
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.add('hide');    
-            thisPopup.classList.remove('no-transformations');    
-        }
-        function prevArticle(container){
-            let observer = new IntersectionObserver((entries) => {
+    }
+
+    // hides the popup or modal 
+    function hidePopup(popup) { 
+        let thisPopup = document.getElementById(popup);
+        thisPopup.parentNode.classList.add('hide');    
+        thisPopup.classList.remove('no-transformations');    
+    }
+    function prevArticle(container){
+        let observer = new IntersectionObserver((entries) => {
                 if(entries[0].isIntersecting)
                     container.children[1].classList.add('hide')
                 else
                     container.children[1].classList.remove('hide')
-            },{
-                root: container,
-                threshold: 1
-            })
-            observer.observe(container.children[0].firstElementChild)
-            container.children[0].scrollBy({
-                top: 0,
-                left: -400,
-                behavior: 'smooth'
-            });
-        }
-        function nextArticle(container){
-            container.children[1].classList.remove('hide')
-            let observer = new IntersectionObserver((entries) => {
+        },{
+            root: container,
+            threshold: 0.8
+        })
+        observer.observe(container.children[0].firstElementChild)
+        container.children[0].scrollBy({
+            top: 0,
+            left: -400,
+            behavior: 'smooth'
+        });
+    }
+    function nextArticle(container){
+        container.children[1].classList.remove('hide')
+        let observer = new IntersectionObserver((entries) => {
                 if(entries[0].isIntersecting)
                     container.children[2].classList.add('hide')
                 else
                     container.children[2].classList.remove('hide')
-            }, {
-                root: container,
-                threshold: 1
+        }, {
+            root: container,
+            threshold: 0.8
+        })
+        observer.observe(container.children[0].lastElementChild)
+
+        container.children[0].scrollBy({
+            top: 0,
+            left: 400,
+            behavior: 'smooth'
+        });
+    }
+    function showMessage(msg) {
+        document.getElementById('show_log_events').textContent = msg;
+        if(document.getElementById('loader_container').classList.contains('hide')){
+            showLoader()
+            setTimeout(() => {
+                hideLoader()
+            }, 1000);
+        }
+    }
+    function showLoader(){
+        let spinner = document.getElementById('loader_container');
+            spinner.firstElementChild.classList.add('pulse');
+            spinner.classList.remove('hide');
+    }
+    function hideLoader(){
+        let spinner = document.getElementById('loader_container');
+            spinner.firstElementChild.classList.remove('pulse');
+            spinner.classList.add('hide');
+    }
+
+    function buidAdminUI() {
+        
+        if(floGlobals.subAdmins.includes(myFloID)) {
+            let admindivui = `<section class="popup-container hide" id="article_creation_div">
+                <div id="article_creation_modal" class="popup">
+                    <h3>Create a new article</h3>
+                    <input type="text" id="article_name" placeholder="Article name">
+            
+                    <input type="number" id="section_nums" placeholder="Number of sections">
+
+                    <button onclick="hidePopup('article_creation_modal')">Cancel</button>
+                    <button id="reset_data_btn">Create</button>
+                    
+                </div>
+            </section>
+            <div class="popup-container hide">
+                <div id="edit_article" class="popup">
+                    <header>
+                        <h3>Edit section names</h3>
+                        <button onclick="cloudArticleApp.update_section_names()">
+                            <svg viewBox="0 0 45.91 32.62">
+                                <polyline points="0.71,17.21 14.71,31.21 45.21,0.71 "/>
+                            </svg>
+                            Done</button>
+                    </header>
+                    <div id="edit_section_container"></div>
+                </div>
+            </div>`;
+
+            document.getElementById('admindiv').innerHTML = admindivui;
+
+            const reset_data_btn = document.getElementById('reset_data_btn');
+            reset_data_btn.onclick = function() {
+                cloudArticleApp.resetArticleContent();
+                hidePopup('edit_article')
+            } 
+            document.querySelectorAll('.admin-options').forEach((option) => {
+                option.classList.remove('hide-completely');
             })
-            observer.observe(container.children[0].lastElementChild)
-    
-            container.children[0].scrollBy({
-                top: 0,
-                left: 400,
-                behavior: 'smooth'
-            });  
         }
-        function showMessage(msg) {
-            document.getElementById('show_log_events').textContent = msg;
-            if(document.getElementById('loader_container').classList.contains('hide')){
-                showLoader()
-                setTimeout(() => {
-                    hideLoader()
-                }, 1000);
-            }
+    }
+    function buttonVisibility(mode, parent){
+        let button = parent.children[2];
+        if(parent.firstElementChild.innerText ==''){
+            button.classList.add('hide')
+            return;
         }
-        function showLoader(){
-            let spinner = document.getElementById('loader_container');
-                spinner.firstElementChild.classList.add('pulse');
-                spinner.classList.remove('hide');
-        }
-        function hideLoader(){
-            let spinner = document.getElementById('loader_container');
-                spinner.firstElementChild.classList.remove('pulse');
-                spinner.classList.add('hide');
-        }
-    </script>    
+        if(mode === 'show' && button.classList.contains('hide'))
+            button.classList.remove('hide')
+        if(mode === 'hide' && !button.classList.contains('hide'))   
+            button.classList.add('hide')
+    }   
+ </script>
 
 <script id="init_lib">
     //All util libraries required for Standard operations (DO NOT EDIT ANY)
@@ -8333,7 +8619,6 @@ Bitcoin.Util = {
     sendDataToSN(data, snfloID){
         return new Promise((resolve, reject) => {
             console.log(snfloID)
-            console.info("five");
             var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
             websocket.onmessage = (evt => {
                 if(evt.data == '$+'){
@@ -8361,7 +8646,6 @@ Bitcoin.Util = {
     sendData: function (data, floID) {
       return new Promise((resolve, reject) => {
         this.kBucket.determineClosestSupernode(floID).then(closestNode => {
-            console.info("four");
             console.log(closestNode)
             this.sendDataToSN(data, closestNode[0])
                 .then(result => resolve(result))
@@ -8982,7 +9266,7 @@ Bitcoin.Util = {
                             floGlobals.appObjects[message.object] = message.reset
                             floGlobals.vectorClock[message.object] = vc
                             compactIDB.writeData("appObjects", floGlobals.appObjects[message.object], message.object)
-                            compactIDB.writeData("vectorClocks", vc, message.object)
+                            compactIDB.writeData("vectorClock", vc, message.object)
                         }
                     }
                 }catch(error){
@@ -9001,7 +9285,7 @@ Bitcoin.Util = {
                                 compactIDB.writeData("appObjects",floGlobals.appObjects[message.object], message.object)
                             }
                         floGlobals.vectorClock[message.object] = vc
-                        compactIDB.writeData("vectorClocks", vc, message.object)
+                        compactIDB.writeData("vectorClock", vc, message.object)
                     }
                 }catch(error){
                     console.error(error)
@@ -9039,7 +9323,6 @@ Bitcoin.Util = {
                     type: type,
                     comment: options.comment || ""
                 }
-                console.info("three");
                 console.table(data);
                 floSupernode.sendData(JSON.stringify(data), data.receiverID)
                     .then(result => resolve(result))
@@ -9070,7 +9353,6 @@ Bitcoin.Util = {
         //send General Data
         sendGeneralData: function(message, type, options = {}){
             return new Promise((resolve,reject) => {
-                console.info("two");
                 this.sendApplicationData(message, type, options)
                     .then(result => resolve(result))
                     .catch(error => reject(error))
@@ -9168,7 +9450,7 @@ Bitcoin.Util = {
                         //for Dapps
                         subAdmins:{},
                         appObjects:{},
-                        vectorClocks:{},
+                        vectorClock:{},
                         generalData:{},
                         generalVC:{}
                     }
@@ -9232,7 +9514,7 @@ Bitcoin.Util = {
 
                 loadDataFromIDB: function(){
                     return new Promise((resolve,reject) => {
-                        var loadData = ["appObjects", "vectorClocks", "generalData", "generalVC"]
+                        var loadData = ["appObjects", "vectorClock", "generalData", "generalVC"]
                         var promises = []
                         for(var i = 0; i < loadData.length; i++)
                             promises[i] = compactIDB.readAllData(loadData[i])
@@ -9419,7 +9701,8 @@ Bitcoin.Util = {
         floDapps.launchStartUp().then(result => {
             console.log(result)
             showMessage(result)
-            showMessage(`Welcome FLO_ID: ${myFloID}`)
+            showMessage(`Welcome ${myFloID}`)
+            buidAdminUI();
             cloudArticleApp.retrieveLatestContent();
         }).catch(error => console.error(error))
     }
@@ -9429,13 +9712,15 @@ Bitcoin.Util = {
     
     const cloudArticleApp = {
 
-        SUBJECT: "BusinessDesign1", // BusinessDesign1 | testArticle9
+        SUBJECT: "testArticle9", // BusinessDesign1 | testArticle9
 
         numberOfSections: 5,
 
-        CONTENT_TYPE: "BUSINESS_DESIGN", // BUSINESS_DESIGN | typeContentCollab9
+        CONTENT_TYPE: "typeContentCollab9", // BUSINESS_DESIGN | typeContentCollab9
 
         todaysContenthashList: [],
+
+        export_file_object: {},
 
         delay: (t, v) => {
           return new Promise(function(resolve) {
@@ -9453,8 +9738,6 @@ Bitcoin.Util = {
         showFullContentOfArticle: function(obj) {
             const full_data_div = document.getElementById('current_data'),
                   articleSubject = floGlobals.appObjects[this.SUBJECT]; 
-
-            //const new_generalData = floDapps.getNextGeneralData(this.CONTENT_TYPE, floGlobals.vectorClock[this.SUBJECT]);
 
             const new_generalData = floGlobals.generalData[JSON.stringify({application:floGlobals.application, type:cloudArticleApp.CONTENT_TYPE})]
 
@@ -9487,7 +9770,8 @@ Bitcoin.Util = {
 
                     if(typeof secObject.section_details==="object"
                       && secObject.section_details.section_name.length) {
-                      article_structure += `<h3 class="gallery-name">${secObject.section_details.section_name}</h3>`;
+                      article_structure_id = Crypto.SHA256(secObject.section_details.section_name);  
+                      article_structure += `<h3 class="gallery-name" id="${article_structure_id}">${secObject.section_details.section_name}</h3>`;
                     }
              
                     // Add non scored new entries from users
@@ -9513,13 +9797,7 @@ Bitcoin.Util = {
                         let vc = article_data.vectorClock || "";
 
                         if(Number(article_data.score)>0) {
-                          // const new_content_object = {
-                          //   content: article_data.content,
-                          //   content_creator: article_data.content_creator,
-                          //   score: article_data.score,
-                          //   vectorClock: article_data.vectorClock,
-                          //   signerPubKey: article_data.signerPubKey
-                          // }
+
                           const new_content_object = {
                             article_name: article_data.article_name,
                             content: article_data.content,
@@ -9544,15 +9822,17 @@ Bitcoin.Util = {
                         article_structure += 
                         `<div class="article-body">
                                 <div class="article-header">
-                                    <h5>${article_data.content_creator}</h5>
+                                    <h5 title="Article author">${article_data.content_creator}</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="content-div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" onfocusout="cloudArticleApp.edit_onfocuout(event)">
+                                    <div class="content-div" id="${gen_div_id}" data-gramm="false" data-value="${key}__${secKey}" contenteditable="true" onkeyup="buttonVisibility('show', this.parentNode)">
                                         ${article_data.content.trim()}
                                     </div>
-                                    <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}">
+                                    <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}"/>
+                                    <button class="hide" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
                                 </div>
                                 <div class="card-footer">
+                                    <h5 id="exp_${gen_div_id}" title="Add this article as selected" class="select-for-export" onclick="cloudArticleApp.register_content_to_export(event)">Select</h5>
                                     <h5 title="Give score to this article">
                                         <svg viewBox="0 0 16.55 16" style="enable-background:new 0 0 16.55 16;" xml:space="preserve" fill="${fill}">
                                             <polygon
@@ -9593,7 +9873,7 @@ Bitcoin.Util = {
                                                 c0.66,0.17,1.38,0,1.9-0.52l17.68-17.68L19.38,5.53z"/>
                                             </svg>Edit</button>
                                             `;
-                }
+            }
         },
 
         editArticleSectionNames: function(Topic) {
@@ -9629,10 +9909,13 @@ Bitcoin.Util = {
         },
 
         retrieveLatestContent: async function(receiverID=floGlobals.adminID, senderIDs=floGlobals.subAdmins) {
+            showLoader()
+            showMessage('Loading the latest content')
             await floCloudAPI.requestObjectData(this.SUBJECT,{receiverID, senderIDs});
             await floCloudAPI.requestGeneralData(this.CONTENT_TYPE);
             document.getElementById('current_data').innerHTML = '';
             cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
+            hideLoader()
         },
 
         createNewArticle: function(article_name, div='', number_of_sections=cloudArticleApp.numberOfSections) {
@@ -9722,7 +10005,7 @@ Bitcoin.Util = {
             let iterNum = Number(iterNumber)+1;
 
             // Convert line breaks into br
-            newcontent = newcontent.replace(/\n/g, '<br>').trim();
+            newcontent = newcontent.replace(/\n/g, '<br>').trim(); //.replace(/\r\n|\r|\n/g,"</br>")
 
             const contentSHA256Hash = Crypto.SHA256(newcontent);
 
@@ -9765,8 +10048,6 @@ Bitcoin.Util = {
               }
               general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
 
-              console.info("one");
-
               floCloudAPI.sendGeneralData(general_data_obj,this.CONTENT_TYPE,{receiverID:floGlobals.adminID, senderIDs:[myFloID]});
             }
             
@@ -9778,9 +10059,9 @@ Bitcoin.Util = {
             return e.target || e.srcElement;
         },
 
-        edit_onfocuout: function(event) {
+        edit_onfocuout: function(parent) {
             if(floGlobals.subAdmins.includes(myFloID)) return;
-            let target = this.getEventTarget(event);
+            let target = parent.firstElementChild;
             const updated_content = target.innerText.trim();   
             const updated_content_hash = Crypto.SHA256(updated_content);
             let editable_div = document.getElementsByClassName('content_div');
@@ -9792,6 +10073,7 @@ Bitcoin.Util = {
             if(separate_data.length!==2) return;
 
             cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content, myFloID);
+            buttonVisibility('hide', parent)
         },
 
         upgrade_article: function(event) {
@@ -9814,21 +10096,117 @@ Bitcoin.Util = {
             }
           }
         },
+        
+        register_content_to_export: function(event) {
+          let target = cloudArticleApp.getEventTarget(event),
+              article_id = target.id.substring(4),
+              parent_heading_id = target.closest('.gallery-container').previousElementSibling.id,
+              options = document.getElementById('context_menu'),
+              top = target.getBoundingClientRect().top,
+              left = target.getBoundingClientRect().left;
+          
+          if(typeof cloudArticleApp.export_file_object[parent_heading_id]!=="object") {
+            this.register_heading_to_export(parent_heading_id);
+          }
+          if(JSON.stringify(cloudArticleApp.export_file_object[parent_heading_id].contents).search(article_id)>=0) return;
+          const rank = Number(Object.keys(cloudArticleApp.export_file_object[parent_heading_id].contents))+1;
+          cloudArticleApp.export_file_object[parent_heading_id].contents[rank] = {
+            article_id: article_id,
+            rank: rank
+          }
+          console.log(cloudArticleApp.export_file_object)
+          target.classList.add("snippet-selected");
+          target.textContent= 'Selected';
+          options.classList.remove('hide') 
+            let y = document.addEventListener("touchend", function(event) {
+                if (event.target.closest('#context_menu') || event.target.closest('.select-for-export')) return;
+                options.classList.add('hide') 
+                document.removeEventListener('click', y);
+            });
+            if(window.innerWidth > 640){
+                document.querySelectorAll('.export-options').forEach((option) => {
+                    option.classList.remove('hide-completely')
+                })
+            }
+            if(top > window.innerHeight - 100)
+                options.setAttribute('style', `transform: translate(${left}px, ${top-160}px)`)
+            else
+                options.setAttribute('style', `transform: translate(${left}px, ${top}px)`)
+        },
+
+        register_heading_to_export: function(heading_id="") {
+            if(heading_id.length<1 || typeof cloudArticleApp.export_file_object[heading_id]==="object") return;
+            
+            cloudArticleApp.export_file_object[heading_id] = {
+                title: document.getElementById(heading_id).innerText,
+                rank: Object.keys(cloudArticleApp.export_file_object).length+1,
+                contents: {}
+            };
+        },
+
+        export_as_file: function(e) {
+            const headings = Object.values(cloudArticleApp.export_file_object).sort((a,b)=>a.rank<b.rank);
+
+            let t = ``;
+
+            for(textContent of headings) {
+                let snippets = Object.values(textContent.contents).sort((c,d)=>c.rank<d.rank);
+                t += `<h4>${textContent.title}</h4>`;
+                for(snips of snippets) {
+                    if(typeof snips!=="object") continue;
+                    t += '<p>' +document.getElementById(snips.article_id).innerText+'</p>';
+                }
+            }
+
+            let file_name = "content_collaboration"+new Date().getTime();
+
+            this.downloadInnerHtml(file_name, t, 'text/html');
+            document.getElementById('context_menu').classList.add('hide')
+
+        },
+
+        // https://stackoverflow.com/a/22085875/5348972
+        downloadInnerHtml: function(filename, elHtml, mimeType) {
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(new Blob([elHtml], { type: mimeType + ';charset=utf-8;' }), filename);
+            } else {
+                var link = document.createElement('a');
+                mimeType = mimeType || 'text/plain';
+
+                link.setAttribute('download', filename);
+                link.setAttribute('href', 'data:' + mimeType  +  ';charset=utf-8,' + encodeURIComponent(elHtml));
+                link.click(); 
+            }
+            cloudArticleApp.export_file_object = {};
+        },
+
+        reset_export_list: function() {
+            cloudArticleApp.export_file_object = {};
+            document.querySelectorAll('.snippet-selected').forEach((cl) =>{
+                cl.textContent= 'Select';
+                cl.classList.remove("snippet-selected");
+            })
+            document.getElementById('context_menu').classList.add('hide')
+            document.querySelectorAll('.export-options').forEach((option) => {
+                    option.classList.add('hide-completely')
+            })
+        }, 
+        logout: function() {
+            if(confirm("Do you want to logout?")){
+                floDapps.clearCredentials()
+                compactIDB.deleteDB().then((message) => {
+                    console.log(message)
+                    onLoadStartUp()
+                    alert('You have logged out successfully.')
+                }).catch((error) => {
+                    console.log(error)
+                })
+            }
+        }
 
     }
 
  </script>
-
- <script>
-    (function() {
-        const reset_data_btn = document.getElementById('reset_data_btn');
-        reset_data_btn.onclick = function() {
-            cloudArticleApp.resetArticleContent();
-            hidePopup('edit_article')
-        }
-    })();
- </script>
-
 
 </body>
 </html>
