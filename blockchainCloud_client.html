@@ -8526,633 +8526,641 @@
     <script id="floSupernode">
         /* flo Supernode Operators to send/receive data from supernodes using websocket */
         const floSupernode = {
-
-            //kBucket object 
-            kBucket: {
-                supernodeKBucket: null,
-                decodeBase58Address: function (address) {
-                    let k = bitjs.Base58.decode(address)
-                    k.shift()
-                    k.splice(-4, 4)
-                    return Crypto.util.bytesToHex(k)
-                },
-                floIdToKbucketId: function (address) {
-                    const decodedId = this.decodeBase58Address(address);
-                    const nodeIdBigInt = new BigInteger(decodedId, 16);
-                    const nodeIdBytes = nodeIdBigInt.toByteArrayUnsigned();
-                    const nodeIdNewInt8Array = new Uint8Array(nodeIdBytes);
-                    return nodeIdNewInt8Array;
-                },
-                launch: function (superNodeList = Object.keys(floGlobals.supernodes), master_floID = floGlobals.adminID) {
-                    return new Promise((resolve, reject) => {
-                        try {
-                            const SuKBucketId = this.floIdToKbucketId(master_floID);
-                            const SukbOptions = {
-                                localNodeId: SuKBucketId
-                            }
-                            this.supernodeKBucket = new BuildKBucket(SukbOptions);
-                            for (var i = 0; i < superNodeList.length; i++) {
-                                this.addNewNode(superNodeList[i])
-                            }
-                            resolve('SuperNode KBucket formed');
-                        } catch (error) {
-                            reject(error);
-                        }
-                    });
-                },
-                addContact: function (id, floID, KB = this.supernodeKBucket) {
-                    const contact = {
-                        id: id,
-                        floID: floID
-                    };
-                    KB.add(contact)
-                },
-                addNewNode: function (address, KB = this.supernodeKBucket) {
-                    let decodedId = address;
-                    try {
-                        decodedId = this.floIdToKbucketId(address);
-                    } catch (e) {
-                        decodedId = address;
-                    }
-                    this.addContact(decodedId, address, KB);
-                },
-                isNodePresent: function (flo_id, KB = this.supernodeKBucket) {
-                    let kArray = KB.toArray();
-                    let kArrayFloIds = kArray.map(k => k.floID);
-                    if (kArrayFloIds.includes(flo_id))
-                        return true;
-                    else
-                        return false;
-                },
-
-                getInnerNodes: function (flo_addr1, flo_addr2, KB = this.supernodeKBucket) {
-                    return new Promise((resolve, reject) => {
-                        let kArrayFloIds = KB.toArray().map(k => k.floID);
-                        var innerNodes = []
-                        if (kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)) {
-                            for (var i = kArrayFloIds.indexOf(flo_addr1); i != flo_addr2; i++) {
-                                if (i >= kArrayFloIds.length)
-                                    i = -1
-                                else
-                                    innerNodes.push(kArrayFloIds[i])
-                            }
-                            resolve(innerNodes)
-                        } else
-                            reject('Given nodes are not in KBucket')
-                    });
-                },
-
-                getOuterNodes: function (flo_addr1, flo_addr2, KB = this.supernodeKBucket) {
-                    return new Promise((resolve, reject) => {
-                        let kArrayFloIds = KB.toArray().map(k => k.floID);
-                        var outterNodes = []
-                        if (kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)) {
-                            for (var i = kArrayFloIds.indexOf(flo_addr2); i != flo_addr1; i++) {
-                                if (i >= kArrayFloIds.length)
-                                    i = -1
-                                else
-                                    outterNodes.push(kArrayFloIds[i])
-                            }
-                            resolve(outterNodes)
-                        } else
-                            reject('Given nodes are not in KBucket')
-                    });
-                },
-
-                getPrevSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
-                    return new Promise((resolve, reject) => {
-                        try {
-                            let kArrayFloIds = KB.toArray().map(k => k.floID);
-                            let pos = kArrayFloIds.indexOf(flo_addr)
-                            var prevSupernode = []
-                            for (var i = 1; i <= n; i++) {
-                                if (pos - i < 0)
-                                    var prev = pos - i + kArrayFloIds.length
-                                else
-                                    var prev = pos - i
-                                prevSupernode.push(kArrayFloIds[prev])
-                            }
-                            resolve(prevSupernode);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    });
-                },
-
-                getNextSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
-                    return new Promise((resolve, reject) => {
-                        try {
-                            let kArrayFloIds = KB.toArray().map(k => k.floID);
-                            let pos = kArrayFloIds.indexOf(flo_addr)
-                            var nextSupernode = []
-                            for (var i = 1; i <= n; i++) {
-                                if (pos + i >= kArrayFloIds.length)
-                                    var next = pos + i - kArrayFloIds.length
-                                else
-                                    var next = pos + i
-                                nextSupernode.push(kArrayFloIds[next])
-                            }
-                            resolve(nextSupernode);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    });
-                },
-
-                determineClosestSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
-                    return new Promise((resolve, reject) => {
-                        try {
-                            let isFloIdUint8 = flo_addr instanceof Uint8Array;
-                            if (!isFloIdUint8)
-                                flo_addr = this.floIdToKbucketId(flo_addr);
-                            var closestSupernode = KB.closest(flo_addr, n);
-                            closestSupernode = closestSupernode.map(k => k.floID);
-                            resolve(closestSupernode);
-                        } catch (error) {
-                            reject(error);
-                        }
-                    });
+      
+          //kBucket object 
+          kBucket: {
+            supernodeKBucket: null,
+            decodeBase58Address: function (address) {
+              let k = bitjs.Base58.decode(address)
+              k.shift()
+              k.splice(-4, 4)
+              return Crypto.util.bytesToHex(k)
+            },
+            floIdToKbucketId: function (address) {
+              const decodedId = this.decodeBase58Address(address);
+              const nodeIdBigInt = new BigInteger(decodedId, 16);
+              const nodeIdBytes = nodeIdBigInt.toByteArrayUnsigned();
+              const nodeIdNewInt8Array = new Uint8Array(nodeIdBytes);
+              return nodeIdNewInt8Array;
+            },
+            launch: function (superNodeList = Object.keys(floGlobals.supernodes), master_floID = floGlobals.adminID) {
+              return new Promise((resolve, reject) => {
+                try {
+                  const SuKBucketId = this.floIdToKbucketId(master_floID);
+                  const SukbOptions = {
+                    localNodeId: SuKBucketId
+                  }
+                  this.supernodeKBucket = new BuildKBucket(SukbOptions);
+                  for (var i = 0; i < superNodeList.length; i++) {
+                    this.addNewNode(superNodeList[i])
+                  }
+                  resolve('SuperNode KBucket formed');
+                } catch (error) {
+                  reject(error);
                 }
+              });
             },
-
-            sendDataToSN(data, snfloID) {
-                return new Promise((resolve, reject) => {
-                    console.log(snfloID)
-                    var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
-                    websocket.onmessage = (evt => {
-                        if (evt.data == '$+') {
-                            websocket.send(data);
-                            resolve(`Data sent to supernode : ${snfloID}`);
-                        } else if (evt.data == '$-') {
-                            this.kBucket.getNextSupernode(snfloID)
-                                .then(nextNode => this.sendDataToSN(data, nextNode[0]))
-                                .catch(error => reject(error))
-                        } else {
-                            console.log(evt.data)
-                            reject(evt.data)
-                        }
-                        websocket.close();
-                    })
-                    websocket.onerror = (evt) => {
-                        this.kBucket.getNextSupernode(snfloID)
-                            .then(nextNode => this.sendDataToSN(data, nextNode[0]))
-                            .catch(error => reject(error))
-                    };
-                })
+            addContact: function (id, floID, KB = this.supernodeKBucket) {
+              const contact = {
+                id: id,
+                floID: floID
+              };
+              KB.add(contact)
             },
-
-            //Sends data to the supernode
-            sendData: function (data, floID) {
-                return new Promise((resolve, reject) => {
-                    this.kBucket.determineClosestSupernode(floID).then(closestNode => {
-                        console.log(closestNode)
-                        this.sendDataToSN(data, closestNode[0])
-                            .then(result => resolve(result))
-                            .catch(error => reject(error))
-                    }).catch(error => {
-                        reject(error);
-                    });
-                });
+            addNewNode: function (address, KB = this.supernodeKBucket) {
+              let decodedId = address;
+              try {
+                decodedId = this.floIdToKbucketId(address);
+              } catch (e) {
+                decodedId = address;
+              }
+              this.addContact(decodedId, address, KB);
             },
-
-            requestDataFromSN(request, snfloID) {
-                return new Promise((resolve, reject) => {
-                    var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
-                    websocket.onmessage = (evt => {
-                        if (evt.data == '$+') {
-                            websocket.send(`?${request}`);
-                        } else if (evt.data == '$-') {
-                            this.kBucket.getNextSupernode(snfloID)
-                                .then(nextNode => this.requestDataFromSN(request, nextNode[0]))
-                                .catch(error => reject(error))
-                            websocket.close()
-                        } else {
-                            resolve(evt.data);
-                            websocket.close();
-                        }
-                    })
-                    websocket.onerror = (evt) => {
-                        this.kBucket.getNextSupernode(snfloID)
-                            .then(nextNode => this.requestDataFromSN(request, nextNode[0]))
-                            .catch(error => reject(error))
-                    };
-                })
+            isNodePresent: function (flo_id, KB = this.supernodeKBucket) {
+              let kArray = KB.toArray();
+              let kArrayFloIds = kArray.map(k => k.floID);
+              if (kArrayFloIds.includes(flo_id))
+                  return true;
+              else
+                  return false;
             },
-
-            //Request data from supernode
-            requestData: function (request, floID) {
-                return new Promise((resolve, reject) => {
-                    this.kBucket.determineClosestSupernode(floID).then(closestNode => {
-                        this.requestDataFromSN(request, closestNode[0])
-                            .then(result => resolve(result))
-                            .catch(error => reject(error))
-                    }).catch(error => {
-                        reject(error);
-                    });
-                });
+       
+            getInnerNodes: function(flo_addr1, flo_addr2, KB = this.supernodeKBucket){
+              return new Promise((resolve, reject) => {
+                let kArrayFloIds = KB.toArray().map(k => k.floID);
+                var innerNodes = []
+                if(kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)){
+                  for(var i = kArrayFloIds.indexOf(flo_addr1); i!= flo_addr2; i++){
+                      if(i >= kArrayFloIds.length)
+                          i = -1
+                      else
+                          innerNodes.push(kArrayFloIds[i])
+                  }
+                  resolve(innerNodes)
+                }else
+                  reject('Given nodes are not in KBucket')
+              });
+            },
+      
+            getOuterNodes: function(flo_addr1, flo_addr2, KB = this.supernodeKBucket){
+              return new Promise((resolve, reject) => {
+                let kArrayFloIds = KB.toArray().map(k => k.floID);
+                var outterNodes = []
+                if(kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)){
+                  for(var i = kArrayFloIds.indexOf(flo_addr2); i!= flo_addr1; i++){
+                      if(i >= kArrayFloIds.length)
+                          i = -1
+                      else
+                          outterNodes.push(kArrayFloIds[i])
+                  }
+                  resolve(outterNodes)
+                }else
+                  reject('Given nodes are not in KBucket')
+              });
+            },
+      
+            getPrevSupernode: function(flo_addr, n = 1, KB = this.supernodeKBucket){
+              return new Promise((resolve, reject) => {
+                try {
+                  let kArrayFloIds = KB.toArray().map(k => k.floID);
+                  let pos = kArrayFloIds.indexOf(flo_addr)
+                  var prevSupernode = []
+                  for(var i = 1; i <= n; i++){
+                      if(pos - i < 0)
+                          var prev = pos - i + kArrayFloIds.length
+                      else
+                          var prev = pos - i
+                      prevSupernode.push(kArrayFloIds[prev])
+                  }
+                  resolve(prevSupernode);
+                } catch (error) {
+                  reject(error);
+                }
+              });
+            },
+      
+            getNextSupernode: function(flo_addr, n = 1, KB = this.supernodeKBucket){
+              return new Promise((resolve, reject) => {
+                try {
+                  let kArrayFloIds = KB.toArray().map(k => k.floID);
+                  let pos = kArrayFloIds.indexOf(flo_addr)
+                  var nextSupernode = []
+                  for(var i = 1; i <= n; i++){
+                      if(pos + i >= kArrayFloIds.length)
+                          var next = pos + i - kArrayFloIds.length
+                      else
+                          var next = pos + i
+                      nextSupernode.push(kArrayFloIds[next])
+                  }
+                  resolve(nextSupernode);
+                } catch (error) {
+                  reject(error);
+                }
+              });
+            },
+      
+            determineClosestSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
+              return new Promise((resolve, reject) => {
+                try {
+                  let isFloIdUint8 = flo_addr instanceof Uint8Array;
+                  if (!isFloIdUint8)
+                    flo_addr = this.floIdToKbucketId(flo_addr);
+                  var closestSupernode = KB.closest(flo_addr, n);
+                  closestSupernode = closestSupernode.map(k => k.floID);
+                  resolve(closestSupernode);
+                } catch (error) {
+                  reject(error);
+                }
+              });
             }
+          },
+      
+          sendDataToSN(data, snfloID){
+              return new Promise((resolve, reject) => {
+                  console.log(snfloID)
+                  var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
+                  websocket.onmessage = (evt => {
+                      if(evt.data == '$+'){
+                          websocket.send(data);
+                          resolve(`Data sent to supernode : ${snfloID}`);
+                      }else if(evt.data == '$-'){
+                          this.kBucket.getNextSupernode(snfloID).then(nextNode => {
+                              this.sendDataToSN(data, nextNode[0])
+                                  .then(result => resolve(result))
+                                  .catch(error => reject(error))
+                          }).catch(error => reject(error))
+                      }else{
+                          console.log(evt.data)
+                          reject(evt.data)
+                      }
+                      websocket.close();
+                  })
+                  websocket.onerror = (evt) => {
+                      this.kBucket.getNextSupernode(snfloID).then(nextNode => {
+                          this.sendDataToSN(data, nextNode[0])
+                              .then(result => resolve(result))
+                              .catch(error => reject(error))
+                      }).catch(error => reject(error))
+                  };
+              })
+          },
+      
+          //Sends data to the supernode
+          sendData: function (data, floID) {
+            return new Promise((resolve, reject) => {
+              this.kBucket.determineClosestSupernode(floID).then(closestNode => {
+                  console.log(closestNode)
+                  this.sendDataToSN(data, closestNode[0])
+                      .then(result => resolve(result))
+                      .catch(error => reject(error))
+              }).catch(error => {
+                  reject(error);
+              });
+            });
+          },
+      
+          requestDataFromSN(request, snfloID){
+              return new Promise((resolve, reject) => {
+                  var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
+                  websocket.onmessage = (evt => {
+                      if(evt.data == '$+'){
+                          websocket.send(`?${request}`);
+                      }else if(evt.data == '$-'){
+                          this.kBucket.getNextSupernode(snfloID).then(nextNode => {
+                              this.requestDataFromSN(request, nextNode[0])
+                                  .then(result => resolve(result))
+                                  .catch(error => reject(error))
+                          }).catch(error => reject(error))
+                          websocket.close()
+                      }else{
+                          resolve(evt.data);
+                          websocket.close();
+                      }
+                  })
+                  websocket.onerror = (evt) => {
+                      this.kBucket.getNextSupernode(snfloID).then(nextNode => {
+                          this.requestDataFromSN(request, nextNode[0])
+                              .then(result => resolve(result))
+                              .catch(error => reject(error))
+                      }).catch(error => reject(error))
+                  };
+              })
+          },
+      
+          //Request data from supernode
+          requestData: function (request, floID) {
+            return new Promise((resolve, reject) => {
+              this.kBucket.determineClosestSupernode(floID).then(closestNode => {
+                  this.requestDataFromSN(request, closestNode[0])
+                      .then(result => resolve(result))
+                      .catch(error => reject(error))
+              }).catch(error => {
+                  reject(error);
+              });
+            });
+          }
         }
-
+      
         /**Kademlia DHT K-bucket implementation as a binary tree.
          * Implementation of a Kademlia DHT k-bucket used for storing
          * contact (peer node) information.
          *
          * @extends EventEmitter
          */
-        function BuildKBucket(options = {}) {
-            /**
-             * `options`:
-             *   `distance`: Function
-             *     `function (firstId, secondId) { return distance }` An optional
-             *     `distance` function that gets two `id` Uint8Arrays
-             *     and return distance (as number) between them.
-             *   `arbiter`: Function (Default: vectorClock arbiter)
-             *     `function (incumbent, candidate) { return contact; }` An optional
-             *     `arbiter` function that givent two `contact` objects with the same `id`
-             *     returns the desired object to be used for updating the k-bucket. For
-             *     more details, see [arbiter function](#arbiter-function).
-             *   `localNodeId`: Uint8Array An optional Uint8Array representing the local node id.
-             *     If not provided, a local node id will be created via `randomBytes(20)`.
-             *     `metadata`: Object (Default: {}) Optional satellite data to include
-             *     with the k-bucket. `metadata` property is guaranteed not be altered by,
-             *     it is provided as an explicit container for users of k-bucket to store
-             *     implementation-specific data.
-             *   `numberOfNodesPerKBucket`: Integer (Default: 20) The number of nodes
-             *     that a k-bucket can contain before being full or split.
-             *     `numberOfNodesToPing`: Integer (Default: 3) The number of nodes to
-             *     ping when a bucket that should not be split becomes full. KBucket will
-             *     emit a `ping` event that contains `numberOfNodesToPing` nodes that have
-             *     not been contacted the longest.
-             *
-             * @param {Object=} options optional
-             */
-
-            this.localNodeId = options.localNodeId || window.crypto.getRandomValues(new Uint8Array(20))
-            this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
-            this.numberOfNodesToPing = options.numberOfNodesToPing || 3
-            this.distance = options.distance || this.distance
-            // use an arbiter from options or vectorClock arbiter by default
-            this.arbiter = options.arbiter || this.arbiter
-            this.metadata = Object.assign({}, options.metadata)
-
-            this.createNode = function () {
-                return {
-                    contacts: [],
-                    dontSplit: false,
-                    left: null,
-                    right: null
-                }
+         function BuildKBucket(options = {}) {
+          /**
+           * `options`:
+           *   `distance`: Function
+           *     `function (firstId, secondId) { return distance }` An optional
+           *     `distance` function that gets two `id` Uint8Arrays
+           *     and return distance (as number) between them.
+           *   `arbiter`: Function (Default: vectorClock arbiter)
+           *     `function (incumbent, candidate) { return contact; }` An optional
+           *     `arbiter` function that givent two `contact` objects with the same `id`
+           *     returns the desired object to be used for updating the k-bucket. For
+           *     more details, see [arbiter function](#arbiter-function).
+           *   `localNodeId`: Uint8Array An optional Uint8Array representing the local node id.
+           *     If not provided, a local node id will be created via `randomBytes(20)`.
+           *     `metadata`: Object (Default: {}) Optional satellite data to include
+           *     with the k-bucket. `metadata` property is guaranteed not be altered by,
+           *     it is provided as an explicit container for users of k-bucket to store
+           *     implementation-specific data.
+           *   `numberOfNodesPerKBucket`: Integer (Default: 20) The number of nodes
+           *     that a k-bucket can contain before being full or split.
+           *     `numberOfNodesToPing`: Integer (Default: 3) The number of nodes to
+           *     ping when a bucket that should not be split becomes full. KBucket will
+           *     emit a `ping` event that contains `numberOfNodesToPing` nodes that have
+           *     not been contacted the longest.
+           *
+           * @param {Object=} options optional
+           */
+      
+          this.localNodeId = options.localNodeId || window.crypto.getRandomValues(new Uint8Array(20))
+          this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
+          this.numberOfNodesToPing = options.numberOfNodesToPing || 3
+          this.distance = options.distance || this.distance
+          // use an arbiter from options or vectorClock arbiter by default
+          this.arbiter = options.arbiter || this.arbiter
+          this.metadata = Object.assign({}, options.metadata)
+      
+          this.createNode = function () {
+            return {
+              contacts: [],
+              dontSplit: false,
+              left: null,
+              right: null
             }
-
-            this.ensureInt8 = function (name, val) {
-                if (!(val instanceof Uint8Array)) {
-                    throw new TypeError(name + ' is not a Uint8Array')
-                }
+          }
+      
+          this.ensureInt8 = function (name, val) {
+            if (!(val instanceof Uint8Array)) {
+              throw new TypeError(name + ' is not a Uint8Array')
             }
-
-            /**
-             * @param  {Uint8Array} array1
-             * @param  {Uint8Array} array2
-             * @return {Boolean}
-             */
-            this.arrayEquals = function (array1, array2) {
-                if (array1 === array2) {
-                    return true
-                }
-                if (array1.length !== array2.length) {
-                    return false
-                }
-                for (let i = 0, length = array1.length; i < length; ++i) {
-                    if (array1[i] !== array2[i]) {
-                        return false
-                    }
-                }
-                return true
+          }
+      
+          /**
+           * @param  {Uint8Array} array1
+           * @param  {Uint8Array} array2
+           * @return {Boolean}
+           */
+          this.arrayEquals = function (array1, array2) {
+            if (array1 === array2) {
+              return true
             }
-
-            this.ensureInt8('option.localNodeId as parameter 1', this.localNodeId)
-            this.root = this.createNode()
-
-            /**
-             * Default arbiter function for contacts with the same id. Uses
-             * contact.vectorClock to select which contact to update the k-bucket with.
-             * Contact with larger vectorClock field will be selected. If vectorClock is
-             * the same, candidat will be selected.
-             *
-             * @param  {Object} incumbent Contact currently stored in the k-bucket.
-             * @param  {Object} candidate Contact being added to the k-bucket.
-             * @return {Object}           Contact to updated the k-bucket with.
-             */
-            this.arbiter = function (incumbent, candidate) {
-                return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
+            if (array1.length !== array2.length) {
+              return false
             }
-
-            /**
-             * Default distance function. Finds the XOR
-             * distance between firstId and secondId.
-             *
-             * @param  {Uint8Array} firstId  Uint8Array containing first id.
-             * @param  {Uint8Array} secondId Uint8Array containing second id.
-             * @return {Number}              Integer The XOR distance between firstId
-             *                               and secondId.
-             */
-            this.distance = function (firstId, secondId) {
-                let distance = 0
-                let i = 0
-                const min = Math.min(firstId.length, secondId.length)
-                const max = Math.max(firstId.length, secondId.length)
-                for (; i < min; ++i) {
-                    distance = distance * 256 + (firstId[i] ^ secondId[i])
-                }
-                for (; i < max; ++i) distance = distance * 256 + 255
-                return distance
+            for (let i = 0, length = array1.length; i < length; ++i) {
+              if (array1[i] !== array2[i]) {
+                return false
+              }
             }
-
-            /**
-             * Adds a contact to the k-bucket.
-             *
-             * @param {Object} contact the contact object to add
-             */
-            this.add = function (contact) {
-                this.ensureInt8('contact.id', (contact || {}).id)
-
-                let bitIndex = 0
-                let node = this.root
-
-                while (node.contacts === null) {
-                    // this is not a leaf node but an inner node with 'low' and 'high'
-                    // branches; we will check the appropriate bit of the identifier and
-                    // delegate to the appropriate node for further processing
-                    node = this._determineNode(node, contact.id, bitIndex++)
-                }
-
-                // check if the contact already exists
-                const index = this._indexOf(node, contact.id)
-                if (index >= 0) {
-                    this._update(node, index, contact)
-                    return this
-                }
-
-                if (node.contacts.length < this.numberOfNodesPerKBucket) {
-                    node.contacts.push(contact)
-                    return this
-                }
-
-                // the bucket is full
-                if (node.dontSplit) {
-                    // we are not allowed to split the bucket
-                    // we need to ping the first this.numberOfNodesToPing
-                    // in order to determine if they are alive
-                    // only if one of the pinged nodes does not respond, can the new contact
-                    // be added (this prevents DoS flodding with new invalid contacts)
-                    return this
-                }
-
-                this._split(node, bitIndex)
-                return this.add(contact)
+            return true
+          }
+      
+          this.ensureInt8('option.localNodeId as parameter 1', this.localNodeId)
+          this.root = this.createNode()
+      
+          /**
+           * Default arbiter function for contacts with the same id. Uses
+           * contact.vectorClock to select which contact to update the k-bucket with.
+           * Contact with larger vectorClock field will be selected. If vectorClock is
+           * the same, candidat will be selected.
+           *
+           * @param  {Object} incumbent Contact currently stored in the k-bucket.
+           * @param  {Object} candidate Contact being added to the k-bucket.
+           * @return {Object}           Contact to updated the k-bucket with.
+           */
+          this.arbiter = function (incumbent, candidate) {
+            return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
+          }
+      
+          /**
+           * Default distance function. Finds the XOR
+           * distance between firstId and secondId.
+           *
+           * @param  {Uint8Array} firstId  Uint8Array containing first id.
+           * @param  {Uint8Array} secondId Uint8Array containing second id.
+           * @return {Number}              Integer The XOR distance between firstId
+           *                               and secondId.
+           */
+          this.distance = function (firstId, secondId) {
+            let distance = 0
+            let i = 0
+            const min = Math.min(firstId.length, secondId.length)
+            const max = Math.max(firstId.length, secondId.length)
+            for (; i < min; ++i) {
+              distance = distance * 256 + (firstId[i] ^ secondId[i])
             }
-
-            /**
-             * Get the n closest contacts to the provided node id. "Closest" here means:
-             * closest according to the XOR metric of the contact node id.
-             *
-             * @param  {Uint8Array} id  Contact node id
-             * @param  {Number=} n      Integer (Default: Infinity) The maximum number of
-             *                          closest contacts to return
-             * @return {Array}          Array Maximum of n closest contacts to the node id
-             */
-            this.closest = function (id, n = Infinity) {
-                this.ensureInt8('id', id)
-
-                if ((!Number.isInteger(n) && n !== Infinity) || n <= 0) {
-                    throw new TypeError('n is not positive number')
-                }
-
-                let contacts = []
-
-                for (let nodes = [this.root], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
-                    const node = nodes.pop()
-                    if (node.contacts === null) {
-                        const detNode = this._determineNode(node, id, bitIndex++)
-                        nodes.push(node.left === detNode ? node.right : node.left)
-                        nodes.push(detNode)
-                    } else {
-                        contacts = contacts.concat(node.contacts)
-                    }
-                }
-
-                return contacts
-                    .map(a => [this.distance(a.id, id), a])
-                    .sort((a, b) => a[0] - b[0])
-                    .slice(0, n)
-                    .map(a => a[1])
+            for (; i < max; ++i) distance = distance * 256 + 255
+            return distance
+          }
+      
+          /**
+           * Adds a contact to the k-bucket.
+           *
+           * @param {Object} contact the contact object to add
+           */
+          this.add = function (contact) {
+            this.ensureInt8('contact.id', (contact || {}).id)
+      
+            let bitIndex = 0
+            let node = this.root
+      
+            while (node.contacts === null) {
+              // this is not a leaf node but an inner node with 'low' and 'high'
+              // branches; we will check the appropriate bit of the identifier and
+              // delegate to the appropriate node for further processing
+              node = this._determineNode(node, contact.id, bitIndex++)
             }
-
-            /**
-             * Counts the total number of contacts in the tree.
-             *
-             * @return {Number} The number of contacts held in the tree
-             */
-            this.count = function () {
-                // return this.toArray().length
-                let count = 0
-                for (const nodes = [this.root]; nodes.length > 0;) {
-                    const node = nodes.pop()
-                    if (node.contacts === null) nodes.push(node.right, node.left)
-                    else count += node.contacts.length
-                }
-                return count
+      
+            // check if the contact already exists
+            const index = this._indexOf(node, contact.id)
+            if (index >= 0) {
+              this._update(node, index, contact)
+              return this
             }
-
-            /**
-             * Determines whether the id at the bitIndex is 0 or 1.
-             * Return left leaf if `id` at `bitIndex` is 0, right leaf otherwise
-             *
-             * @param  {Object} node     internal object that has 2 leafs: left and right
-             * @param  {Uint8Array} id   Id to compare localNodeId with.
-             * @param  {Number} bitIndex Integer (Default: 0) The bit index to which bit
-             *                           to check in the id Uint8Array.
-             * @return {Object}          left leaf if id at bitIndex is 0, right leaf otherwise.
-             */
-            this._determineNode = function (node, id, bitIndex) {
-                // *NOTE* remember that id is a Uint8Array and has granularity of
-                // bytes (8 bits), whereas the bitIndex is the bit index (not byte)
-
-                // id's that are too short are put in low bucket (1 byte = 8 bits)
-                // (bitIndex >> 3) finds how many bytes the bitIndex describes
-                // bitIndex % 8 checks if we have extra bits beyond byte multiples
-                // if number of bytes is <= no. of bytes described by bitIndex and there
-                // are extra bits to consider, this means id has less bits than what
-                // bitIndex describes, id therefore is too short, and will be put in low
-                // bucket
-                const bytesDescribedByBitIndex = bitIndex >> 3
-                const bitIndexWithinByte = bitIndex % 8
-                if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) {
-                    return node.left
-                }
-
-                const byteUnderConsideration = id[bytesDescribedByBitIndex]
-
-                // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
-                // where 255 is 11111111 and 0 is 00000000
-                // in order to find out whether the bit at bitIndexWithinByte is set
-                // we construct (1 << (7 - bitIndexWithinByte)) which will consist
-                // of all bits being 0, with only one bit set to 1
-                // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
-                // (1 << (7 - 3)) -> (1 << 4) -> 16
-                if (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))) {
-                    return node.right
-                }
-
-                return node.left
+      
+            if (node.contacts.length < this.numberOfNodesPerKBucket) {
+              node.contacts.push(contact)
+              return this
             }
-
-            /**
-             * Get a contact by its exact ID.
-             * If this is a leaf, loop through the bucket contents and return the correct
-             * contact if we have it or null if not. If this is an inner node, determine
-             * which branch of the tree to traverse and repeat.
-             *
-             * @param  {Uint8Array} id The ID of the contact to fetch.
-             * @return {Object|Null}   The contact if available, otherwise null
-             */
-            this.get = function (id) {
-                this.ensureInt8('id', id)
-
-                let bitIndex = 0
-
-                let node = this.root
-                while (node.contacts === null) {
-                    node = this._determineNode(node, id, bitIndex++)
-                }
-
-                // index of uses contact id for matching
-                const index = this._indexOf(node, id)
-                return index >= 0 ? node.contacts[index] : null
+      
+            // the bucket is full
+            if (node.dontSplit) {
+              // we are not allowed to split the bucket
+              // we need to ping the first this.numberOfNodesToPing
+              // in order to determine if they are alive
+              // only if one of the pinged nodes does not respond, can the new contact
+              // be added (this prevents DoS flodding with new invalid contacts)
+              return this
             }
-
-            /**
-             * Returns the index of the contact with provided
-             * id if it exists, returns -1 otherwise.
-             *
-             * @param  {Object} node    internal object that has 2 leafs: left and right
-             * @param  {Uint8Array} id  Contact node id.
-             * @return {Number}         Integer Index of contact with provided id if it
-             *                          exists, -1 otherwise.
-             */
-            this._indexOf = function (node, id) {
-                for (let i = 0; i < node.contacts.length; ++i) {
-                    if (this.arrayEquals(node.contacts[i].id, id)) return i
-                }
-
-                return -1
+      
+            this._split(node, bitIndex)
+            return this.add(contact)
+          }
+      
+          /**
+           * Get the n closest contacts to the provided node id. "Closest" here means:
+           * closest according to the XOR metric of the contact node id.
+           *
+           * @param  {Uint8Array} id  Contact node id
+           * @param  {Number=} n      Integer (Default: Infinity) The maximum number of
+           *                          closest contacts to return
+           * @return {Array}          Array Maximum of n closest contacts to the node id
+           */
+          this.closest = function (id, n = Infinity) {
+            this.ensureInt8('id', id)
+      
+            if ((!Number.isInteger(n) && n !== Infinity) || n <= 0) {
+              throw new TypeError('n is not positive number')
             }
-
-            /**
-             * Removes contact with the provided id.
-             *
-             * @param  {Uint8Array} id The ID of the contact to remove.
-             * @return {Object}        The k-bucket itself.
-             */
-            this.remove = function (id) {
-                this.ensureInt8('the id as parameter 1', id)
-
-                let bitIndex = 0
-                let node = this.root
-
-                while (node.contacts === null) {
-                    node = this._determineNode(node, id, bitIndex++)
-                }
-
-                const index = this._indexOf(node, id)
-                if (index >= 0) {
-                    const contact = node.contacts.splice(index, 1)[0]
-                }
-
-                return this
+      
+            let contacts = []
+      
+            for (let nodes = [this.root], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
+              const node = nodes.pop()
+              if (node.contacts === null) {
+                const detNode = this._determineNode(node, id, bitIndex++)
+                nodes.push(node.left === detNode ? node.right : node.left)
+                nodes.push(detNode)
+              } else {
+                contacts = contacts.concat(node.contacts)
+              }
             }
-
-            /**
-             * Splits the node, redistributes contacts to the new nodes, and marks the
-             * node that was split as an inner node of the binary tree of nodes by
-             * setting this.root.contacts = null
-             *
-             * @param  {Object} node     node for splitting
-             * @param  {Number} bitIndex the bitIndex to which byte to check in the
-             *                           Uint8Array for navigating the binary tree
-             */
-            this._split = function (node, bitIndex) {
-                node.left = this.createNode()
-                node.right = this.createNode()
-
-                // redistribute existing contacts amongst the two newly created nodes
-                for (const contact of node.contacts) {
-                    this._determineNode(node, contact.id, bitIndex).contacts.push(contact)
-                }
-
-                node.contacts = null // mark as inner tree node
-
-                // don't split the "far away" node
-                // we check where the local node would end up and mark the other one as
-                // "dontSplit" (i.e. "far away")
-                const detNode = this._determineNode(node, this.localNodeId, bitIndex)
-                const otherNode = node.left === detNode ? node.right : node.left
-                otherNode.dontSplit = true
+      
+            return contacts
+              .map(a => [this.distance(a.id, id), a])
+              .sort((a, b) => a[0] - b[0])
+              .slice(0, n)
+              .map(a => a[1])
+          }
+      
+          /**
+           * Counts the total number of contacts in the tree.
+           *
+           * @return {Number} The number of contacts held in the tree
+           */
+          this.count = function () {
+            // return this.toArray().length
+            let count = 0
+            for (const nodes = [this.root]; nodes.length > 0;) {
+              const node = nodes.pop()
+              if (node.contacts === null) nodes.push(node.right, node.left)
+              else count += node.contacts.length
             }
-
-            /**
-             * Returns all the contacts contained in the tree as an array.
-             * If this is a leaf, return a copy of the bucket. `slice` is used so that we
-             * don't accidentally leak an internal reference out that might be
-             * accidentally misused. If this is not a leaf, return the union of the low
-             * and high branches (themselves also as arrays).
-             *
-             * @return {Array} All of the contacts in the tree, as an array
-             */
-            this.toArray = function () {
-                let result = []
-                for (const nodes = [this.root]; nodes.length > 0;) {
-                    const node = nodes.pop()
-                    if (node.contacts === null) nodes.push(node.right, node.left)
-                    else result = result.concat(node.contacts)
-                }
-                return result
+            return count
+          }
+      
+          /**
+           * Determines whether the id at the bitIndex is 0 or 1.
+           * Return left leaf if `id` at `bitIndex` is 0, right leaf otherwise
+           *
+           * @param  {Object} node     internal object that has 2 leafs: left and right
+           * @param  {Uint8Array} id   Id to compare localNodeId with.
+           * @param  {Number} bitIndex Integer (Default: 0) The bit index to which bit
+           *                           to check in the id Uint8Array.
+           * @return {Object}          left leaf if id at bitIndex is 0, right leaf otherwise.
+           */
+          this._determineNode = function (node, id, bitIndex) {
+            // *NOTE* remember that id is a Uint8Array and has granularity of
+            // bytes (8 bits), whereas the bitIndex is the bit index (not byte)
+      
+            // id's that are too short are put in low bucket (1 byte = 8 bits)
+            // (bitIndex >> 3) finds how many bytes the bitIndex describes
+            // bitIndex % 8 checks if we have extra bits beyond byte multiples
+            // if number of bytes is <= no. of bytes described by bitIndex and there
+            // are extra bits to consider, this means id has less bits than what
+            // bitIndex describes, id therefore is too short, and will be put in low
+            // bucket
+            const bytesDescribedByBitIndex = bitIndex >> 3
+            const bitIndexWithinByte = bitIndex % 8
+            if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) {
+              return node.left
             }
-
-            /**
-             * Updates the contact selected by the arbiter.
-             * If the selection is our old contact and the candidate is some new contact
-             * then the new contact is abandoned (not added).
-             * If the selection is our old contact and the candidate is our old contact
-             * then we are refreshing the contact and it is marked as most recently
-             * contacted (by being moved to the right/end of the bucket array).
-             * If the selection is our new contact, the old contact is removed and the new
-             * contact is marked as most recently contacted.
-             *
-             * @param  {Object} node    internal object that has 2 leafs: left and right
-             * @param  {Number} index   the index in the bucket where contact exists
-             *                          (index has already been computed in a previous
-             *                          calculation)
-             * @param  {Object} contact The contact object to update.
-             */
-            this._update = function (node, index, contact) {
-                // sanity check
-                if (!this.arrayEquals(node.contacts[index].id, contact.id)) {
-                    throw new Error('wrong index for _update')
-                }
-
-                const incumbent = node.contacts[index]
-                const selection = this.arbiter(incumbent, contact)
-                // if the selection is our old contact and the candidate is some new
-                // contact, then there is nothing to do
-                if (selection === incumbent && incumbent !== contact) return
-
-                node.contacts.splice(index, 1) // remove old contact
-                node.contacts.push(selection) // add more recent contact version
-
+      
+            const byteUnderConsideration = id[bytesDescribedByBitIndex]
+      
+            // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
+            // where 255 is 11111111 and 0 is 00000000
+            // in order to find out whether the bit at bitIndexWithinByte is set
+            // we construct (1 << (7 - bitIndexWithinByte)) which will consist
+            // of all bits being 0, with only one bit set to 1
+            // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
+            // (1 << (7 - 3)) -> (1 << 4) -> 16
+            if (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))) {
+              return node.right
             }
+      
+            return node.left
+          }
+      
+          /**
+           * Get a contact by its exact ID.
+           * If this is a leaf, loop through the bucket contents and return the correct
+           * contact if we have it or null if not. If this is an inner node, determine
+           * which branch of the tree to traverse and repeat.
+           *
+           * @param  {Uint8Array} id The ID of the contact to fetch.
+           * @return {Object|Null}   The contact if available, otherwise null
+           */
+          this.get = function (id) {
+            this.ensureInt8('id', id)
+      
+            let bitIndex = 0
+      
+            let node = this.root
+            while (node.contacts === null) {
+              node = this._determineNode(node, id, bitIndex++)
+            }
+      
+            // index of uses contact id for matching
+            const index = this._indexOf(node, id)
+            return index >= 0 ? node.contacts[index] : null
+          }
+      
+          /**
+           * Returns the index of the contact with provided
+           * id if it exists, returns -1 otherwise.
+           *
+           * @param  {Object} node    internal object that has 2 leafs: left and right
+           * @param  {Uint8Array} id  Contact node id.
+           * @return {Number}         Integer Index of contact with provided id if it
+           *                          exists, -1 otherwise.
+           */
+          this._indexOf = function (node, id) {
+            for (let i = 0; i < node.contacts.length; ++i) {
+              if (this.arrayEquals(node.contacts[i].id, id)) return i
+            }
+      
+            return -1
+          }
+      
+          /**
+           * Removes contact with the provided id.
+           *
+           * @param  {Uint8Array} id The ID of the contact to remove.
+           * @return {Object}        The k-bucket itself.
+           */
+          this.remove = function (id) {
+            this.ensureInt8('the id as parameter 1', id)
+      
+            let bitIndex = 0
+            let node = this.root
+      
+            while (node.contacts === null) {
+              node = this._determineNode(node, id, bitIndex++)
+            }
+      
+            const index = this._indexOf(node, id)
+            if (index >= 0) {
+              const contact = node.contacts.splice(index, 1)[0]
+            }
+      
+            return this
+          }
+      
+          /**
+           * Splits the node, redistributes contacts to the new nodes, and marks the
+           * node that was split as an inner node of the binary tree of nodes by
+           * setting this.root.contacts = null
+           *
+           * @param  {Object} node     node for splitting
+           * @param  {Number} bitIndex the bitIndex to which byte to check in the
+           *                           Uint8Array for navigating the binary tree
+           */
+          this._split = function (node, bitIndex) {
+            node.left = this.createNode()
+            node.right = this.createNode()
+      
+            // redistribute existing contacts amongst the two newly created nodes
+            for (const contact of node.contacts) {
+              this._determineNode(node, contact.id, bitIndex).contacts.push(contact)
+            }
+      
+            node.contacts = null // mark as inner tree node
+      
+            // don't split the "far away" node
+            // we check where the local node would end up and mark the other one as
+            // "dontSplit" (i.e. "far away")
+            const detNode = this._determineNode(node, this.localNodeId, bitIndex)
+            const otherNode = node.left === detNode ? node.right : node.left
+            otherNode.dontSplit = true
+          }
+      
+          /**
+           * Returns all the contacts contained in the tree as an array.
+           * If this is a leaf, return a copy of the bucket. `slice` is used so that we
+           * don't accidentally leak an internal reference out that might be
+           * accidentally misused. If this is not a leaf, return the union of the low
+           * and high branches (themselves also as arrays).
+           *
+           * @return {Array} All of the contacts in the tree, as an array
+           */
+          this.toArray = function () {
+            let result = []
+            for (const nodes = [this.root]; nodes.length > 0;) {
+              const node = nodes.pop()
+              if (node.contacts === null) nodes.push(node.right, node.left)
+              else result = result.concat(node.contacts)
+            }
+            return result
+          }
+      
+          /**
+           * Updates the contact selected by the arbiter.
+           * If the selection is our old contact and the candidate is some new contact
+           * then the new contact is abandoned (not added).
+           * If the selection is our old contact and the candidate is our old contact
+           * then we are refreshing the contact and it is marked as most recently
+           * contacted (by being moved to the right/end of the bucket array).
+           * If the selection is our new contact, the old contact is removed and the new
+           * contact is marked as most recently contacted.
+           *
+           * @param  {Object} node    internal object that has 2 leafs: left and right
+           * @param  {Number} index   the index in the bucket where contact exists
+           *                          (index has already been computed in a previous
+           *                          calculation)
+           * @param  {Object} contact The contact object to update.
+           */
+          this._update = function (node, index, contact) {
+            // sanity check
+            if (!this.arrayEquals(node.contacts[index].id, contact.id)) {
+              throw new Error('wrong index for _update')
+            }
+      
+            const incumbent = node.contacts[index]
+            const selection = this.arbiter(incumbent, contact)
+            // if the selection is our old contact and the candidate is some new
+            // contact, then there is nothing to do
+            if (selection === incumbent && incumbent !== contact) return
+      
+            node.contacts.splice(index, 1) // remove old contact
+            node.contacts.push(selection) // add more recent contact version
+      
+          }
         }
-
+      
     </script>
     <script id="compactIDB">
         /* Compact IndexedDB operations */
@@ -9767,508 +9775,508 @@
         }
     </script>
 
-    <script>
+<script>
 
-        const cloudArticleApp = {
+    const cloudArticleApp = {
 
-            SUBJECT: "testArticle9", // BusinessDesign1 | testArticle9
+        SUBJECT: "testArticle9", // BusinessDesign1 | testArticle9
 
-            numberOfSections: 5,
+        numberOfSections: 5,
 
-            CONTENT_TYPE: "typeContentCollab9", // BUSINESS_DESIGN | typeContentCollab9
+        CONTENT_TYPE: "typeContentCollab9", // BUSINESS_DESIGN | typeContentCollab9
 
-            todaysContenthashList: [],
+        todaysContenthashList: [],
 
-            export_file_object: {},
+        export_file_object: {},
 
-            delay: (t, v) => {
-                return new Promise(function (resolve) {
-                    setTimeout(resolve.bind(null, v), t);
-                });
-            },
+        delay: (t, v) => {
+            return new Promise(function (resolve) {
+                setTimeout(resolve.bind(null, v), t);
+            });
+        },
 
-            // Create unique id
-            unique_id: function () {
-                return `${+new Date()}_${Math.random()
-                    .toString(36)
-                    .substr(2, 9)}`;
-            },
+        // Create unique id
+        unique_id: function () {
+            return `${+new Date()}_${Math.random()
+                .toString(36)
+                .substr(2, 9)}`;
+        },
 
-            showFullContentOfArticle: function (obj) {
-                const full_data_div = document.getElementById('current_data'),
-                    articleSubject = floGlobals.appObjects[this.SUBJECT];
+        showFullContentOfArticle: function (obj) {
+            const full_data_div = document.getElementById('current_data'),
+                articleSubject = floGlobals.appObjects[this.SUBJECT];
 
-                const new_generalData = floGlobals.generalData[JSON.stringify({ application: floGlobals.application, type: cloudArticleApp.CONTENT_TYPE })]
+            const new_generalData = floGlobals.generalData[JSON.stringify({ application: floGlobals.application, type: cloudArticleApp.CONTENT_TYPE })]
 
-                let new_entries_array = [];
+            let new_entries_array = [];
 
-                for (new_data of new_generalData) {
-                    new_obj = {
-                        content: new_data.message.content,
-                        content_creator: new_data.message.content_creator,
-                        score: 0,
-                        vectorClock: new_data.vectorClock
-                    }
-                    if (typeof new_data.message.section == "string") {
-                        if (typeof new_entries_array[new_data.message.section] !== "object")
-                            new_entries_array[new_data.message.section] = [];
-                        new_entries_array[new_data.message.section].push(new_obj);
-                    }
+            for (new_data of new_generalData) {
+                new_obj = {
+                    content: new_data.message.content,
+                    content_creator: new_data.message.content_creator,
+                    score: 0,
+                    vectorClock: new_data.vectorClock
                 }
-
-                let article_structure = ``;
-
-                for (key in obj) {
-                    if (Object.keys(articleSubject).includes(key)) {
-                        article_structure += `<div class="section-title"><h2>${key}</h2><div class="edit-article"></div></div>`;
-                    }
-
-                    for (secKey in articleSubject[key].data) {
-                        let tempCounter = 0;
-                        const secObject = articleSubject[key].data[secKey];
-
-                        if (typeof secObject.section_details === "object"
-                            && secObject.section_details.section_name.length) {
-                            article_structure_id = Crypto.SHA256(secObject.section_details.section_name);
-                            article_structure += `<h3 class="gallery-name" id="${article_structure_id}">${secObject.section_details.section_name}</h3>`;
-                        }
-
-                        // Add non scored new entries from users
-                        if (typeof new_entries_array[secKey] === "object") {
-                            let temp_iter_count = 0;
-                            for (new_conts of new_entries_array[secKey]) {
-                                secObject.section_iters[`temp_iter_${temp_iter_count}`] = new_conts;
-                                temp_iter_count++;
-                            }
-                        }
-
-                        // Sort by score
-                        let secObj = Object.values(secObject.section_iters).sort((a, b) => b.score - a.score);
-                        const vc_array = [];
-
-                        article_structure += `<div class="gallery-container">
-                                            <div class="gallery">`;
-
-                        for (iterKey in secObj) {
-                            const article_data = secObj[iterKey];
-                            const gen_div_id = this.unique_id();
-                            const content_hash = Crypto.SHA256(article_data.content.trim());
-                            let vc = article_data.vectorClock || "";
-
-                            if (Number(article_data.score) > 0) {
-
-                                const new_content_object = {
-                                    article_name: article_data.article_name,
-                                    content: article_data.content,
-                                    contentSHA256Hash: article_data.contentSHA256Hash,
-                                    content_creator: article_data.content_creator,
-                                    section: article_data.section,
-                                    score: article_data.score,
-                                    vectorClock: article_data.vectorClock,
-                                    signerPubKey: article_data.signerPubKey
-                                }
-                                if (!floGlobals.subAdmins.includes(bitjs.pubkey2address(article_data.signerPubKey))) continue;
-                                if (floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey) !== true) continue;
-                                if (vc.length > 0) vc_array.push(vc);
-                            } else {
-                                if (vc_array.includes(vc)) continue;
-                            }
-                            let fill;
-                            if (article_data.score > 0)
-                                fill = 'mediumspringgreen'
-                            else
-                                fill = 'none'
-                            article_structure +=
-                                `<div class="article-body">
-                                <div class="article-header">
-                                    <h5 title="Article author">${article_data.content_creator}</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="content-div" id="${gen_div_id}" data-gramm="false" data-value="${key}__${secKey}" contenteditable="true" onkeyup="buttonVisibility('show', this.parentNode)">
-                                        ${article_data.content.trim()}
-                                    </div>
-                                    <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}"/>
-                                    <button class="hide" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
-                                </div>
-                                <div class="card-footer">
-                                    <h5 id="exp_${gen_div_id}" title="Add this article as selected" class="select-for-export" onclick="cloudArticleApp.register_content_to_export(event)">Select</h5>
-                                    <h5 title="Give score to this article">
-                                        <svg viewBox="0 0 16.55 16" style="enable-background:new 0 0 16.55 16;" xml:space="preserve" fill="${fill}">
-                                            <polygon
-                                            id="score_${vc}" onclick="cloudArticleApp.upgrade_article(event)"
-                                             points="8.28,13.27 3.16,16 4.14,10.21 0,6.11 5.72,5.27 8.28,0 10.83,5.27 16.55,6.11 12.41,10.21 13.39,16"/>
-                                        </svg>
-                                        ${article_data.score}
-                                    </h5>
-                                </div>
-                          </div>`;
-                            tempCounter++;
-                        }
-                        if ((tempCounter > 1 && window.innerWidth < 720) || (tempCounter > 3 && window.innerWidth > 720))
-                            article_structure += `
-                        </div>
-                            <svg class="navigation-arrows hide" onclick="prevArticle(this.parentNode)"  viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
-                                <polygon points="5.66,50.91 45.25,90.51 50.91,84.85 11.31,45.25 50.91,5.66 45.25,0 5.66,39.6 0,45.25    "/>
-                            </svg>
-
-                            <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
-                                <polygon points="45.25,39.6 5.66,0 0,5.66 39.6,45.25 0,84.85 5.66,90.51 45.25,50.91 50.91,45.25 "/>
-                            </svg>`;
-                        article_structure += `</div>`;
-                    }
-
-                }
-                full_data_div.innerHTML = article_structure
-                hideLoader();
-                //section_settings
-                if (!floGlobals.subAdmins.includes(myFloID)) return false;
-                if (typeof floGlobals.appObjects[this.SUBJECT] !== "object") return false;
-                let topics = document.querySelectorAll('.edit-article');
-                for (let i = 0; i < Object.keys(floGlobals.appObjects[this.SUBJECT]).length; i++) {
-                    topics[i].innerHTML = `<button title="Edit article sections" id="${Object.keys(floGlobals.appObjects[this.SUBJECT])[i]}" onclick="cloudArticleApp.editArticleSectionNames(this.id)"><svg viewBox="0 0 30.57 30.57">
-                                            <path d="M24.32,0.59l-3.53,3.53l5.66,5.66l3.53-3.53c0.78-0.78,0.78-2.05,0-2.83l-2.83-2.83
-                                                C26.37-0.2,25.11-0.2,24.32,0.59z"/>
-                                            <path d="M19.38,5.53L1.7,23.21c-0.52,0.52-0.68,1.24-0.52,1.9L0.04,29.3c-0.2,0.75,0.48,1.43,1.23,1.23l4.19-1.14
-                                                c0.66,0.17,1.38,0,1.9-0.52l17.68-17.68L19.38,5.53z"/>
-                                            </svg>Edit</button>
-                                            `;
-                }
-            },
-
-            editArticleSectionNames: function (Topic) {
-                showPopup('edit_article');
-                let sec_counter = 1,
-                    sectionSettingsHtml = ``,
-                    sectionSettingsList = document.getElementById("edit_section_container");
-
-                if (!Object.keys(floGlobals.appObjects[this.SUBJECT]).includes(Topic)) return;
-                sectionSettingsList.innerHTML = ``;
-                for (vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
-                    sectionSettingsHtml += `<label for="section${sec_counter}">Section ${sec_counter}</label>
-                                        <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
-                    sec_counter++;
-                }
-
-                sectionSettingsList.innerHTML = sectionSettingsHtml;
-            },
-
-            update_section_names: async function () {
-                if (!floGlobals.subAdmins.includes(myFloID)) return;
-                var sec_items = document.getElementsByName("section_names_ip");
-                let full_data = JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
-                const Topic = Object.keys(full_data)[0];
-                sec_items.forEach((y, i) => {
-                    i++;
-                    full_data[Topic].data[`section${i}`].section_details.section_name = y.value;
-                });
-
-                floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, { receiverID: floGlobals.adminID });
-                this.retrieveLatestContent();
-                hidePopup('edit_article')
-            },
-
-            retrieveLatestContent: async function (receiverID = floGlobals.adminID, senderIDs = floGlobals.subAdmins) {
-                showLoader()
-                showMessage('Loading the latest content')
-                await floCloudAPI.requestObjectData(this.SUBJECT, { receiverID, senderIDs });
-                await floCloudAPI.requestGeneralData(this.CONTENT_TYPE);
-                document.getElementById('current_data').innerHTML = '';
-                cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
-                hideLoader()
-            },
-
-            createNewArticle: function (article_name, div = '', number_of_sections = cloudArticleApp.numberOfSections) {
-                new_article = {};
-                new_article[article_name] = {};
-                new_article[article_name].data = {};
-                for (let j = 0; j < number_of_sections; j++) {
-                    i = j + 1;
-                    let content = '';
-                    if (div == 'article_creation_modal') {
-                        //content = document.getElementById(`article_content${i}`).value;
-                        new_article[article_name].data[`section${i}`] = {
-                            section_details: {},
-                            section_iters: {},
-                        };
-                        new_article[article_name].data[`section${i}`]["section_details"] = {
-                            section_name: ""
-                        };
-                        new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
-                            content: "",
-                            content_creator: myFloID,
-                            score: 0
-                        }
-                    } else if (div == 'update_data_div') {
-                        content = document.getElementById(`article_content_up`).value;
-                        new_article[article_name].data[`section${i}`] = {
-                            section_details: {},
-                            section_iters: {},
-                        };
-                        new_article[article_name].data[`section${i}`]["section_details"] = {
-                            section_name: ""
-                        };
-                        if (i !== 1) content = '';
-                        new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
-                            content: content,
-                            content_creator: myFloID,
-                            score: 0
-                        }
-                    } else {
-                        console.error('error');
-                    }
-
-                }
-
-                return new_article;
-            },
-
-            resetArticleContent: function () {
-                showMessage(`Creating new article...`);
-                const article_name = document.getElementById('article_name').value;
-                let number_of_sections = document.getElementById('section_nums').value;
-                number_of_sections = Number(number_of_sections);
-                if (number_of_sections < 1) {
-                    let err = 'Error: Number of sections must be more than 0.';
-                    showMessage(err)
-                    throw new Error(err)
-                }
-                let new_article = this.createNewArticle(article_name, 'article_creation_modal', number_of_sections);
-                floCloudAPI.resetObjectData(new_article, this.SUBJECT,
-                    { receiverID: floGlobals.adminID });
-
-                this.retrieveLatestContent();
-
-                return true;
-            },
-
-            addArticleContent: async function (article_name = "", section = "", newcontent = "", content_creator = "", score = 0, vectorClock = "") {
-                await this.retrieveLatestContent();
-                let full_data = JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
-                let article = full_data[article_name];
-
-                if (typeof article !== "object") throw new Error(article_name + " does not exists");
-
-                // if(typeof article!=="object") {
-                //     make_article=this.createNewArticle(article_name, 'update_data_div');
-                //     full_data[article_name] = make_article[article_name];
-                //     article = full_data[article_name];
-                // }
-
-                let iterNumber = Object.keys(article.data[section]["section_iters"]).map(f => {
-                    return f.match(/\d+/)[0];
-                }).reduce(function (prev, current) {
-                    return (prev.y > current.y) ? prev : current
-                });
-
-                let oldArticle = article.data[section]["section_iters"][`iteration${iterNumber}`];
-                let iterNum = Number(iterNumber) + 1;
-
-                // Convert line breaks into br
-                newcontent = newcontent.replace(/\n/g, '<br>').trim(); //.replace(/\r\n|\r|\n/g,"</br>")
-
-                const contentSHA256Hash = Crypto.SHA256(newcontent);
-
-                // Reject if this hash is already present in db
-                if (JSON.stringify(article).includes(contentSHA256Hash)) return false;
-
-                // Reject if duplicate content is being submitted && which is not yet registered in floGlobals.appObjects[this.SUBJECT]
-                if (cloudArticleApp.todaysContenthashList.includes(contentSHA256Hash)) return false;
-                cloudArticleApp.todaysContenthashList.push(contentSHA256Hash);
-
-                const new_content_object = {
-                    article_name: article_name,
-                    content: newcontent,
-                    contentSHA256Hash: contentSHA256Hash,
-                    content_creator: content_creator,
-                    section: section,
-                    score: score,
-                    vectorClock: vectorClock,
-                    signerPubKey: myPubKey
-                }
-
-                new_content_object.sign = floCrypto.signData(JSON.stringify(new_content_object), myPrivKey);
-
-                article.data[section]["section_iters"][`iteration${iterNum}`] = new_content_object;
-
-                showMessage(`Adding new iteration to article ${article_name}`);
-
-                if (floGlobals.subAdmins.includes(myFloID)) {
-                    floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, { receiverID: floGlobals.adminID });
-                } else {
-                    const general_data_obj = {
-                        article_name: article_name,
-                        content: newcontent,
-                        contentSHA256Hash: contentSHA256Hash,
-                        content_creator: myFloID,
-                        section: section,
-                        score: 0,
-                        vectorClock: vectorClock,
-                        signerPubKey: myPubKey
-                    }
-                    general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
-
-                    floCloudAPI.sendGeneralData(general_data_obj, this.CONTENT_TYPE, { receiverID: floGlobals.adminID, senderIDs: [myFloID] });
-                }
-
-                this.retrieveLatestContent();
-            },
-
-            getEventTarget: function (e) {
-                e = e || window.event; // for browsers compatibility
-                return e.target || e.srcElement;
-            },
-
-            edit_onfocuout: function (parent) {
-                if (floGlobals.subAdmins.includes(myFloID)) return;
-                let target = parent.firstElementChild;
-                const updated_content = target.innerText.trim();
-                const updated_content_hash = Crypto.SHA256(updated_content);
-                let editable_div = document.getElementsByClassName('content_div');
-                let _id = target.id;
-                let previous_content_hash = document.getElementById(`hash_${_id}`).value;
-                if (previous_content_hash === updated_content_hash) return;
-                let detail_block = document.getElementById(_id).getAttribute('data-value');
-                let separate_data = detail_block.trim().split('__');
-                if (separate_data.length !== 2) return;
-
-                cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content, myFloID);
-                buttonVisibility('hide', parent)
-            },
-
-            upgrade_article: function (event) {
-                let new_score = prompt("Enter Score: ", 0);
-                new_score = Number(new_score);
-                if (typeof new_score !== "number" || new_score <= 0) return;
-                let target = cloudArticleApp.getEventTarget(event);
-                let article_vc = target.id.substr(6);
-                let contents = floGlobals.appObjects[this.SUBJECT];
-                for (title of Object.keys(contents)) {
-                    for (sections of Object.keys(contents[title].data)) {
-                        for (iters of Object.values(contents[title].data[sections].section_iters)) {
-                            if (typeof iters.vectorClock === "string"
-                                && iters.vectorClock == article_vc) {
-                                cloudArticleApp.addArticleContent(title, sections, iters.content,
-                                    iters.content_creator, new_score, article_vc);
-                                break;
-                            }
-                        }
-                    }
-                }
-            },
-
-            register_content_to_export: function (event) {
-                let target = cloudArticleApp.getEventTarget(event),
-                    article_id = target.id.substring(4),
-                    parent_heading_id = target.closest('.gallery-container').previousElementSibling.id,
-                    options = document.getElementById('context_menu'),
-                    top = target.getBoundingClientRect().top,
-                    left = target.getBoundingClientRect().left;
-
-                if (typeof cloudArticleApp.export_file_object[parent_heading_id] !== "object") {
-                    this.register_heading_to_export(parent_heading_id);
-                }
-                if (JSON.stringify(cloudArticleApp.export_file_object[parent_heading_id].contents).search(article_id) >= 0) return;
-                const current_rank_of_articles = Object.keys(cloudArticleApp.export_file_object[parent_heading_id].contents);
-                let max_rank = Math.max.apply(null, current_rank_of_articles);
-                if(max_rank=="-Infinity") max_rank= Math.max(current_rank_of_articles)
-                const rank = Number(max_rank) + 1;
-                cloudArticleApp.export_file_object[parent_heading_id].contents[rank] = {
-                    article_id: article_id,
-                    rank: rank
-                }
-                console.log(cloudArticleApp.export_file_object)
-                target.classList.add("snippet-selected");
-                target.textContent = 'Selected';
-                options.classList.remove('hide')
-                let y = document.addEventListener("touchend", function (event) {
-                    if (event.target.closest('#context_menu') || event.target.closest('.select-for-export')) return;
-                    options.classList.add('hide')
-                    document.removeEventListener('click', y);
-                });
-                if (window.innerWidth > 640) {
-                    document.querySelectorAll('.export-options').forEach((option) => {
-                        option.classList.remove('hide-completely')
-                    })
-                }
-                if (top > window.innerHeight - 100)
-                    options.setAttribute('style', `transform: translate(${left}px, ${top - 160}px)`)
-                else
-                    options.setAttribute('style', `transform: translate(${left}px, ${top}px)`)
-            },
-
-            register_heading_to_export: function (heading_id = "") {
-                if (heading_id.length < 1 || typeof cloudArticleApp.export_file_object[heading_id] === "object") return;
-
-                cloudArticleApp.export_file_object[heading_id] = {
-                    title: document.getElementById(heading_id).innerText,
-                    rank: Object.keys(cloudArticleApp.export_file_object).length + 1,
-                    contents: {}
-                };
-            },
-
-            export_as_file: function (e) {
-                const headings = Object.values(cloudArticleApp.export_file_object).sort((a, b) => a.rank < b.rank);
-
-                let t = ``;
-
-                for (textContent of headings) {
-                    let snippets = Object.values(textContent.contents).sort((c, d) => c.rank < d.rank);
-                    t += `<h4>${textContent.title}</h4>`;
-                    for (snips of snippets) {
-                        if (typeof snips !== "object") continue;
-                        t += '<p>' + document.getElementById(snips.article_id).innerText + '</p>';
-                    }
-                }
-
-                let file_name = "content_collaboration" + new Date().getTime();
-
-                this.downloadInnerHtml(file_name, t, 'text/html');
-                document.getElementById('context_menu').classList.add('hide')
-
-            },
-
-            // https://stackoverflow.com/a/22085875/5348972
-            downloadInnerHtml: function (filename, elHtml, mimeType) {
-                if (navigator.msSaveBlob) { // IE 10+
-                    navigator.msSaveBlob(new Blob([elHtml], { type: mimeType + ';charset=utf-8;' }), filename);
-                } else {
-                    var link = document.createElement('a');
-                    mimeType = mimeType || 'text/plain';
-
-                    link.setAttribute('download', filename);
-                    link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
-                    link.click();
-                }
-                cloudArticleApp.export_file_object = {};
-            },
-
-            reset_export_list: function () {
-                cloudArticleApp.export_file_object = {};
-                document.querySelectorAll('.snippet-selected').forEach((cl) => {
-                    cl.textContent = 'Select';
-                    cl.classList.remove("snippet-selected");
-                })
-                document.getElementById('context_menu').classList.add('hide')
-                document.querySelectorAll('.export-options').forEach((option) => {
-                    option.classList.add('hide-completely')
-                })
-            },
-            logout: function () {
-                if (confirm("Do you want to logout?")) {
-                    floDapps.clearCredentials()
-                    compactIDB.deleteDB().then((message) => {
-                        console.log(message)
-                        onLoadStartUp()
-                        alert('You have logged out successfully.')
-                    }).catch((error) => {
-                        console.log(error)
-                    })
+                if (typeof new_data.message.section == "string") {
+                    if (typeof new_entries_array[new_data.message.section] !== "object")
+                        new_entries_array[new_data.message.section] = [];
+                    new_entries_array[new_data.message.section].push(new_obj);
                 }
             }
 
+            let article_structure = ``;
+
+            for (key in obj) {
+                if (Object.keys(articleSubject).includes(key)) {
+                    article_structure += `<div class="section-title"><h2>${key}</h2><div class="edit-article"></div></div>`;
+                }
+
+                for (secKey in articleSubject[key].data) {
+                    let tempCounter = 0;
+                    const secObject = articleSubject[key].data[secKey];
+
+                    if (typeof secObject.section_details === "object"
+                        && secObject.section_details.section_name.length) {
+                        article_structure_id = Crypto.SHA256(secObject.section_details.section_name);
+                        article_structure += `<h3 class="gallery-name" id="${article_structure_id}">${secObject.section_details.section_name}</h3>`;
+                    }
+
+                    // Add non scored new entries from users
+                    if (typeof new_entries_array[secKey] === "object") {
+                        let temp_iter_count = 0;
+                        for (new_conts of new_entries_array[secKey]) {
+                            secObject.section_iters[`temp_iter_${temp_iter_count}`] = new_conts;
+                            temp_iter_count++;
+                        }
+                    }
+
+                    // Sort by score
+                    let secObj = Object.values(secObject.section_iters).sort((a, b) => b.score - a.score);
+                    const vc_array = [];
+
+                    article_structure += `<div class="gallery-container">
+                                        <div class="gallery">`;
+
+                    for (iterKey in secObj) {
+                        const article_data = secObj[iterKey];
+                        const gen_div_id = this.unique_id();
+                        const content_hash = Crypto.SHA256(article_data.content.trim());
+                        let vc = article_data.vectorClock || "";
+
+                        if (Number(article_data.score) > 0) {
+
+                            const new_content_object = {
+                                article_name: article_data.article_name,
+                                content: article_data.content,
+                                contentSHA256Hash: article_data.contentSHA256Hash,
+                                content_creator: article_data.content_creator,
+                                section: article_data.section,
+                                score: article_data.score,
+                                vectorClock: article_data.vectorClock,
+                                signerPubKey: article_data.signerPubKey
+                            }
+                            if (!floGlobals.subAdmins.includes(bitjs.pubkey2address(article_data.signerPubKey))) continue;
+                            if (floCrypto.verifySign(JSON.stringify(new_content_object), article_data.sign, article_data.signerPubKey) !== true) continue;
+                            if (vc.length > 0) vc_array.push(vc);
+                        } else {
+                            if (vc_array.includes(vc)) continue;
+                        }
+                        let fill;
+                        if (article_data.score > 0)
+                            fill = 'mediumspringgreen'
+                        else
+                            fill = 'none'
+                        article_structure +=
+                            `<div class="article-body">
+                            <div class="article-header">
+                                <h5 title="Article author">${article_data.content_creator}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="content-div" id="${gen_div_id}" data-gramm="false" data-value="${key}__${secKey}" contenteditable="true" onkeyup="buttonVisibility('show', this.parentNode)">
+                                    ${article_data.content.trim()}
+                                </div>
+                                <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}"/>
+                                <button class="hide" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
+                            </div>
+                            <div class="card-footer">
+                                <h5 id="exp_${gen_div_id}" title="Add this article as selected" class="select-for-export" onclick="cloudArticleApp.register_content_to_export(event)">Select</h5>
+                                <h5 title="Give score to this article">
+                                    <svg viewBox="0 0 16.55 16" style="enable-background:new 0 0 16.55 16;" xml:space="preserve" fill="${fill}">
+                                        <polygon
+                                        id="score_${vc}" onclick="cloudArticleApp.upgrade_article(event)"
+                                         points="8.28,13.27 3.16,16 4.14,10.21 0,6.11 5.72,5.27 8.28,0 10.83,5.27 16.55,6.11 12.41,10.21 13.39,16"/>
+                                    </svg>
+                                    ${article_data.score}
+                                </h5>
+                            </div>
+                      </div>`;
+                        tempCounter++;
+                    }
+                    if ((tempCounter > 1 && window.innerWidth < 720) || (tempCounter > 3 && window.innerWidth > 720))
+                        article_structure += `
+                    </div>
+                        <svg class="navigation-arrows hide" onclick="prevArticle(this.parentNode)"  viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
+                            <polygon points="5.66,50.91 45.25,90.51 50.91,84.85 11.31,45.25 50.91,5.66 45.25,0 5.66,39.6 0,45.25    "/>
+                        </svg>
+
+                        <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
+                            <polygon points="45.25,39.6 5.66,0 0,5.66 39.6,45.25 0,84.85 5.66,90.51 45.25,50.91 50.91,45.25 "/>
+                        </svg>`;
+                    article_structure += `</div>`;
+                }
+
+            }
+            full_data_div.innerHTML = article_structure
+            hideLoader();
+            //section_settings
+            if (!floGlobals.subAdmins.includes(myFloID)) return false;
+            if (typeof floGlobals.appObjects[this.SUBJECT] !== "object") return false;
+            let topics = document.querySelectorAll('.edit-article');
+            for (let i = 0; i < Object.keys(floGlobals.appObjects[this.SUBJECT]).length; i++) {
+                topics[i].innerHTML = `<button title="Edit article sections" id="${Object.keys(floGlobals.appObjects[this.SUBJECT])[i]}" onclick="cloudArticleApp.editArticleSectionNames(this.id)"><svg viewBox="0 0 30.57 30.57">
+                                        <path d="M24.32,0.59l-3.53,3.53l5.66,5.66l3.53-3.53c0.78-0.78,0.78-2.05,0-2.83l-2.83-2.83
+                                            C26.37-0.2,25.11-0.2,24.32,0.59z"/>
+                                        <path d="M19.38,5.53L1.7,23.21c-0.52,0.52-0.68,1.24-0.52,1.9L0.04,29.3c-0.2,0.75,0.48,1.43,1.23,1.23l4.19-1.14
+                                            c0.66,0.17,1.38,0,1.9-0.52l17.68-17.68L19.38,5.53z"/>
+                                        </svg>Edit</button>
+                                        `;
+            }
+        },
+
+        editArticleSectionNames: function (Topic) {
+            showPopup('edit_article');
+            let sec_counter = 1,
+                sectionSettingsHtml = ``,
+                sectionSettingsList = document.getElementById("edit_section_container");
+
+            if (!Object.keys(floGlobals.appObjects[this.SUBJECT]).includes(Topic)) return;
+            sectionSettingsList.innerHTML = ``;
+            for (vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
+                sectionSettingsHtml += `<label for="section${sec_counter}">Section ${sec_counter}</label>
+                                    <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
+                sec_counter++;
+            }
+
+            sectionSettingsList.innerHTML = sectionSettingsHtml;
+        },
+
+        update_section_names: async function () {
+            if (!floGlobals.subAdmins.includes(myFloID)) return;
+            var sec_items = document.getElementsByName("section_names_ip");
+            let full_data = JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
+            const Topic = Object.keys(full_data)[0];
+            sec_items.forEach((y, i) => {
+                i++;
+                full_data[Topic].data[`section${i}`].section_details.section_name = y.value;
+            });
+
+            floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, { receiverID: floGlobals.adminID });
+            this.retrieveLatestContent();
+            hidePopup('edit_article')
+        },
+
+        retrieveLatestContent: async function (receiverID = floGlobals.adminID, senderIDs = floGlobals.subAdmins) {
+            showLoader()
+            showMessage('Loading the latest content')
+            await floCloudAPI.requestObjectData(this.SUBJECT, { receiverID, senderIDs });
+            await floCloudAPI.requestGeneralData(this.CONTENT_TYPE);
+            document.getElementById('current_data').innerHTML = '';
+            cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
+            hideLoader()
+        },
+
+        createNewArticle: function (article_name, div = '', number_of_sections = cloudArticleApp.numberOfSections) {
+            new_article = {};
+            new_article[article_name] = {};
+            new_article[article_name].data = {};
+            for (let j = 0; j < number_of_sections; j++) {
+                i = j + 1;
+                let content = '';
+                if (div == 'article_creation_modal') {
+                    //content = document.getElementById(`article_content${i}`).value;
+                    new_article[article_name].data[`section${i}`] = {
+                        section_details: {},
+                        section_iters: {},
+                    };
+                    new_article[article_name].data[`section${i}`]["section_details"] = {
+                        section_name: ""
+                    };
+                    new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
+                        content: "",
+                        content_creator: myFloID,
+                        score: 0
+                    }
+                } else if (div == 'update_data_div') {
+                    content = document.getElementById(`article_content_up`).value;
+                    new_article[article_name].data[`section${i}`] = {
+                        section_details: {},
+                        section_iters: {},
+                    };
+                    new_article[article_name].data[`section${i}`]["section_details"] = {
+                        section_name: ""
+                    };
+                    if (i !== 1) content = '';
+                    new_article[article_name].data[`section${i}`]["section_iters"]["iteration0"] = {
+                        content: content,
+                        content_creator: myFloID,
+                        score: 0
+                    }
+                } else {
+                    console.error('error');
+                }
+
+            }
+
+            return new_article;
+        },
+
+        resetArticleContent: function () {
+            showMessage(`Creating new article...`);
+            const article_name = document.getElementById('article_name').value;
+            let number_of_sections = document.getElementById('section_nums').value;
+            number_of_sections = Number(number_of_sections);
+            if (number_of_sections < 1) {
+                let err = 'Error: Number of sections must be more than 0.';
+                showMessage(err)
+                throw new Error(err)
+            }
+            let new_article = this.createNewArticle(article_name, 'article_creation_modal', number_of_sections);
+            floCloudAPI.resetObjectData(new_article, this.SUBJECT,
+                { receiverID: floGlobals.adminID });
+
+            this.retrieveLatestContent();
+
+            return true;
+        },
+
+        addArticleContent: async function (article_name = "", section = "", newcontent = "", content_creator = "", score = 0, vectorClock = "") {
+            await this.retrieveLatestContent();
+            let full_data = JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
+            let article = full_data[article_name];
+
+            if (typeof article !== "object") throw new Error(article_name + " does not exists");
+
+            // if(typeof article!=="object") {
+            //     make_article=this.createNewArticle(article_name, 'update_data_div');
+            //     full_data[article_name] = make_article[article_name];
+            //     article = full_data[article_name];
+            // }
+
+            let iterNumber = Object.keys(article.data[section]["section_iters"]).map(f => {
+                return f.match(/\d+/)[0];
+            }).reduce(function (prev, current) {
+                return (prev.y > current.y) ? prev : current
+            });
+
+            let oldArticle = article.data[section]["section_iters"][`iteration${iterNumber}`];
+            let iterNum = Number(iterNumber) + 1;
+
+            // Convert line breaks into br
+            newcontent = newcontent.replace(/\n/g, '<br>').trim(); //.replace(/\r\n|\r|\n/g,"</br>")
+
+            const contentSHA256Hash = Crypto.SHA256(newcontent);
+
+            // Reject if this hash is already present in db
+            if (JSON.stringify(article).includes(contentSHA256Hash)) return false;
+
+            // Reject if duplicate content is being submitted && which is not yet registered in floGlobals.appObjects[this.SUBJECT]
+            if (cloudArticleApp.todaysContenthashList.includes(contentSHA256Hash)) return false;
+            cloudArticleApp.todaysContenthashList.push(contentSHA256Hash);
+
+            const new_content_object = {
+                article_name: article_name,
+                content: newcontent,
+                contentSHA256Hash: contentSHA256Hash,
+                content_creator: content_creator,
+                section: section,
+                score: score,
+                vectorClock: vectorClock,
+                signerPubKey: myPubKey
+            }
+
+            new_content_object.sign = floCrypto.signData(JSON.stringify(new_content_object), myPrivKey);
+
+            article.data[section]["section_iters"][`iteration${iterNum}`] = new_content_object;
+
+            showMessage(`Adding new iteration to article ${article_name}`);
+
+            if (floGlobals.subAdmins.includes(myFloID)) {
+                floCloudAPI.updateObjectData(floGlobals.appObjects[this.SUBJECT], full_data, this.SUBJECT, { receiverID: floGlobals.adminID });
+            } else {
+                const general_data_obj = {
+                    article_name: article_name,
+                    content: newcontent,
+                    contentSHA256Hash: contentSHA256Hash,
+                    content_creator: myFloID,
+                    section: section,
+                    score: 0,
+                    vectorClock: vectorClock,
+                    signerPubKey: myPubKey
+                }
+                general_data_obj.sign = floCrypto.signData(JSON.stringify(general_data_obj), myPrivKey);
+
+                floCloudAPI.sendGeneralData(general_data_obj, this.CONTENT_TYPE, { receiverID: floGlobals.adminID, senderIDs: [myFloID] });
+            }
+
+            this.retrieveLatestContent();
+        },
+
+        getEventTarget: function (e) {
+            e = e || window.event; // for browsers compatibility
+            return e.target || e.srcElement;
+        },
+
+        edit_onfocuout: function (parent) {
+            if (floGlobals.subAdmins.includes(myFloID)) return;
+            let target = parent.firstElementChild;
+            const updated_content = target.innerText.trim();
+            const updated_content_hash = Crypto.SHA256(updated_content);
+            let editable_div = document.getElementsByClassName('content_div');
+            let _id = target.id;
+            let previous_content_hash = document.getElementById(`hash_${_id}`).value;
+            if (previous_content_hash === updated_content_hash) return;
+            let detail_block = document.getElementById(_id).getAttribute('data-value');
+            let separate_data = detail_block.trim().split('__');
+            if (separate_data.length !== 2) return;
+
+            cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content, myFloID);
+            buttonVisibility('hide', parent)
+        },
+
+        upgrade_article: function (event) {
+            let new_score = prompt("Enter Score: ", 0);
+            new_score = Number(new_score);
+            if (typeof new_score !== "number" || new_score <= 0) return;
+            let target = cloudArticleApp.getEventTarget(event);
+            let article_vc = target.id.substr(6);
+            let contents = floGlobals.appObjects[this.SUBJECT];
+            for (title of Object.keys(contents)) {
+                for (sections of Object.keys(contents[title].data)) {
+                    for (iters of Object.values(contents[title].data[sections].section_iters)) {
+                        if (typeof iters.vectorClock === "string"
+                            && iters.vectorClock == article_vc) {
+                            cloudArticleApp.addArticleContent(title, sections, iters.content,
+                                iters.content_creator, new_score, article_vc);
+                            break;
+                        }
+                    }
+                }
+            }
+        },
+
+        register_content_to_export: function (event) {
+            let target = cloudArticleApp.getEventTarget(event),
+                article_id = target.id.substring(4),
+                parent_heading_id = target.closest('.gallery-container').previousElementSibling.id,
+                options = document.getElementById('context_menu'),
+                top = target.getBoundingClientRect().top,
+                left = target.getBoundingClientRect().left;
+
+            if (typeof cloudArticleApp.export_file_object[parent_heading_id] !== "object") {
+                this.register_heading_to_export(parent_heading_id);
+            }
+            if (JSON.stringify(cloudArticleApp.export_file_object[parent_heading_id].contents).search(article_id) >= 0) return;
+            const current_rank_of_articles = Object.keys(cloudArticleApp.export_file_object[parent_heading_id].contents);
+            let max_rank = Math.max.apply(null, current_rank_of_articles);
+            if(max_rank=="-Infinity") max_rank= Math.max(current_rank_of_articles)
+            const rank = Number(max_rank) + 1;
+            cloudArticleApp.export_file_object[parent_heading_id].contents[rank] = {
+                article_id: article_id,
+                rank: rank
+            }
+            console.log(cloudArticleApp.export_file_object)
+            target.classList.add("snippet-selected");
+            target.textContent = 'Selected';
+            options.classList.remove('hide')
+            let y = document.addEventListener("touchend", function (event) {
+                if (event.target.closest('#context_menu') || event.target.closest('.select-for-export')) return;
+                options.classList.add('hide')
+                document.removeEventListener('click', y);
+            });
+            if (window.innerWidth > 640) {
+                document.querySelectorAll('.export-options').forEach((option) => {
+                    option.classList.remove('hide-completely')
+                })
+            }
+            if (top > window.innerHeight - 100)
+                options.setAttribute('style', `transform: translate(${left}px, ${top - 160}px)`)
+            else
+                options.setAttribute('style', `transform: translate(${left}px, ${top}px)`)
+        },
+
+        register_heading_to_export: function (heading_id = "") {
+            if (heading_id.length < 1 || typeof cloudArticleApp.export_file_object[heading_id] === "object") return;
+
+            cloudArticleApp.export_file_object[heading_id] = {
+                title: document.getElementById(heading_id).innerText,
+                rank: Object.keys(cloudArticleApp.export_file_object).length + 1,
+                contents: {}
+            };
+        },
+
+        export_as_file: function (e) {
+            const headings = Object.values(cloudArticleApp.export_file_object).sort((a, b) => a.rank < b.rank);
+
+            let t = ``;
+
+            for (textContent of headings) {
+                let snippets = Object.values(textContent.contents).sort((c, d) => c.rank < d.rank);
+                t += `<h4>${textContent.title}</h4>`;
+                for (snips of snippets) {
+                    if (typeof snips !== "object") continue;
+                    t += '<p>' + document.getElementById(snips.article_id).innerText + '</p>';
+                }
+            }
+
+            let file_name = "content_collaboration" + new Date().getTime();
+
+            this.downloadInnerHtml(file_name, t, 'text/html');
+            document.getElementById('context_menu').classList.add('hide')
+
+        },
+
+        // https://stackoverflow.com/a/22085875/5348972
+        downloadInnerHtml: function (filename, elHtml, mimeType) {
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(new Blob([elHtml], { type: mimeType + ';charset=utf-8;' }), filename);
+            } else {
+                var link = document.createElement('a');
+                mimeType = mimeType || 'text/plain';
+
+                link.setAttribute('download', filename);
+                link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
+                link.click();
+            }
+            cloudArticleApp.export_file_object = {};
+        },
+
+        reset_export_list: function () {
+            cloudArticleApp.export_file_object = {};
+            document.querySelectorAll('.snippet-selected').forEach((cl) => {
+                cl.textContent = 'Select';
+                cl.classList.remove("snippet-selected");
+            })
+            document.getElementById('context_menu').classList.add('hide')
+            document.querySelectorAll('.export-options').forEach((option) => {
+                option.classList.add('hide-completely')
+            })
+        },
+        logout: function () {
+            if (confirm("Do you want to logout?")) {
+                floDapps.clearCredentials()
+                compactIDB.deleteDB().then((message) => {
+                    console.log(message)
+                    onLoadStartUp()
+                    alert('You have logged out successfully.')
+                }).catch((error) => {
+                    console.log(error)
+                })
+            }
         }
 
-    </script>
+    }
+
+</script>
 
 </body>
 
