@@ -1135,17 +1135,22 @@
                 function parsePlot(plottext) {
 
                     var tstring = plottext.replace(/\s+/g, " ");
+                    tstring = tstring.trim();
                     tstring = tstring.split(") -> (");
+
                     if (tstring.length > 0) {
-                        if (tstring[0][0].trim() == "(") {
+                        if (tstring[0].trim()[0] == "(") {
                             tstring[0] = tstring[0].trim().slice(1)
                         }
                         else {
                             return 'error';
                         }
 
-                        if (tstring[-1][-1].trim() == ")") {
-                            tstring[0] = tstring[0].trim().slice(0, -1)
+                        var lastobj = tstring[tstring.length - 1];
+                        var lastobjlen = lastobj.length;
+
+                        if (lastobj.trim()[lastobjlen - 1] == ")") {
+                            tstring[tstring.length - 1] = lastobj.trim().slice(0, lastobjlen - 1)
                         }
                         else {
                             return 'error';
