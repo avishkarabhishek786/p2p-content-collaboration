@@ -9976,7 +9976,6 @@ Bitcoin.Util = {
                     diff: findDifference(JSON.parse(this.util.lastCommit[objectName]), floGlobals
                         .appObjects[objectName])
                 }
-                debugger;
                 this.sendApplicationData(message, `${objectName}@Update`, options).then(result => {
                     this.util.lastCommit[objectName] = JSON.stringify(floGlobals.appObjects[
                         objectName])
@@ -10722,8 +10721,50 @@ Bitcoin.Util = {
             await this.retrieveLatestContent();
         },
 
+        addSections: async function (sections) {
+            showMessage(`Adding sections...`);
+
+            let number_of_sections, section_names = [];
+
+            if(Array.isArray(sections)){
+                number_of_sections = sections.length;
+                section_names = sections
+            } else if(typeof sections == 'number'){
+                number_of_sections = sections
+                for(let k=0; k<number_of_sections; k++)
+                    section_names.push("")
+            }
+            
+            if (number_of_sections < 1) {
+                let err = 'Error: Number of sections must be more than 0.';
+                showMessage(err)
+                throw new Error(err)
+            }
+            let article = floGlobals.appObjects[this.SUBJECT]
+            let article_name = Object.keys(article)[0]
+            let i = Object.keys(article[article_name].data).length + 1;
+            for (let j = 0; j < number_of_sections; j++) {
+                let content = '';
+                article[article_name].data[`section${i+j}`] = {
+                    section_details: {},
+                    section_iters: {},
+                };
+                article[article_name].data[`section${i+j}`]["section_details"] = {
+                    section_name: section_names[j]
+                };
+                article[article_name].data[`section${i+j}`]["section_iters"]["iteration0"] = {
+                    content: "",
+                    content_creator: myFloID,
+                    score: 0
+                }
+            }
+
+            await floCloudAPI.updateObjectData(this.SUBJECT);
+            await this.retrieveLatestContent();
+        },
+
+
         addArticleContent: async function (article_name = "", section = "", newcontent = "", content_creator = "", score = 0, vectorClock = "") {
-            debugger;
             await this.retrieveLatestContent();
             //let full_data = JSON.parse(JSON.stringify(floGlobals.appObjects[this.SUBJECT]));
             let article = floGlobals.appObjects[this.SUBJECT][article_name];
@@ -10742,7 +10783,6 @@ Bitcoin.Util = {
                 return (prev.y > current.y) ? prev : current
             });
 
-            debugger;
 
             let oldArticle = article.data[section]["section_iters"][`iteration${iterNumber}`];
             let iterNum = Number(iterNumber) + 1;
