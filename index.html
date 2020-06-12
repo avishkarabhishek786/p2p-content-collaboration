@@ -1099,13 +1099,48 @@ let myCustomLogin = function () {
                     </div>
                 </section>`;
 
+                
+                function parsePlot(plottext){
+
+                    var tstring = plottext.replace(/\s+/g, " ");
+                    tstring = tstring.split(") -> (");
+                    if(tstring.length > 0){
+                        if(tstring[0][0]=="("){
+                            tstring[0] = tstring[0].slice(1)                                                        
+                        }
+                        else{
+                            return 'error';
+                        }
+
+                        if(tstring[-1][-1]==")"){
+                            tstring[0] = tstring[0].slice(0,-1)                              
+                        }
+                        else{
+                            return 'error';
+                        }
+                    }
+                    else{
+                        return 'error';
+                    }
+                    return tstring;
+                }
+
                 document.getElementById('sectionplotdiv').innerHTML = sectionPlotUI;
                 const section_plot_btn = document.getElementById('section_plot_btn');
                 section_plot_btn.onclick = function () {
                     let section_plot_value = document.getElementById('section_plot_txt').value;
-                    console.log(section_plot_value);
+                    //console.log(section_plot_value);
                     // plot func here
-                    hidePopup('section_plot_modal')
+                    var splitSections = parsePlot(section_plot_value);
+                    console.log(splitSections);
+                    if(splitSections != 'error'){
+                        cloudArticleApp.addSections(splitSections);
+                        hidePopup('section_plot_modal');
+                    }
+                    else{
+                        showMessage('Plot diagram entered is in wrong format')
+                    }
+                    
                 }
             }
             
@@ -1275,7 +1310,7 @@ let myCustomLogin = function () {
                         <line x1="32" x2="32" y2="64"/>
                         <line x1="64" y1="32" y2="32"/>
                     </svg>
-                    Add Plot Diagram
+                    Add Sections from Plot Diagram
                 </button>
             </div>
         </div>
