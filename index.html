@@ -1087,6 +1087,26 @@ let myCustomLogin = function () {
                 document.querySelectorAll('.admin-options').forEach((option) => {
                     option.classList.remove('hide-completely');
                 })
+                
+                let sectionPlotUI = `<section class="popup-container hide" id="section_plot_div">
+                    <div id="section_plot_modal" class="popup">
+                        <header class="heading">
+                        <h3 class="heading">Paste Plot Diagram</h3>
+                        <button id="section_plot_btn">Create Sections</button>
+                        </header>
+                        <textarea id="section_plot_txt" placeholder="Paste the plot diagram for the article..">
+                        </textarea>
+                    </div>
+                </section>`;
+
+                document.getElementById('sectionplotdiv').innerHTML = sectionPlotUI;
+                const section_plot_btn = document.getElementById('section_plot_btn');
+                section_plot_btn.onclick = function () {
+                    let section_plot_value = document.getElementById('section_plot_txt').value;
+                    console.log(section_plot_value);
+                    // plot func here
+                    hidePopup('section_plot_modal')
+                }
             }
             
         }
