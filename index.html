@@ -1134,9 +1134,11 @@
 
                 function parsePlot(plottext) {
 
-                    var tstring = plottext.replace(/\s+/g, " ");
-                    tstring = tstring.trim();
-                    tstring = tstring.split(") -> (");
+                    var tstring = plottext.replace(/\s+/g, " ") // collapse all whitespace to single whitespace
+                    tstring = tstring.trim(); // trim whitespace from both ends
+                    tstring = tstring.replace(/\)\s*\->\s*\(/g, ")->(");
+
+                    tstring = tstring.split(")->("); // split string based on the delimiter
 
                     if (tstring.length > 0) {
                         if (tstring[0].trim()[0] == "(") {
@@ -1161,7 +1163,7 @@
                     }
                     return tstring;
                 }
-
+                
                 document.getElementById('sectionplotdiv').innerHTML = sectionPlotUI;
                 const section_plot_btn = document.getElementById('section_plot_btn');
                 section_plot_btn.onclick = function () {
