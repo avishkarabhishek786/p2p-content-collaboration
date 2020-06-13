@@ -874,6 +874,33 @@
                 display: none;
             }
         }
+
+        /* Tooltip container */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+        }
+
+            /* Tooltip text */
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 350px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 6px;
+            
+            /* Position the tooltip text - see examples below! */
+            position: absolute;
+            z-index: 1;
+        }
+
+            /* Show the tooltip text when you mouse over the tooltip container */
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
     </style>
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
@@ -1124,9 +1151,26 @@
                     <div id="section_plot_modal" class="popup">
                         <header class="heading">
                         <h3 class="heading">Paste Plot Diagram</h3>
+                        <div class="tooltip">What's this?
+                            <span class="tooltiptext">
+                                Assume P1, P2 and P3 be three paragraphs of your article.
+
+                                Then H-1, H-2 and H-3 are their respective headings 
+                                where format of H-x = (subject-x, time-x, space-x, emotion-x).
+                                
+                                Example - For first moon landing plot heading can be someting like 
+                                ('Neil Armstrong', 'July 20, 1969', 'Moon', 'crowning achievement for mankind')
+                                
+                                So you can paste a plot diagram with headings H-1, H-2 and H-3 as
+                                
+                                ( H-1 ) -> ( H-2 ) -> ( H-2 ) 
+                                
+                                then H-1 ,H-2 and H-3 will be added as sections. 
+                            </span>
+                        </div>
                         <button id="section_plot_btn">Create Sections</button>
                         </header>
-                        <textarea id="section_plot_txt" placeholder="Paste the plot diagram for the article..">
+                        <textarea id="section_plot_txt" rows=20 cols=20 placeholder="Paste the plot diagram for the article..">
                         </textarea>
                     </div>
                 </section>`;
@@ -1168,8 +1212,6 @@
                 const section_plot_btn = document.getElementById('section_plot_btn');
                 section_plot_btn.onclick = function () {
                     let section_plot_value = document.getElementById('section_plot_txt').value;
-                    //console.log(section_plot_value);
-                    // plot func here
                     var splitSections = parsePlot(section_plot_value);
                     console.log(splitSections);
                     if (splitSections != 'error') {
