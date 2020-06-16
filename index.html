@@ -10765,7 +10765,7 @@
 
         const cloudArticleApp = {
 
-            SUBJECT: null, // Power of Blockchain Driven Cloud
+            SUBJECT: null, 
 
             numberOfSections: 100,
 
@@ -10881,10 +10881,15 @@
                         article_structure += `<div class="gallery-container">
                                         <div class="gallery">`;
 
+                        const hashes_box = [];
+
                         for (iterKey in secObj) {
                             const article_data = secObj[iterKey];
                             const gen_div_id = this.unique_id();
                             const content_hash = Crypto.SHA256(article_data.content.trim());
+                            if(!hashes_box.includes(content_hash)) {
+                                hashes_box.push(content_hash);
+                            } else continue;
                             let vc = article_data.vectorClock || "";
 
                             if (Number(article_data.score) > 0) {
@@ -10961,8 +10966,7 @@
                     <svg class="icon" viewBox="0 0 64 64">
                     <title>edit</title>
                     <path d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9"/>
-                    </svg>Edit</button>
-                                        `;
+                    </svg>Edit</button>`;
                 }
             },
 
@@ -10976,7 +10980,7 @@
                 sectionSettingsList.innerHTML = ``;
                 for (vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
                     sectionSettingsHtml += `<label for="section${sec_counter}">Section ${sec_counter}</label>
-                                    <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
+                    <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
                     sec_counter++;
                 }
 
@@ -11215,7 +11219,6 @@
             },
 
             edit_onfocuout: function (parent) {
-                debugger;
                 //if (floGlobals.subAdmins.includes(myFloID)) return;
                 let target = parent.firstElementChild;
                 const updated_content = target.innerText.trim();
@@ -11226,7 +11229,7 @@
                 if (previous_content_hash === updated_content_hash) return;
                 let detail_block = document.getElementById(_id).getAttribute('data-value');
                 let separate_data = detail_block.trim().split('__');
-                debugger;
+                
                 if (separate_data.length !== 2) return;
 
                 cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content, myFloID);
@@ -11310,17 +11313,22 @@
                 let t = ``;
 
                 for (textContent of headings) {
+                    t += `<div class="collumns">
+                            <div class="collumn">`;
                     let snippets = Object.values(textContent.contents).sort((c, d) => c.rank < d.rank);
-                    t += `<h4>${textContent.title}</h4>`;
+                    t += `<div class="head"><span class="headline hl3">${textContent.title}</span></div>`;
                     for (snips of snippets) {
                         if (typeof snips !== "object") continue;
                         t += '<p>' + document.getElementById(snips.article_id).innerText + '</p>';
                     }
+                    t += `</div></div>`;
                 }
+
+                let template = cloudArticleApp.html_template(t);
 
                 let file_name = "content_collaboration" + new Date().getTime();
 
-                this.downloadInnerHtml(file_name, t, 'text/html');
+                this.downloadInnerHtml(file_name, template, 'text/html');
                 document.getElementById('context_menu').classList.add('hide')
 
             },
@@ -11367,7 +11375,341 @@
                     .catch(error => {
                         console.log(error)
                     })
-            }
+            },
+            html_template: function(mid_section='') {
+                let t = ``;
+                t += `<html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>RanchiMall Content Collaboration Output</title>
+                            <style>
+                                body {
+                                    font-family: 'Droid Serif', serif;
+                                    font-size: 14px;
+                                    color: #2f2f2f;
+                                    background-color: #f9f7f1;
+                                }
+
+                                header {
+                                    font-family: 'Playfair Display', serif;
+                                    font-weight: 900;
+                                    font-size: 80px;
+                                    text-transform: uppercase;
+                                    display: inline-block;
+                                    line-height: 72px;
+                                    margin-bottom: 20px;
+
+                                }
+
+                                p {
+                                    margin-top: 0;
+                                    margin-bottom: 20px;
+                                }
+
+                                .head {
+                                    text-align: center;
+                                    position: relative;
+
+
+                                }
+
+                                .headerobjectswrapper {}
+
+                                .subhead {
+                                    text-transform: uppercase;
+                                    border-bottom: 2px solid #2f2f2f;
+                                    border-top: 2px solid #2f2f2f;
+                                    padding: 12px 0 12px 0;
+
+                                }
+
+                                .content {
+                                    font-size: 0;
+                                    line-height: 0;
+                                    word-spacing: -.31em;
+                                    display: inline-block;
+                                    margin: 30px 2% 0 15%;
+
+
+                                }
+
+                                .collumns {}
+
+                                .collumn {
+                                    font-size: 14px;
+                                    line-height: 20px;
+                                    width: 80%;
+                                    display: inline-block;
+                                    padding: 0 1% 0 1%;
+                                    vertical-align: top;
+                                    margin-bottom: 50px;
+                                    -webkit-transition: all .7s;
+                                    transition: all .7s;
+                                }
+
+                                .collumn+.collumn {
+                                    border-left: 1px solid #2f2f2f;
+                                }
+
+                                .collumn .headline {
+                                    text-align: center;
+                                    line-height: normal;
+                                    font-family: 'Playfair Display', serif;
+                                    display: block;
+                                    margin: 0 auto;
+
+
+                                }
+
+                                .collumn .headline.hl1 {
+                                    font-weight: 700;
+                                    font-size: 30px;
+                                    text-transform: uppercase;
+                                    padding: 10px 0 30px 0;
+
+                                }
+
+                                .collumn .headline.hl2 {
+                                    font-weight: 400;
+                                    font-style: italic;
+                                    font-size: 24px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 30px 0;
+                                }
+
+                                .collumn .headline.hl2:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 7px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .headline.hl2:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 13px;
+                                    display: block;
+                                    margin: 0 auto;
+
+                                }
+
+                                .collumn .headline.hl3 {
+                                    font-weight: 400;
+                                    font-style: italic;
+                                    font-size: 36px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 30px 0;
+                                }
+
+                                .collumn .headline.hl4 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 30px 0;
+                                }
+
+                                .collumn .headline.hl4:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 7px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .headline.hl4:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 10px;
+                                    display: block;
+                                    margin: 0 auto;
+
+                                }
+
+                                .collumn .headline.hl5 {
+                                    font-weight: 400;
+                                    font-size: 42px;
+                                    text-transform: uppercase;
+                                    font-style: italic;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl6 {
+                                    font-weight: 400;
+                                    font-size: 18px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl6:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 7px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .headline.hl6:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 10px;
+                                    display: block;
+                                    margin: 0 auto;
+
+                                }
+
+                                .collumn .headline.hl7 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    display: block;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl8 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl9 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl10 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .citation {
+                                    font-family: 'Playfair Display', serif;
+                                    font-size: 36px;
+                                    line-height: 44px;
+                                    /*font-style: italic;*/
+                                    text-align: center;
+                                    font-weight: 400;
+                                    display: block;
+                                    margin: 40px 0 40px 0;
+                                    font-feature-settings: "liga", "dlig";
+
+                                }
+
+                                .collumn .citation:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 16px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .citation:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 16px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .figure {
+                                    margin: 0 0 20px;
+                                }
+
+                                .collumn .figcaption {
+                                    font-style: italic;
+                                    font-size: 12px;
+                                }
+
+                                .media {
+                                    -webkit-filter: sepia(80%) contrast(1) opacity(0.8);
+                                    filter: sepia(80%) grayscale(1) contrast(1) opacity(0.8);
+                                    mix-blend-mode: multiply;
+                                    width: 100%;
+                                }
+
+                                /*________________________________________________________________________________________________________________________________*/
+                                /*MEDIAQUERIES*/
+                                @media only all and (max-width: 1300px) {
+                                    .weatherforcastbox {
+                                        display: none;
+                                    }
+
+                                }
+
+                                @media only all and (max-width: 1200px) {
+                                    .collumn {
+                                        width: 80%;
+                                    }
+
+                                }
+
+                                @media only all and (max-width: 900px) {
+                                    .collumn {
+                                        width: 80%;
+                                    }
+
+                                }
+
+                                @media only all and (max-width: 600px) {
+                                    .collumn {
+                                        width: 100%;
+                                    }
+
+                                    .collumn+.collumn {
+                                        border-left: none;
+                                        border-bottom: 1px solid #2f2f2f;
+                                    }
+
+                                    header {
+                                        max-width: 320px;
+                                        font-size: 60px;
+                                        line-height: 54px;
+                                        overflow: hidden;
+                                    }
+
+                                    .content {
+                                        margin: 30px 6% 0 5%;
+
+
+                                    }
+
+                                }
+                            </style>
+                        </head>
+                        <body translate="no">
+                            <link
+                                href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700,900,400italic,700italic,900italic|Droid+Serif:400,700,400italic,700italic"
+                                rel="stylesheet" type="text/css">
+                            <meta name="viewport" content="width=device-width">
+                            <div class="head">
+                                <div class="headerobjectswrapper">
+
+                                    <header>${Object.keys(floGlobals.appObjects[cloudArticleApp.SUBJECT])[0]}</header>
+                                </div>
+                                <div class="subhead">Exported by RanchiMall Content Collaboration on FLO Blockchain</div>
+                            </div>
+                            <div class="content">`;
+                t += `${mid_section}`;
+                t += `</div>
+                </body>
+                </html>`;
+
+                return t;
+            },
 
         }
 
