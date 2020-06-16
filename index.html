@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Content Collaboration</title>
     <meta charset="UTF-8">
@@ -35,13 +34,12 @@
         }
 
         body {
-            font-size: 16px;
-            background: #111;
-        }
-
-        :root {
             --primary-color: #00fa9a;
-            --light-shade: rgba(255, 255, 255, 0.1);
+            --light-shade: #222;
+            --background: #111;
+            --text: 238, 238, 238;
+            font-size: 16px;
+            background: var(--background);
         }
 
         * {
@@ -56,14 +54,16 @@
         h2,
         h3,
         h4,
-        h5,
-        span,
-        p {
+        h5 {
             font-family: 'Barlow', sans-serif;
         }
 
+        p {
+            line-height: 1.6;
+        }
+
         ::-webkit-scrollbar {
-            width: 0.3rem;
+            width: 0.5rem;
             height: 0.3rem;
         }
 
@@ -94,19 +94,14 @@
             color: var(--primary-color);
             padding: 0.6rem 1rem;
             border: none;
-            -webkit-transition: background 0.2s ease;
-            transition: background 0.2s ease;
+            -webkit-transition: background 0.3s ease;
+            transition: background 0.3s ease;
             font-family: 'Barlow', sans-serif;
             letter-spacing: 0.06em;
             word-spacing: 0.1em;
             font-weight: 500;
             border-radius: 0.2rem;
             text-transform: uppercase;
-        }
-
-        button svg {
-            height: 1rem;
-            width: 1rem;
         }
 
         button .icon {
@@ -126,8 +121,21 @@
             outline: none;
         }
 
-        input:not([type="checkbox"]),
-        select {
+        button[disabled] {
+            opacity: 0.5 !important;
+            cursor: default;
+            color: rgba(var(--text), 1);
+        }
+
+        textarea {
+            background: var(--light-shade);
+            color: rgba(var(--text), 1);
+            padding: 1.5rem;
+            max-width: 100%;
+            font-size: 1rem;
+        }
+
+        input:not([type="checkbox"]) {
             -ms-flex-item-align: start;
             align-self: flex-start;
             display: -webkit-box;
@@ -139,7 +147,7 @@
             border-radius: 0.2rem;
             margin: 1rem 0;
             background: #181818;
-            color: white;
+            color: rgba(var(--text), 1);
             font-size: 1rem !important;
         }
 
@@ -157,7 +165,37 @@
             align-items: center;
         }
 
+        #confirmation {
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #confirmation p {
+            margin: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: rgba(var(--text), 1);
+        }
+
+        #confirmation div {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        #confirmation div button:first-of-type {
+            margin-left: auto;
+        }
+
         .icon {
+            height: 1rem;
+            width: 1rem;
             fill: none;
             stroke: var(--primary-color);
             stroke-width: 6;
@@ -181,11 +219,6 @@
 
         .default-article-checkbox input {
             margin: 0;
-        }
-
-        #clear_export svg {
-            -webkit-transform: rotate(45deg);
-            transform: rotate(45deg);
         }
 
         .dropdown {
@@ -243,7 +276,7 @@
         }
 
         .popup-container .popup {
-            width: 24rem;
+            width: 26rem;
             -ms-flex-item-align: center;
             align-self: center;
             border-radius: 0.4rem;
@@ -266,7 +299,13 @@
             transition: transform 0.3s, -webkit-transform 0.3s;
             -webkit-box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.24);
             box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.24);
-            color: white;
+            color: rgba(var(--text), 1);
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .solid-background {
+            background: var(--background);
         }
 
         #context_menu {
@@ -289,17 +328,19 @@
         }
 
         .section-title h2 {
-            color: #111;
+            color: var(--background);
             background: var(--primary-color);
             padding: 0.5rem;
             margin: 0;
-            cursor: pointer;
         }
 
         .gallery-name {
             padding: 0.2rem 0;
             margin: 1rem 0;
-            color: white;
+            font-size: 1.2rem;
+            color: rgba(var(--text), 1);
+            font-weight: 500;
+            line-height: 1.5;
         }
 
         .edit-article {
@@ -338,6 +379,7 @@
             -ms-flex-align: center;
             align-items: center;
             padding: 0.5rem 0;
+            margin-bottom: 0.5rem;
         }
 
         .heading h3 {
@@ -350,6 +392,12 @@
             -ms-flex-item-align: center;
             -ms-grid-row-align: center;
             align-self: center;
+        }
+
+        .heading>.icon:first-of-type {
+            margin-right: 1rem;
+            cursor: pointer;
+            stroke: rgba(var(--text), 1);
         }
 
         .gallery-container {
@@ -394,6 +442,7 @@
             overflow-x: auto;
             -ms-scroll-snap-type: x mandatory;
             scroll-snap-type: x mandatory;
+            margin-bottom: 4rem !important;
         }
 
         .article-body {
@@ -407,13 +456,13 @@
             scroll-snap-align: start;
             min-width: 30%;
             background-color: #222;
-            color: white;
+            color: rgba(var(--text), 1);
             margin: 0 1rem 1rem 0;
             border-radius: 0.2rem;
         }
 
         .article-body .article-header {
-            padding: 1rem 1.5rem;
+            padding: 1.5rem;
             word-break: break-all;
         }
 
@@ -430,16 +479,18 @@
         }
 
         .article-body .card-body .content-div {
-            padding: 0 1rem 4rem 1rem;
+            padding: 0 1.5rem 4rem 1.5rem;
             min-height: 16rem;
-            line-height: 1.4em;
+            line-height: 1.7;
             max-height: 50vh;
             overflow-y: auto;
             font-weight: 400;
+            overflow-wrap: break-word;
         }
 
         .article-body .card-body .content-div * {
             font-family: 'Roboto', sans-serif;
+            overflow-wrap: break-word;
         }
 
         .article-body .card-body button {
@@ -447,6 +498,10 @@
             bottom: 0;
             right: 0;
             margin-right: 1rem;
+        }
+
+        .article-body .card-body .submit-btn {
+            background: var(--light-shade);
         }
 
         .article-body .card-footer {
@@ -486,111 +541,6 @@
             margin-right: 0.5rem;
         }
 
-        #sign_in {
-            border-radius: 0;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-            -ms-flex-flow: column wrap;
-            flex-flow: column wrap;
-            padding: 2rem;
-            overflow: hidden;
-            margin: 1rem;
-            -ms-flex-item-align: center;
-            -ms-grid-row-align: center;
-            align-self: center;
-            width: 30rem;
-        }
-
-        #sign_in h2 {
-            margin: 0.5rem 0;
-            z-index: 3;
-        }
-
-        #sign_in p:first-of-type {
-            margin-bottom: 4rem;
-            z-index: 3;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        #sign_in span {
-            position: absolute;
-            background: var(--accent-color);
-            border-radius: 10%;
-            padding: 10rem;
-            top: -8rem;
-            right: -10rem;
-            z-index: 1;
-            -webkit-transform: rotate(30deg);
-            transform: rotate(30deg);
-        }
-
-        #sign_in div:first-of-type {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-pack: center;
-            -ms-flex-pack: center;
-            justify-content: center;
-            margin-bottom: 4rem;
-            z-index: 3;
-        }
-
-        #sign_in div:first-of-type button {
-            margin: initial;
-            -webkit-box-pack: center;
-            -ms-flex-pack: center;
-            justify-content: center;
-            text-align: center;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-            -ms-flex-direction: column;
-            flex-direction: column;
-            margin: 0.5rem;
-            width: 8rem;
-            background: rgba(0, 0, 0, 0.2);
-            -webkit-transition: -webkit-box-shadow 0.3s ease;
-            transition: -webkit-box-shadow 0.3s ease;
-            transition: box-shadow 0.3s ease;
-            transition: box-shadow 0.3s ease, -webkit-box-shadow 0.3s ease;
-            border: 1px solid rgba(var(--rgb-bw), 0.06);
-        }
-
-        #sign_in div:first-of-type button svg {
-            height: 2rem;
-            width: 2rem;
-            margin: 1rem;
-            fill: var(--primary-color);
-        }
-
-        #sign_in div:first-of-type button:hover {
-            -webkit-box-shadow: 0.1rem 0.2rem 2rem rgba(0, 0, 0, 0.24);
-            box-shadow: 0.1rem 0.2rem 2rem rgba(0, 0, 0, 0.24);
-        }
-
-        #sign_in #priv_key_sign_in {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-            -ms-flex-flow: column wrap;
-            flex-flow: column wrap;
-            z-index: 3;
-        }
-
-        #sign_in #priv_key_sign_in .input {
-            background: rgba(0, 0, 0, 0.24);
-        }
-
-        #sign_in #priv_key_sign_in button {
-            margin-left: initial;
-            margin-bottom: 2rem;
-            background: rgba(var(--rgb-bw), 0.04);
-            width: -webkit-fit-content;
-            width: -moz-fit-content;
-            width: fit-content;
-        }
-
         .show {
             opacity: 1;
             pointer-events: all;
@@ -619,6 +569,134 @@
             transform: none !important;
         }
 
+        :-webkit-any-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        :-moz-any-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        :any-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        #sign_in {
+            border-radius: 0;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-flow: column wrap;
+            flex-flow: column wrap;
+            padding: 2rem;
+            overflow: hidden;
+            margin: 1rem;
+            -ms-flex-item-align: center;
+            -ms-grid-row-align: center;
+            align-self: center;
+            width: calc(100% - 2rem);
+        }
+
+        #sign_in .icon {
+            stroke: rgba(var(--text), 1);
+        }
+
+        #sign_in h2 {
+            margin-bottom: 1rem;
+            z-index: 3;
+        }
+
+        #sign_in p:first-of-type {
+            margin-bottom: 4rem;
+            z-index: 3;
+            color: rgba(var(--text), 0.8);
+        }
+
+        #sign_in .back-btn {
+            margin-bottom: 1rem;
+            padding-left: 0;
+            color: rgba(var(--text), 1);
+        }
+
+        #sign_in div:first-of-type {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            margin-bottom: 4rem;
+            z-index: 3;
+        }
+
+        #sign_in div:first-of-type .icon {
+            height: 3rem;
+            width: 3rem;
+            stroke-width: 4;
+            margin-bottom: 1rem;
+            margin-right: 0;
+        }
+
+        #sign_in div:first-of-type button {
+            margin: initial;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            text-align: center;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            margin: 0.5rem;
+            width: 8rem;
+            color: rgba(var(--text), 1);
+            background: rgba(var(--foreground), 1);
+        }
+
+        #sign_in div:first-of-type button:hover {
+            color: var(--primary-color);
+        }
+
+        #sign_in div:first-of-type button:hover .icon {
+            stroke: var(--primary-color);
+        }
+
+        #sign_in #priv_key_sign_in {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-flow: column wrap;
+            flex-flow: column wrap;
+            z-index: 3;
+        }
+
+        #sign_in #priv_key_sign_in .input {
+            display: -webkit-box !important;
+            display: -ms-flexbox !important;
+            display: flex !important;
+            background: rgba(0, 0, 0, 0.24);
+        }
+
+        #sign_in #priv_key_sign_in .input input {
+            width: 100%;
+            border: none;
+            outline: none;
+            margin: 0;
+        }
+
+        #sign_in #priv_key_sign_in button {
+            margin: 1rem 0 2rem 0;
+            width: 100%;
+            background: rgba(var(--text), 0.1);
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+
         #navbar {
             position: fixed;
             width: 100%;
@@ -632,10 +710,11 @@
             -webkit-box-align: center;
             -ms-flex-align: center;
             align-items: center;
-            color: white;
+            color: rgba(var(--text), 1);
             background: #222;
             padding: 1rem;
             z-index: 2;
+            will-change: transform;
         }
 
         #navbar h5 {
@@ -671,7 +750,7 @@
             height: 100vh;
             width: 100vw;
             top: 0;
-            background: rgba(0, 0, 0, 0.4);
+            background: var(--background);
             -webkit-transition: opacity 0.6s ease;
             transition: opacity 0.6s ease;
             display: -ms-grid;
@@ -693,7 +772,7 @@
 
         #loader_container h4 {
             font-weight: normal;
-            color: white;
+            color: rgba(var(--text), 1);
         }
 
         #loader_container button {
@@ -780,6 +859,65 @@
             }
         }
 
+        #section_plot_modal p {
+            margin: 1rem 0;
+            font-weight: 400;
+        }
+
+        #section_plot_modal details {
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        #section_plot_modal summary {
+            outline: none;
+        }
+
+        @media screen and (min-width: 640px) {
+            #sign_in {
+                width: 24rem;
+                height: auto;
+                border-radius: 0.4rem;
+            }
+
+            .gallery-name {
+                max-width: 40rem;
+            }
+
+            #section_plot_modal {
+                width: 42rem;
+            }
+
+            #confirmation {
+                padding: 1rem;
+                width: 24rem;
+            }
+
+            #confirmation button {
+                margin-left: 0.5rem;
+            }
+
+            #confirmation button:first-of-type {
+                margin-left: auto;
+            }
+
+            #confirmation p {
+                margin: 1rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media screen and (min-width: 1920px) {
+            .article-body {
+                min-width: 20%;
+            }
+        }
+
+        .label {
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+        }
+
         @media only screen and (max-width: 640px) {
             ::-webkit-scrollbar {
                 width: 0.2rem;
@@ -843,11 +981,6 @@
                 flex-direction: column;
             }
 
-            #context_menu button:nth-of-type(1) svg {
-                -webkit-transform: rotate(45deg);
-                transform: rotate(45deg);
-            }
-
             #article_container {
                 padding: 1.5rem 1.5rem 6rem 1.5rem;
             }
@@ -875,400 +1008,62 @@
             }
         }
 
-        /* Tooltip container */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+        @media (any-hover: hover) {
+            .gallery {
+                overflow-x: hidden;
+            }
         }
 
-            /* Tooltip text */
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 350px;
-            background-color: black;
-            color: #fff;
-            text-align: center;
-            padding: 5px 0;
-            border-radius: 6px;
-            
-            /* Position the tooltip text - see examples below! */
-            position: absolute;
-            z-index: 1;
-        }
-
-            /* Show the tooltip text when you mouse over the tooltip container */
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-        }
+        /*# sourceMappingURL=main.css.map */
     </style>
-    <script id="floGlobals">
-        /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
-        const floGlobals = {
-
-            //Required for all
-            blockchain: "FLO",
-
-            //Required for blockchain API operators
-            apiURL: {
-                FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/', 'https://flosight.duckdns.org/',
-                    'http://livenet-explorer.floexperiments.com/'
-                ],
-                FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
-            },
-            adminID: "F9Cs1wF7BS8fDj1gmCsuQ3kpBWRwQj7B2o",
-            sendAmt: 0.001,
-            fee: 0.0005,
-
-            //Required for Supernode operations
-            SNStorageID: "FEzk75EGMPEQMrCuPosGiwuK162hcEu49E",
-            supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
-
-            //for cloud apps
-            subAdmins: [],
-            application: "ContentCollaboration",
-            vectorClock: {},
-            appObjects: {},
-            generalData: {},
-            generalVC: {}
-        }
-    </script>
-
-    <script>
-
-        let myCustomLogin = function () {
-            return new Promise((resolve, reject) => {
-                hideLoader()
-                showPopup('sign_in', false);
-                let container = document.getElementById('priv_key_sign_in'),
-                    signIn = document.getElementById('sign_in'),
-                    privField = document.getElementById('priv_key_field'),
-                    btn = document.getElementById('back_to_main_page');
-                document.getElementById('guest_btn').onclick = function () {
-                    hidePopup('sign_in')
-                    reject(null);
-                }
-                document.getElementById('priv_key_btn').onclick = function () {
-                    container.classList.remove('hide-completely')
-                    signIn.children[2].classList.add('hide-completely')
-                    btn.classList.remove('hide-completely')
-                    privField.focus()
-                }
-                btn.onclick = function () {
-                    container.classList.add('hide-completely')
-                    signIn.children[2].classList.remove('hide-completely')
-                    btn.classList.add('hide-completely')
-                }
-                privField.addEventListener('keyup', (event) => {
-                    if (privField.value.trim() !== '')
-                        enableBtn('sign_in_btn')
-                    else
-                        disableBtn('sign_in_btn')
-                    if (event.keyCode === 13 || event.key === 13) {
-                        if (privField.value.trim().length > 40) {
-                            resolve(privField.value.trim())
-                            hidePopup('sign_in')
-                            showLoader()
-                        } else {
-                            showMessage('error', 'Please enter correct private key.')
-                        }
-                    }
-                })
-                document.getElementById('sign_in_btn').onclick = function () {
-                    if (privField.value.trim().length > 40) {
-                        resolve(privField.value.trim())
-                        hidePopup('sign_in')
-                        showLoader()
-                    } else {
-                        showMessage('error', 'Please enter correct private key.')
-                    }
-                }
-            })
-        }
-
-        function enableBtn(btn) {
-            if (typeof btn === 'string')
-                btn = document.getElementById(btn);
-            if (btn.disabled)
-                btn.disabled = false;
-        }
-
-        // function required for popups or modals to appear
-        function showPopup(popup) {
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.remove('hide');
-            thisPopup.classList.add('no-transformations');
-            window.onclick = function (event) {
-                if (event.target == thisPopup.parentNode)
-                    hidePopup(popup);
-            }
-        }
-
-        // hides the popup or modal 
-        function hidePopup(popup) {
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.add('hide');
-            thisPopup.classList.remove('no-transformations');
-        }
-        function prevArticle(container) {
-            let observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting)
-                    container.children[1].classList.add('hide')
-                else
-                    container.children[1].classList.remove('hide')
-            }, {
-                root: container,
-                threshold: 0.8
-            })
-            observer.observe(container.children[0].firstElementChild)
-            container.children[0].scrollBy({
-                top: 0,
-                left: -400,
-                behavior: 'smooth'
-            });
-        }
-        function nextArticle(container) {
-            container.children[1].classList.remove('hide')
-            let observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting)
-                    container.children[2].classList.add('hide')
-                else
-                    container.children[2].classList.remove('hide')
-            }, {
-                root: container,
-                threshold: 0.8
-            })
-            observer.observe(container.children[0].lastElementChild)
-
-            container.children[0].scrollBy({
-                top: 0,
-                left: 400,
-                behavior: 'smooth'
-            });
-        }
-        function showMessage(msg) {
-            document.getElementById('show_log_events').textContent = msg;
-            if (document.getElementById('loader_container').classList.contains('hide')) {
-                showLoader()
-                setTimeout(() => {
-                    hideLoader()
-                }, 1000);
-            }
-        }
-        function showLoader() {
-            let spinner = document.getElementById('loader_container');
-            spinner.firstElementChild.classList.add('pulse');
-            spinner.classList.remove('hide');
-        }
-        function hideLoader() {
-            let spinner = document.getElementById('loader_container');
-            spinner.firstElementChild.classList.remove('pulse');
-            spinner.classList.add('hide');
-        }
-
-        function buildAdminUI() {
-
-            let article_list = ``;
-            let articles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
-            for (let a in articles)
-                article_list += `<option value="${a}">${articles[a]}</option>`;
-
-            let userdivui = `<section class="popup-container hide">
-                <div id="article_list_div" class="popup">
-                    <h3>Select an Article</h3>
-                    
-                    <select id="article_list">
-                    ${article_list}
-                    </select>
-
-                    <button id="clear_local_default">Cancel</button>
-                    <button id="select_article_btn">View</button>
-                    
-                </div>
-            </section>`;
-
-            document.getElementById('userdiv').innerHTML = userdivui;
-
-            document.getElementById('clear_local_default').onclick = function () {
-                cloudArticleApp.setLocalDefault(null);
-                cloudArticleApp.retrieveLatestContent();
-                hidePopup("article_list_div")
-            }
-
-            document.getElementById('select_article_btn').onclick = function () {
-                let article_id = document.getElementById("article_list").value;
-                cloudArticleApp.setLocalDefault(article_id);
-                cloudArticleApp.retrieveLatestContent();
-                hidePopup("article_list_div")
-            }
-
-            if (floGlobals.subAdmins.includes(myFloID)) {
-                let admindivui = `<section class="popup-container hide" id="article_creation_div">
-                <div id="article_creation_modal" class="popup">
-                    <header class="heading">
-                    <h3 class="heading">Create a new article</h3>
-                    <button id="create_article_btn">Create</button>
-                    </header>
-                    <input type="text" id="article_name" placeholder="Article name">
-                    <input type="number" id="section_nums" placeholder="Number of sections">
-                    <label class="default-article-checkbox">
-                        <input type="checkbox" id="set_default_article"/>
-                        Set as default
-                    </label>            
-                </div>
-            </section>
-            <div class="popup-container hide">
-                <div id="edit_article" class="popup">
-                    <header class="heading">
-                        <h3>Edit section names</h3>
-                        <button onclick="cloudArticleApp.update_section_names()">
-                            <svg class="icon" viewBox="0 0 64 64">
-                                <title>tick</title>
-                                <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/>
-                            </svg>
-                            Done</button>
-                    </header>
-                    <label class="default-article-checkbox">
-                        <input type="checkbox" id="edit_default_article"/>
-                        Set as default
-                    </label>
-                    <div id="edit_section_container"></div>
-                </div>
-            </div>`;
-
-                document.getElementById('admindiv').innerHTML = admindivui;
-
-                const create_article_btn = document.getElementById('create_article_btn');
-                create_article_btn.onclick = function () {
-                    cloudArticleApp.createNewArticle();
-                    hidePopup('article_creation_modal')
-                }
-                document.querySelectorAll('.admin-options').forEach((option) => {
-                    option.classList.remove('hide-completely');
-                })
-
-                let sectionPlotUI = `<section class="popup-container hide" id="section_plot_div">
-                    <div id="section_plot_modal" class="popup">
-                        <header class="heading">
-                        <h3 class="heading">Paste Plot Diagram</h3>
-                        <div class="tooltip">What's this?
-                            <span class="tooltiptext">
-                                Assume P1, P2 and P3 be three paragraphs of your article.
-
-                                Then H-1, H-2 and H-3 are their respective headings 
-                                where format of H-x = (subject-x, time-x, space-x, emotion-x).
-                                
-                                Example - For first moon landing plot heading can be someting like 
-                                ('Neil Armstrong', 'July 20, 1969', 'Moon', 'crowning achievement for mankind')
-                                
-                                So you can paste a plot diagram with headings H-1, H-2 and H-3 as
-                                
-                                ( H-1 ) -> ( H-2 ) -> ( H-2 ) 
-                                
-                                then H-1 ,H-2 and H-3 will be added as sections. 
-                            </span>
-                        </div>
-                        <button id="section_plot_btn">Create Sections</button>
-                        </header>
-                        <textarea id="section_plot_txt" rows=20 cols=20 placeholder="Paste the plot diagram for the article..">
-                        </textarea>
-                    </div>
-                </section>`;
-
-
-                function parsePlot(plottext) {
-
-                    var tstring = plottext.replace(/\s+/g, " ") // collapse all whitespace to single whitespace
-                    tstring = tstring.trim(); // trim whitespace from both ends
-                    tstring = tstring.replace(/\)\s*\->\s*\(/g, ")->(");
-
-                    tstring = tstring.split(")->("); // split string based on the delimiter
-
-                    if (tstring.length > 0) {
-                        if (tstring[0].trim()[0] == "(") {
-                            tstring[0] = tstring[0].trim().slice(1)
-                        }
-                        else {
-                            return 'error';
-                        }
-
-                        var lastobj = tstring[tstring.length - 1];
-                        var lastobjlen = lastobj.length;
-
-                        if (lastobj.trim()[lastobjlen - 1] == ")") {
-                            tstring[tstring.length - 1] = lastobj.trim().slice(0, lastobjlen - 1)
-                        }
-                        else {
-                            return 'error';
-                        }
-                    }
-                    else {
-                        return 'error';
-                    }
-                    return tstring;
-                }
-                
-                document.getElementById('sectionplotdiv').innerHTML = sectionPlotUI;
-                const section_plot_btn = document.getElementById('section_plot_btn');
-                section_plot_btn.onclick = function () {
-                    let section_plot_value = document.getElementById('section_plot_txt').value;
-                    var splitSections = parsePlot(section_plot_value);
-                    console.log(splitSections);
-                    if (splitSections != 'error') {
-                        cloudArticleApp.addSections(splitSections);
-                        hidePopup('section_plot_modal');
-                    }
-                    else {
-                        showMessage('Plot diagram entered is in wrong format')
-                    }
-
-                }
-            }
-
-        }
-        function buttonVisibility(mode, parent) {
-            let button = parent.children[2];
-            if (parent.firstElementChild.innerText == '') {
-                button.classList.add('hide')
-                return;
-            }
-            if (mode === 'show' && button.classList.contains('hide'))
-                button.classList.remove('hide')
-            if (mode === 'hide' && !button.classList.contains('hide'))
-                button.classList.add('hide')
-        }   
-    </script>
-
-
 </head>
 
 <body onload="onLoadStartUp()">
+    <div class="popup-container hide">
+        <div id="confirmation" class="popup">
+            <p></p>
+            <div>
+                <button class="hover" onclick="hidePopup()">Cancel</button>
+                <button class="hover">Ok</button>
+            </div>
+        </div>
+    </div>
     <div class="popup-container hide solid-background">
         <div id="sign_in" class="popup">
             <header class="container-header">
-                <svg class="back-arrow hide-completely" id="back_to_main_page" viewBox="0 0 31.24 56.83">
-                    <title>Go back</title>
-                    <polyline points="29.83,1.41 2.83,28.41 29.83,55.41 " />
-                </svg>
+                <button class="hide-completely back-btn" id="back_to_main_page">
+                    <svg class="icon" viewBox="0 0 64 64">
+                        <title>go back</title>
+                        <polyline points="48.01 0.35 16.35 32 48.01 63.65" />
+                    </svg>
+                    back
+                </button>
                 <h2>Sign In</h2>
             </header>
-            <p>Welcome to Content Collaboration.</p>
+            <p>Welcome to Content Collaboration.<br>
+                Please enter your FLO private key to continue.
+            </p>
             <div class="fade-in">
                 <button id="guest_btn" class="hover" title="sign in as a guest">
-                    <svg viewBox="0 0 71.51 63.15">
-                        <circle cx="35.76" cy="18" r="17.5" />
-                        <path d="M35.76,1c9.37,0,17,7.63,17,17s-7.63,17-17,17s-17-7.63-17-17S26.38,1,35.76,1 M35.76,0c-9.94,0-18,8.06-18,18
-                            s8.06,18,18,18s18-8.06,18-18S45.7,0,35.76,0L35.76,0z" />
-                        <path d="M71.04,63C67.7,52.73,53.17,45,35.76,45S3.81,52.73,0.48,63" />
+                    <svg class="icon" viewBox="0 0 64 64">
+                        <title>guest</title>
+                        <path d="M44.7,19.53c0,8.58-4.36,15.95-12.7,15.9-7.48,0-11.75-5.88-12.55-13.26" />
+                        <path
+                            d="M25.9,35.87c-2.31,4.31-9.66,6.53-15.09,8.91-2.25,1-4.05,12.8-1.51,12.8a45.45,45.45,0,0,0,23.18,5.9,40,40,0,0,0,22.22-5.9c2.54,0,.74-11.81-1.51-12.8-5.46-2.38-12.81-4.6-15.09-8.91" />
+                        <path
+                            d="M44.92,18.76c-5.86,2.53-18.4,5.12-25.47,3.41-4.1-1-7.11-3.32-7.9-7.54-.73-3.87,3.82-6.53,8.23-7.15l.3,0v6.68H43.92v-6a50.44,50.44,0,0,0,9.15.39C54.53,8.36,53.43,15.08,44.92,18.76Z" />
+                        <path
+                            d="M43.92,6.34v7.78H20.08V6.34A5.84,5.84,0,0,1,25.93.5H38.07A5.84,5.84,0,0,1,43.92,6.34Z" />
                     </svg>
                     as guest
                 </button>
                 <button id="priv_key_btn" class="hover" title="sign in with private key">
-                    <svg viewBox="0 0 73 28">
-                        <path d="M59,0.5c-5.88,0-10.86,3.76-12.72,9H5c-2.47,0-4.5,2.02-4.5,4.5c0,2.47,2.03,4.5,4.5,4.5h4.5V23
-                        c0,2.47,2.03,4.5,4.5,4.5c2.48,0,4.5-2.03,4.5-4.5v-4.5h4v0.62c0,2.47,2.03,4.5,4.5,4.5c2.48,0,4.5-2.03,4.5-4.5V18.5h14.78
-                        c1.86,5.24,6.84,9,12.72,9c7.46,0,13.5-6.04,13.5-13.5S66.46,0.5,59,0.5z M59,18.5c-2.49,0-4.5-2.01-4.5-4.5s2.01-4.5,4.5-4.5
-                        s4.5,2.01,4.5,4.5S61.49,18.5,59,18.5z" />
+                    <svg class="icon" viewBox="0 0 64 64">
+                        <title>password</title>
+                        <path
+                            d="M20.29,21.49H43.71A9.31,9.31,0,0,1,53,30.8V41.93C53,53.7,43.39,63.71,31.61,63.5A21,21,0,0,1,11,42.48V30.8a9.31,9.31,0,0,1,9.32-9.31h0V12.61A12,12,0,0,1,31.21.53,11.71,11.71,0,0,1,43.71,12.2v9.29" />
+                        <circle cx="32" cy="44.93" r="5.79" />
+                        <line x1="32" y1="39.14" x2="32" y2="33.09" />
                     </svg>
                     private key</button>
             </div>
@@ -1276,11 +1071,10 @@
                 <label class="input">
                     <input id="priv_key_field" placeholder="Private key" type="password">
                 </label>
-                <button id="sign_in_btn" disabled>Sign in</button>
+                <button id="sign_in_btn" disabled>continue</button>
             </div>
             <p>Don't have a private key? get it <a href="https://flo-webwallet.duckdns.org/"
                     target="_blank">here</a><br> or you can sign as guest.</p>
-            <span></span>
         </div>
     </div>
     <div id="admindiv"></div>
@@ -1288,17 +1082,16 @@
     <div id="userdiv"></div>
     <div id="context_menu" class="hide">
         <button onclick="cloudArticleApp.reset_export_list()">
-            <svg viewBox="0 0 24 24">
-                <line x1="12" y1="0" x2="12" y2="24" />
-                <line x1="0" y1="12" x2="24" y2="12" />
+            <svg class="icon" viewBox="0 0 64 64">>
+                <line x1="0" y1="0" x2="64" y2="64" />
+                <line x1="64" y1="0" x2="0" y2="64" />
             </svg>
             Clear Selection</button>
         <button onclick="cloudArticleApp.export_as_file()">
-            <svg viewBox="0 0 28.44 24.47">
-                <g>
-                    <path d="M27.19,6.72C14.18,6.6,4.87,12.2,0.47,24.3" />
-                    <polyline points="21.37,0.35 27.73,6.72 21.37,13.08" />
-                </g>
+            <svg class="icon" viewBox="0 0 64 64">
+                <line x1="16.36" y1="17.11" x2="24.18" y2="9.3" />
+                <polyline points="32 41.22 32 1.48 47.64 17.11" />
+                <path d="M53.4,32.29V59.07a4.58,4.58,0,0,1-4.58,4.57H15.18a4.58,4.58,0,0,1-4.58-4.57V32.29" />
             </svg>
             Export as file</button>
     </div>
@@ -1315,6 +1108,14 @@
                 <title>Create New Article</title>
                 <line x1="32" x2="32" y2="64" />
                 <line x1="64" y1="32" y2="32" />
+            </svg>
+        </button>
+        <button class="admin-options hide-completely" onclick="showPopup('section_plot_modal')"
+            title="Create new sections by plot diagram">
+            <svg class="icon" viewBox="0 0 64 64">
+                <polyline points="21.46 42.99 0.5 42.99 0.5 13.51 63.5 13.51 63.5 28.25" />
+                <line x1="45.12" y1="35.49" x2="45.12" y2="50.49" />
+                <line x1="52.62" y1="42.99" x2="37.62" y2="42.99" />
             </svg>
         </button>
     </div>
@@ -1353,18 +1154,17 @@
             Refresh</button>
         <button id="clear_export" title="Clear article selection" class="export-options hide-completely hide-on-mobile"
             onclick="cloudArticleApp.reset_export_list()">
-            <svg viewBox="0 0 24 24">
-                <line x1="12" y1="0" x2="12" y2="24" />
-                <line x1="0" y1="12" x2="24" y2="12" />
+            <svg class="icon" viewBox="0 0 64 64">>
+                <line x1="0" y1="0" x2="64" y2="64" />
+                <line x1="64" y1="0" x2="0" y2="64" />
             </svg>
             Clear Selection</button>
         <button class="export-options hide-completely hide-on-mobile" title="Export selected articles as html file"
             onclick="cloudArticleApp.export_as_file()">
-            <svg viewBox="0 0 28.44 24.47">
-                <g>
-                    <path d="M27.19,6.72C14.18,6.6,4.87,12.2,0.47,24.3" />
-                    <polyline points="21.37,0.35 27.73,6.72 21.37,13.08" />
-                </g>
+            <svg class="icon" viewBox="0 0 64 64">
+                <line x1="16.36" y1="17.11" x2="24.18" y2="9.3" />
+                <polyline points="32 41.22 32 1.48 47.64 17.11" />
+                <path d="M53.4,32.29V59.07a4.58,4.58,0,0,1-4.58,4.57H15.18a4.58,4.58,0,0,1-4.58-4.57V32.29" />
             </svg>
             Export as file
         </button>
@@ -1388,9 +1188,9 @@
                 </button>
                 <button onclick="showPopup('section_plot_modal')" title="Create new sections by plot diagram">
                     <svg class="icon" viewBox="0 0 64 64">
-                        <title>add</title>
-                        <line x1="32" x2="32" y2="64" />
-                        <line x1="64" y1="32" y2="32" />
+                        <polyline points="21.46 42.99 0.5 42.99 0.5 13.51 63.5 13.51 63.5 28.25" />
+                        <line x1="45.12" y1="35.49" x2="45.12" y2="50.49" />
+                        <line x1="52.62" y1="42.99" x2="37.62" y2="42.99" />
                     </svg>
                     Add Sections from Plot Diagram
                 </button>
@@ -1422,7 +1222,432 @@
         <div id="current_data"></div>
     </section>
 
+    <script id="floGlobals">
+        /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
+        const floGlobals = {
 
+            //Required for all
+            blockchain: "FLO",
+
+            //Required for blockchain API operators
+            apiURL: {
+                FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/', 'https://flosight.duckdns.org/',
+                    'http://livenet-explorer.floexperiments.com/'
+                ],
+                FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
+            },
+            adminID: "F9Cs1wF7BS8fDj1gmCsuQ3kpBWRwQj7B2o",
+            sendAmt: 0.001,
+            fee: 0.0005,
+
+            //Required for Supernode operations
+            SNStorageID: "FEzk75EGMPEQMrCuPosGiwuK162hcEu49E",
+            supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
+
+            //for cloud apps
+            subAdmins: [],
+            application: "ContentCollaboration",
+            vectorClock: {},
+            appObjects: {},
+            generalData: {},
+            generalVC: {}
+        }
+    </script>
+
+    <script>
+        document.getElementById('priv_key_field').addEventListener('input', function (e) {
+            if (this.value.trim() !== '')
+                enableBtn('sign_in_btn')
+            else
+                disableBtn('sign_in_btn')
+        })
+        let myCustomLogin = function () {
+            return new Promise((resolve, reject) => {
+                hideLoader()
+                showPopup('sign_in', false);
+                let container = document.getElementById('priv_key_sign_in'),
+                    signIn = document.getElementById('sign_in'),
+                    privField = document.getElementById('priv_key_field'),
+                    btn = document.getElementById('back_to_main_page');
+                document.getElementById('guest_btn').onclick = function () {
+                    hidePopup()
+                    reject(null);
+                }
+                document.getElementById('priv_key_btn').onclick = function () {
+                    container.classList.remove('hide-completely')
+                    signIn.children[2].classList.add('hide-completely')
+                    btn.classList.remove('hide-completely')
+                    privField.focus()
+                }
+                btn.onclick = function () {
+                    container.classList.add('hide-completely')
+                    signIn.children[2].classList.remove('hide-completely')
+                    btn.classList.add('hide-completely')
+                }
+                privField.addEventListener('keyup', e => {
+                    if (privField.value.trim() !== '')
+                        enableBtn('sign_in_btn')
+                    else
+                        disableBtn('sign_in_btn')
+                    if (e.key === "Enter") {
+                        if (privField.value.trim().length > 40) {
+                            resolve(privField.value.trim())
+                            hidePopup()
+                            showLoader()
+                        } else {
+                            showMessage('error', 'Please enter correct private key.')
+                        }
+                    }
+                })
+                document.getElementById('sign_in_btn').onclick = function () {
+                    if (privField.value.trim().length > 40) {
+                        resolve(privField.value.trim())
+                        hidePopup()
+                        showLoader()
+                    } else {
+                        showMessage('error', 'Please enter correct private key.')
+                    }
+                }
+            })
+        }
+
+        function enableBtn(btn) {
+            if (typeof btn === 'string')
+                btn = document.getElementById(btn);
+            if (btn.disabled)
+                btn.disabled = false;
+        }
+
+        function disableBtn(btn) {
+            if (typeof btn === 'string')
+                btn = document.getElementById(btn);
+            if (!btn.disabled)
+                btn.disabled = true;
+        }
+
+        //helper functions
+
+        function setAttributes(el, attrs) {
+            for (var key in attrs) {
+                el.setAttribute(key, attrs[key]);
+            }
+        }
+
+        function clearAllInputs(parent) {
+            parent.querySelectorAll("input, textarea").forEach((field) => {
+                field.value = '';
+            })
+        }
+
+        // function required for popups or modals to appear
+        class Stack {
+            constructor() {
+                this.items = [];
+            }
+            push(element) {
+                this.items.push(element);
+            }
+            pop() {
+                if (this.items.length == 0)
+                    return "Underflow";
+                return this.items.pop();
+            }
+            peek() {
+                return this.items[this.items.length - 1];
+            }
+        }
+        let popupStack = new Stack(),
+            zIndex = 10;
+        function showPopup(popup, permission) {
+            let thisPopup = document.getElementById(popup);
+            thisPopup.parentNode.classList.remove('hide');
+            thisPopup.classList.add('no-transformations');
+            popupStack.push({ popup, permission })
+            zIndex++;
+            thisPopup.parentNode.setAttribute('style', `z-index: ${zIndex}`)
+            if (popup === 'main_loader') {
+                loader.classList.add('animate-loader')
+                document.querySelector('main').classList.add('hide-completely')
+            }
+        }
+
+        // hides the popup or modal 
+        function hidePopup() {
+            if (popupStack.peek() === undefined)
+                return
+            let { popup, permission } = popupStack.pop();
+            thisPopup = document.getElementById(popup);
+            thisPopup.closest('.popup-container').classList.add('hide');
+            thisPopup.closest('.popup').classList.remove('no-transformations');
+            setTimeout(() => {
+                clearAllInputs(thisPopup)
+                zIndex--;
+                thisPopup.parentNode.setAttribute('style', `z-index: ${zIndex}`)
+            }, 400)
+            if (popup === 'main_loader') {
+                loader.classList.remove('animate-loader')
+                document.querySelector('main').classList.remove('hide-completely')
+            }
+        }
+
+        addEventListener('mousedown', e => {
+            if (e.target.classList.contains('popup-container') && popupStack.peek() !== undefined && popupStack.peek().permission !== false) {
+                hidePopup()
+            }
+        })
+        function prevArticle(container) {
+            let observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting)
+                    container.children[1].classList.add('hide')
+                else
+                    container.children[1].classList.remove('hide')
+            }, {
+                root: container,
+                threshold: 0.8
+            })
+            observer.observe(container.children[0].firstElementChild)
+            container.children[0].scrollBy({
+                top: 0,
+                left: -400,
+                behavior: 'smooth'
+            });
+        }
+        function nextArticle(container) {
+            container.children[1].classList.remove('hide')
+            let observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting)
+                    container.children[2].classList.add('hide')
+                else
+                    container.children[2].classList.remove('hide')
+            }, {
+                root: container,
+                threshold: 0.8
+            })
+            observer.observe(container.children[0].lastElementChild)
+
+            container.children[0].scrollBy({
+                top: 0,
+                left: 400,
+                behavior: 'smooth'
+            });
+        }
+        let askConfirmation = (message) => {
+            return new Promise((resolve, reject) => {
+                let popup = document.getElementById('confirmation');
+                showPopup('confirmation')
+                popup.children[0].textContent = message;
+                popup.children[1].firstElementChild.onclick = function () {
+                    hidePopup('confirmation')
+                    reject(false)
+                }
+                popup.children[1].children[1].onclick = function () {
+                    hidePopup('confirmation')
+                    resolve(true);
+                }
+            })
+        }
+        function showMessage(msg) {
+            document.getElementById('show_log_events').textContent = msg;
+            if (document.getElementById('loader_container').classList.contains('hide')) {
+                showLoader()
+                setTimeout(() => {
+                    hideLoader()
+                }, 1000);
+            }
+        }
+        function showLoader() {
+            let spinner = document.getElementById('loader_container');
+            spinner.firstElementChild.classList.add('pulse');
+            spinner.classList.remove('hide');
+        }
+        function hideLoader() {
+            let spinner = document.getElementById('loader_container');
+            spinner.firstElementChild.classList.remove('pulse');
+            spinner.classList.add('hide');
+        }
+
+        function buildAdminUI() {
+
+            let article_list = ``;
+            let articles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
+            for (let a in articles)
+                article_list += `<option value="${a}">${articles[a]}</option>`;
+
+            let userdivui = `<section class="popup-container hide">
+                    <div id="article_list_div" class="popup">
+                        <h3>Select an Article</h3>
+                        
+                        <select id="article_list">
+                        ${article_list}
+                        </select>
+    
+                        <button id="clear_local_default">Cancel</button>
+                        <button id="select_article_btn">View</button>
+                        
+                    </div>
+                </section>`;
+
+            document.getElementById('userdiv').innerHTML = userdivui;
+
+            document.getElementById('clear_local_default').onclick = function () {
+                cloudArticleApp.setLocalDefault(null);
+                cloudArticleApp.retrieveLatestContent();
+                hidePopup()
+            }
+
+            document.getElementById('select_article_btn').onclick = function () {
+                let article_id = document.getElementById("article_list").value;
+                cloudArticleApp.setLocalDefault(article_id);
+                cloudArticleApp.retrieveLatestContent();
+                hidePopup()
+            }
+
+            if (floGlobals.subAdmins.includes(myFloID)) {
+                let admindivui = `<section class="popup-container hide" id="article_creation_div">
+                    <div id="article_creation_modal" class="popup">
+                        <header class="heading">
+                        <svg class="icon" viewBox="0 0 64 64" onclick="hidePopup()">
+                            <title>close</title>
+                            <line x1="64" y1="0" x2="0" y2="64"/>
+                            <line x1="64" y1="64" x2="0" y2="0"/>
+                        </svg>
+                        <h3>Create a new article</h3>
+                        <button id="create_article_btn">Create</button>
+                        </header>
+                        <input type="text" id="article_name" placeholder="Article name">
+                        <input type="number" id="section_nums" placeholder="Number of sections">
+                        <label class="default-article-checkbox">
+                            <input type="checkbox" id="set_default_article"/>
+                            Set as default
+                        </label>            
+                    </div>
+                </section>
+                <div class="popup-container hide">
+                    <div id="edit_article" class="popup">
+                        <header class="heading">
+                            <h3>Edit section names</h3>
+                            <button onclick="cloudArticleApp.update_section_names()">
+                                <svg class="icon" viewBox="0 0 64 64">
+                                    <title>tick</title>
+                                    <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/>
+                                </svg>
+                                Done</button>
+                        </header>
+                        <label class="default-article-checkbox">
+                            <input type="checkbox" id="edit_default_article"/>
+                            Set as default
+                        </label>
+                        <div id="edit_section_container"></div>
+                    </div>
+                </div>`;
+
+                document.getElementById('admindiv').innerHTML = admindivui;
+
+                const create_article_btn = document.getElementById('create_article_btn');
+                create_article_btn.onclick = function () {
+                    cloudArticleApp.createNewArticle();
+                    hidePopup()
+                }
+                document.querySelectorAll('.admin-options').forEach((option) => {
+                    option.classList.remove('hide-completely');
+                })
+
+                let sectionPlotUI = `<section class="popup-container hide">
+                        <div id="section_plot_modal" class="popup">
+                            <header class="heading">
+                            <svg class="icon" viewBox="0 0 64 64" onclick="hidePopup()">
+                                <title>close</title>
+                                <line x1="64" y1="0" x2="0" y2="64"/>
+                            <line x1="64" y1="64" x2="0" y2="0"/>
+                            </svg>
+                            <h3>Create Plot Diagram</h3>
+                            <button id="section_plot_btn">Create</button>
+                            </header>
+                            <details>
+                            <summary class="label">How it works?</summary>
+                            <p>                       
+                                Assume P1, P2 and P3 are three paragraphs of your article.<br>
+
+                                Then H-1, H-2 and H-3 are their respective headings <br>
+                                where format of H-x = (subject-x, time-x, space-x, emotion-x).<br>
+                                
+                                Eg - For first moon landing plot heading can be something like<br> 
+                                ('Neil Armstrong', 'July 20, 1969', 'Moon', 'crowning achievement for mankind')<br>
+                                
+                                So you can write a plot diagram with headings H-1, H-2 and H-3 as<br>
+                                
+                                ( H-1 ) -> ( H-2 ) -> ( H-2 ) <br>
+                                
+                                then H-1 ,H-2 and H-3 will be added as sections. 
+                            </p>
+                            </details>
+                            <textarea id="section_plot_txt" rows="12" placeholder="Write a plot diagram for the article. eg. ( Heading1 ) -> ( Heading2 ) ..."></textarea>
+                        </div>
+                    </section>`;
+
+
+                function parsePlot(plottext) {
+
+                    var tstring = plottext.replace(/\s+/g, " ") // collapse all whitespace to single whitespace
+                    tstring = tstring.trim(); // trim whitespace from both ends
+                    tstring = tstring.replace(/\)\s*\->\s*\(/g, ")->(");
+
+                    tstring = tstring.split(")->("); // split string based on the delimiter
+
+                    if (tstring.length > 0) {
+                        if (tstring[0].trim()[0] == "(") {
+                            tstring[0] = tstring[0].trim().slice(1)
+                        }
+                        else {
+                            return 'error';
+                        }
+
+                        var lastobj = tstring[tstring.length - 1];
+                        var lastobjlen = lastobj.length;
+
+                        if (lastobj.trim()[lastobjlen - 1] == ")") {
+                            tstring[tstring.length - 1] = lastobj.trim().slice(0, lastobjlen - 1)
+                        }
+                        else {
+                            return 'error';
+                        }
+                    }
+                    else {
+                        return 'error';
+                    }
+                    return tstring;
+                }
+
+                document.getElementById('sectionplotdiv').innerHTML = sectionPlotUI;
+                const section_plot_btn = document.getElementById('section_plot_btn');
+                section_plot_btn.onclick = function () {
+                    let section_plot_value = document.getElementById('section_plot_txt').value;
+                    var splitSections = parsePlot(section_plot_value);
+                    console.log(splitSections);
+                    if (splitSections != 'error') {
+                        cloudArticleApp.addSections(splitSections);
+                        hidePopup();
+                    }
+                    else {
+                        showMessage('Plot diagram entered is in wrong format')
+                    }
+
+                }
+            }
+
+        }
+        function buttonVisibility(mode, parent) {
+            let button = parent.children[2];
+            if (parent.firstElementChild.innerText == '') {
+                button.classList.add('hide')
+                return;
+            }
+            if (mode === 'show' && button.classList.contains('hide'))
+                button.classList.remove('hide')
+            if (mode === 'hide' && !button.classList.contains('hide'))
+                button.classList.add('hide')
+        }   
+    </script>
     <script id="init_lib">
         //All util libraries required for Standard operations (DO NOT EDIT ANY)
 
@@ -10527,7 +10752,6 @@
             floDapps.launchStartUp().then(result => {
                 console.log(result)
                 console.log(`Welcome FLO_ID: ${myFloID}`)
-                showMessage(`Welcome FLO_ID: ${myFloID}`)
                 //App functions....
                 cloudArticleApp.refreshMasterObject().then(result => {
                     cloudArticleApp.retrieveLatestContent();
@@ -10541,7 +10765,7 @@
 
         const cloudArticleApp = {
 
-            SUBJECT: null, // Power of Blockchain Driven Cloud
+            SUBJECT: null, 
 
             numberOfSections: 100,
 
@@ -10657,10 +10881,15 @@
                         article_structure += `<div class="gallery-container">
                                         <div class="gallery">`;
 
+                        const hashes_box = [];
+
                         for (iterKey in secObj) {
                             const article_data = secObj[iterKey];
                             const gen_div_id = this.unique_id();
                             const content_hash = Crypto.SHA256(article_data.content.trim());
+                            if(!hashes_box.includes(content_hash)) {
+                                hashes_box.push(content_hash);
+                            } else continue;
                             let vc = article_data.vectorClock || "";
 
                             if (Number(article_data.score) > 0) {
@@ -10696,7 +10925,7 @@
                                     ${article_data.content.trim()}
                                 </div>
                                 <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}"/>
-                                <button class="hide" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
+                                <button class="hide submit-btn" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
                             </div>
                             <div class="card-footer">
                                 <h5 id="exp_${gen_div_id}" title="Add this article as selected" class="select-for-export" onclick="cloudArticleApp.register_content_to_export(event)">Select</h5>
@@ -10737,8 +10966,7 @@
                     <svg class="icon" viewBox="0 0 64 64">
                     <title>edit</title>
                     <path d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9"/>
-                    </svg>Edit</button>
-                                        `;
+                    </svg>Edit</button>`;
                 }
             },
 
@@ -10752,7 +10980,7 @@
                 sectionSettingsList.innerHTML = ``;
                 for (vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
                     sectionSettingsHtml += `<label for="section${sec_counter}">Section ${sec_counter}</label>
-                                    <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
+                    <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
                     sec_counter++;
                 }
 
@@ -10785,7 +11013,7 @@
 
                 floCloudAPI.updateObjectData(this.SUBJECT);
                 this.retrieveLatestContent();
-                hidePopup('edit_article')
+                hidePopup()
             },
 
             retrieveLatestContent: async function (receiverID = floGlobals.adminID, senderIDs = floGlobals.subAdmins) {
@@ -10991,7 +11219,6 @@
             },
 
             edit_onfocuout: function (parent) {
-                debugger;
                 //if (floGlobals.subAdmins.includes(myFloID)) return;
                 let target = parent.firstElementChild;
                 const updated_content = target.innerText.trim();
@@ -11002,7 +11229,7 @@
                 if (previous_content_hash === updated_content_hash) return;
                 let detail_block = document.getElementById(_id).getAttribute('data-value');
                 let separate_data = detail_block.trim().split('__');
-                debugger;
+                
                 if (separate_data.length !== 2) return;
 
                 cloudArticleApp.addArticleContent(separate_data[0].trim(), separate_data[1].trim(), updated_content, myFloID);
@@ -11086,17 +11313,22 @@
                 let t = ``;
 
                 for (textContent of headings) {
+                    t += `<div class="collumns">
+                            <div class="collumn">`;
                     let snippets = Object.values(textContent.contents).sort((c, d) => c.rank < d.rank);
-                    t += `<h4>${textContent.title}</h4>`;
+                    t += `<div class="head"><span class="headline hl3">${textContent.title}</span></div>`;
                     for (snips of snippets) {
                         if (typeof snips !== "object") continue;
                         t += '<p>' + document.getElementById(snips.article_id).innerText + '</p>';
                     }
+                    t += `</div></div>`;
                 }
+
+                let template = cloudArticleApp.html_template(t);
 
                 let file_name = "content_collaboration" + new Date().getTime();
 
-                this.downloadInnerHtml(file_name, t, 'text/html');
+                this.downloadInnerHtml(file_name, template, 'text/html');
                 document.getElementById('context_menu').classList.add('hide')
 
             },
@@ -11128,7 +11360,7 @@
                 })
             },
             logout: function () {
-                if (confirm("Do you want to logout?")) {
+                askConfirmation("Do you want to logout?").then(result => {
                     floDapps.clearCredentials()
                     compactIDB.deleteDB().then((message) => {
                         console.log(message)
@@ -11139,8 +11371,345 @@
                     }).catch((error) => {
                         console.log(error)
                     })
-                }
-            }
+                })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            },
+            html_template: function(mid_section='') {
+                let t = ``;
+                t += `<html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>RanchiMall Content Collaboration Output</title>
+                            <style>
+                                body {
+                                    font-family: 'Droid Serif', serif;
+                                    font-size: 14px;
+                                    color: #2f2f2f;
+                                    background-color: #f9f7f1;
+                                }
+
+                                header {
+                                    font-family: 'Playfair Display', serif;
+                                    font-weight: 900;
+                                    font-size: 80px;
+                                    text-transform: uppercase;
+                                    display: inline-block;
+                                    line-height: 72px;
+                                    margin-bottom: 20px;
+
+                                }
+
+                                p {
+                                    margin-top: 0;
+                                    margin-bottom: 20px;
+                                }
+
+                                .head {
+                                    text-align: center;
+                                    position: relative;
+
+
+                                }
+
+                                .headerobjectswrapper {}
+
+                                .subhead {
+                                    text-transform: uppercase;
+                                    border-bottom: 2px solid #2f2f2f;
+                                    border-top: 2px solid #2f2f2f;
+                                    padding: 12px 0 12px 0;
+
+                                }
+
+                                .content {
+                                    font-size: 0;
+                                    line-height: 0;
+                                    word-spacing: -.31em;
+                                    display: inline-block;
+                                    margin: 30px 2% 0 15%;
+
+
+                                }
+
+                                .collumns {}
+
+                                .collumn {
+                                    font-size: 14px;
+                                    line-height: 20px;
+                                    width: 80%;
+                                    display: inline-block;
+                                    padding: 0 1% 0 1%;
+                                    vertical-align: top;
+                                    margin-bottom: 50px;
+                                    -webkit-transition: all .7s;
+                                    transition: all .7s;
+                                }
+
+                                .collumn+.collumn {
+                                    border-left: 1px solid #2f2f2f;
+                                }
+
+                                .collumn .headline {
+                                    text-align: center;
+                                    line-height: normal;
+                                    font-family: 'Playfair Display', serif;
+                                    display: block;
+                                    margin: 0 auto;
+
+
+                                }
+
+                                .collumn .headline.hl1 {
+                                    font-weight: 700;
+                                    font-size: 30px;
+                                    text-transform: uppercase;
+                                    padding: 10px 0 30px 0;
+
+                                }
+
+                                .collumn .headline.hl2 {
+                                    font-weight: 400;
+                                    font-style: italic;
+                                    font-size: 24px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 30px 0;
+                                }
+
+                                .collumn .headline.hl2:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 7px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .headline.hl2:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 13px;
+                                    display: block;
+                                    margin: 0 auto;
+
+                                }
+
+                                .collumn .headline.hl3 {
+                                    font-weight: 400;
+                                    font-style: italic;
+                                    font-size: 36px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 30px 0;
+                                }
+
+                                .collumn .headline.hl4 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 30px 0;
+                                }
+
+                                .collumn .headline.hl4:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 7px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .headline.hl4:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 10px;
+                                    display: block;
+                                    margin: 0 auto;
+
+                                }
+
+                                .collumn .headline.hl5 {
+                                    font-weight: 400;
+                                    font-size: 42px;
+                                    text-transform: uppercase;
+                                    font-style: italic;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl6 {
+                                    font-weight: 400;
+                                    font-size: 18px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl6:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 7px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .headline.hl6:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 10px;
+                                    display: block;
+                                    margin: 0 auto;
+
+                                }
+
+                                .collumn .headline.hl7 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    display: block;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl8 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl9 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .headline.hl10 {
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    box-sizing: border-box;
+                                    padding: 10px 0 10px 0;
+                                }
+
+                                .collumn .citation {
+                                    font-family: 'Playfair Display', serif;
+                                    font-size: 36px;
+                                    line-height: 44px;
+                                    /*font-style: italic;*/
+                                    text-align: center;
+                                    font-weight: 400;
+                                    display: block;
+                                    margin: 40px 0 40px 0;
+                                    font-feature-settings: "liga", "dlig";
+
+                                }
+
+                                .collumn .citation:before {
+                                    border-top: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 16px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .citation:after {
+                                    border-bottom: 1px solid #2f2f2f;
+                                    content: '';
+                                    width: 100px;
+                                    height: 16px;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+
+                                .collumn .figure {
+                                    margin: 0 0 20px;
+                                }
+
+                                .collumn .figcaption {
+                                    font-style: italic;
+                                    font-size: 12px;
+                                }
+
+                                .media {
+                                    -webkit-filter: sepia(80%) contrast(1) opacity(0.8);
+                                    filter: sepia(80%) grayscale(1) contrast(1) opacity(0.8);
+                                    mix-blend-mode: multiply;
+                                    width: 100%;
+                                }
+
+                                /*________________________________________________________________________________________________________________________________*/
+                                /*MEDIAQUERIES*/
+                                @media only all and (max-width: 1300px) {
+                                    .weatherforcastbox {
+                                        display: none;
+                                    }
+
+                                }
+
+                                @media only all and (max-width: 1200px) {
+                                    .collumn {
+                                        width: 80%;
+                                    }
+
+                                }
+
+                                @media only all and (max-width: 900px) {
+                                    .collumn {
+                                        width: 80%;
+                                    }
+
+                                }
+
+                                @media only all and (max-width: 600px) {
+                                    .collumn {
+                                        width: 100%;
+                                    }
+
+                                    .collumn+.collumn {
+                                        border-left: none;
+                                        border-bottom: 1px solid #2f2f2f;
+                                    }
+
+                                    header {
+                                        max-width: 320px;
+                                        font-size: 60px;
+                                        line-height: 54px;
+                                        overflow: hidden;
+                                    }
+
+                                    .content {
+                                        margin: 30px 6% 0 5%;
+
+
+                                    }
+
+                                }
+                            </style>
+                        </head>
+                        <body translate="no">
+                            <link
+                                href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700,900,400italic,700italic,900italic|Droid+Serif:400,700,400italic,700italic"
+                                rel="stylesheet" type="text/css">
+                            <meta name="viewport" content="width=device-width">
+                            <div class="head">
+                                <div class="headerobjectswrapper">
+
+                                    <header>${Object.keys(floGlobals.appObjects[cloudArticleApp.SUBJECT])[0]}</header>
+                                </div>
+                                <div class="subhead">Exported by RanchiMall Content Collaboration on FLO Blockchain</div>
+                            </div>
+                            <div class="content">`;
+                t += `${mid_section}`;
+                t += `</div>
+                </body>
+                </html>`;
+
+                return t;
+            },
 
         }
 
