@@ -11219,7 +11219,7 @@
             },
 
             edit_onfocuout: function (parent) {
-                //if (floGlobals.subAdmins.includes(myFloID)) return;
+                if (floGlobals.subAdmins.includes(myFloID)) return;
                 let target = parent.firstElementChild;
                 const updated_content = target.innerText.trim();
                 const updated_content_hash = Crypto.SHA256(updated_content);
@@ -11359,6 +11359,7 @@
                     option.classList.add('hide-completely')
                 })
             },
+            
             logout: function () {
                 askConfirmation("Do you want to logout?").then(result => {
                     floDapps.clearCredentials()
@@ -11376,6 +11377,7 @@
                         console.log(error)
                     })
             },
+            
             html_template: function(mid_section='') {
                 let t = ``;
                 t += `<html lang="en">
@@ -11683,8 +11685,6 @@
 
                                     .content {
                                         margin: 30px 6% 0 5%;
-
-
                                     }
 
                                 }
@@ -11709,6 +11709,74 @@
                 </html>`;
 
                 return t;
+            },
+
+            determine_contributions: function() {
+                try {
+                    const contributions_by_sections = {};
+                    const contributions_by_floid = {};
+                    const data = Object.values(floGlobals.appObjects[cloudArticleApp.SUBJECT])[0].data;
+                    const content_data = Object.values(data);
+
+                    for (const sections_list of content_data) {                            
+                        for(const sec_iters in sections_list.section_iters) {
+                            const section_contributors = sections_list.section_iters[sec_iters];
+                            if(typeof contributions_by_sections[sections_list.section_details.section_name] !== "object") {
+                                contributions_by_sections[sections_list.section_details.section_name]=[];
+                            }
+                            if(typeof contributions_by_floid[section_contributors.content_creator] !== "object") {
+                                contributions_by_floid[section_contributors.content_creator]=[];
+                            }
+                            contributions_by_sections[sections_list.section_details.section_name].push({
+                                content_creator: section_contributors.content_creator,
+                                score: section_contributors.score
+                            });
+
+                            contributions_by_floid[section_contributors.content_creator].push({
+                                section_name: sections_list.section_details.section_name,
+                                score: section_contributors.score
+                            });
+                        }
+                    }
+
+                    return {
+                        contributions_by_sections,
+                        contributions_by_floid
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+
+            determine_scores_by_id: function() {
+                try {
+                   const get_contributions = cloudArticleApp.determine_contributions();
+                   
+                   const report_card = Object.keys(get_contributions.contributions_by_floid)
+                   .map(m=>{
+                        let get_contributions_data = get_contributions.contributions_by_floid[m];
+                        let total_score = get_contributions_data.reduce((acc, cv)=>acc+cv.score, 0);
+                        let total_contributions = get_contributions_data.length;
+                        let avg_score = total_score/total_contributions;
+
+                        return {[m]: {
+                            total_score, avg_score, total_contributions
+                        }}
+                    });
+
+                    console.log(report_card);
+                   
+                    return report_card;
+
+                    // for(rc of report_card) {
+                    //     let k = Object.values(rc)[0];
+                    //     console.log(k.score)
+                    // }
+
+                } catch (error) {
+                    console.error(error);
+                }
             },
 
         }
